@@ -1,16 +1,15 @@
-#include <iostream>
 #include <cmath>
 #include "KFCmdChargedParticle.hpp"
 
-KFCmdChargedParticle::KFCmdChargedParticle(const std::string& name, double mass):
+KFCmd::KFCmdChargedParticle::KFCmdChargedParticle(const std::string& name, double mass):
   KFBase::KFParticle(name, 5, mass) {
 }
 
-KFCmdChargedParticle::~KFCmdChargedParticle() {
+KFCmd::KFCmdChargedParticle::~KFCmdChargedParticle() {
 }
 
-double KFCmdChargedParticle::calcMomentumComponent(const Eigen::VectorXd& x,
-						   KFBase::KFMOMENT_COMPONENT component) const {
+double KFCmd::KFCmdChargedParticle::calcMomentumComponent(const Eigen::VectorXd& x,
+							  KFBase::KFMOMENT_COMPONENT component) const {
   long bi = getBeginIndex();
   // 0 --- pt
   // 1 --- ctg theta
@@ -35,7 +34,7 @@ double KFCmdChargedParticle::calcMomentumComponent(const Eigen::VectorXd& x,
   return result;
 }
 
-Eigen::VectorXd KFCmdChargedParticle::calcDMomentumComponent
+Eigen::VectorXd KFCmd::KFCmdChargedParticle::calcDMomentumComponent
 (const Eigen::VectorXd& x, KFBase::KFMOMENT_COMPONENT component) const {
   long bi = getBeginIndex();
   Eigen::VectorXd result = Eigen::VectorXd::Zero(x.size());
@@ -63,7 +62,7 @@ Eigen::VectorXd KFCmdChargedParticle::calcDMomentumComponent
   return result;
 }
 
-Eigen::MatrixXd KFCmdChargedParticle::calcD2MomentumComponent
+Eigen::MatrixXd KFCmd::KFCmdChargedParticle::calcD2MomentumComponent
 (const Eigen::VectorXd& x, KFBase::KFMOMENT_COMPONENT component) const { 
   long bi = getBeginIndex();
   Eigen::MatrixXd result = Eigen::MatrixXd::Zero(x.size(), x.size());

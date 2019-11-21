@@ -1,15 +1,15 @@
 #include <cmath>
 #include "KFCmdPhoton.hpp"
 
-KFCmdPhoton::KFCmdPhoton(const std::string& name):
+KFCmd::KFCmdPhoton::KFCmdPhoton(const std::string& name):
   KFBase::KFParticle(name, 5) {
 }
 
-KFCmdPhoton::~KFCmdPhoton(){
+KFCmd::KFCmdPhoton::~KFCmdPhoton(){
 }
 
-double KFCmdPhoton::calcMomentumComponent(const Eigen::VectorXd& x,
-					  KFBase::KFMOMENT_COMPONENT component) const {
+double KFCmd::KFCmdPhoton::calcMomentumComponent(const Eigen::VectorXd& x,
+						 KFBase::KFMOMENT_COMPONENT component) const {
   long bi = getBeginIndex();
   double result;
   // 0 --- energy
@@ -34,7 +34,7 @@ double KFCmdPhoton::calcMomentumComponent(const Eigen::VectorXd& x,
   return result;
 }
 
-Eigen::VectorXd KFCmdPhoton::calcDMomentumComponent
+Eigen::VectorXd KFCmd::KFCmdPhoton::calcDMomentumComponent
 (const Eigen::VectorXd& x, KFBase::KFMOMENT_COMPONENT component) const {
   long bi = getBeginIndex();
   Eigen::VectorXd result = Eigen::VectorXd::Zero(x.size());
@@ -64,7 +64,7 @@ Eigen::VectorXd KFCmdPhoton::calcDMomentumComponent
   return result;
 }
 
-Eigen::MatrixXd KFCmdPhoton::calcD2MomentumComponent
+Eigen::MatrixXd KFCmd::KFCmdPhoton::calcD2MomentumComponent
 (const Eigen::VectorXd& x, KFBase::KFMOMENT_COMPONENT component) const {
   long bi = getBeginIndex();
   Eigen::MatrixXd result = Eigen::MatrixXd::Zero(x.size(), x.size());

@@ -61,4 +61,4 @@ set_target_properties(kfcmd
 install(TARGETS kfcmd-test DESTINATION bin)
 install(TARGETS kfcmd
   LIBRARY DESTINATION lib
-  PUBLIC_HEADER DESTINATION include)
+  PUBLIC_HEADER DESTINATION include/KFCmd)

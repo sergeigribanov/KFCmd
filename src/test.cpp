@@ -1,15 +1,15 @@
 #include <iostream>
+#include <ccgo/Optimizer.hpp>
+#include <KFBase/KFMomentumConstraint.hpp>
 #include "KFCmdPhoton.hpp"
-#include "KFMomentumConstraint.hpp"
-#include "Optimizer.hpp"
 
 int main() {
   KFBase::KFMomentumConstraint cpx("px", KFBase::KFMOMENT_X, 0);
   KFBase::KFMomentumConstraint cpy("py", KFBase::KFMOMENT_Y, 0);
   KFBase::KFMomentumConstraint cpz("pz", KFBase::KFMOMENT_Z, 0);
   KFBase::KFMomentumConstraint cpe("pe", KFBase::KFMOMENT_E, 1000);
-  KFCmdPhoton g0("g0");
-  KFCmdPhoton g1("g1");
+  KFCmd::KFCmdPhoton g0("g0");
+  KFCmd::KFCmdPhoton g1("g1");
   ccgo::Optimizer opt;
   opt.addTarget(&g0);
   opt.addTarget(&g1);
@@ -53,7 +53,10 @@ int main() {
   im(4, 4) = 10.1;
   g0.setInverseErrorMatrix(im);
   g1.setInverseErrorMatrix(im);
-  int k = opt.optimize();
+  opt.optimize();
+  std::cout << "---" << std::endl;
+  std::cout << "error code = " << opt.getErrorCode() << std::endl;
+  std::cout << "chi square = " << opt.getChiSquare() << std::endl;
   std::cout << "---" << std::endl;
   std::cout << g0.getFinalParameters() << std::endl;
   std::cout << "---" << std::endl;
