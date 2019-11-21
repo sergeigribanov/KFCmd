@@ -60,8 +60,8 @@ int main() {
   std::cout << g1.getFinalParameters() << std::endl;
   std::cout << "----" << std::endl;
   std::cout << "g0 momentum:" << std::endl;
-  std::cout << g0.getFinalMomentum() << std::endl;
+  g0.getFinalMomentum().Print();
   std::cout << "g1 momentum:" << std::endl;
-  std::cout << g1.getFinalMomentum() << std::endl;
+  g1.getFinalMomentum().Print();
   return 0;
 }

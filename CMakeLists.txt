@@ -24,6 +24,9 @@ if (NOT KFBASE_DIR)
     message(FATAL_ERROR "KFBASE_DIR option is not set")
   endif()
 endif()
+list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS})
+find_package(ROOT REQUIRED COMPONENTS RIO Net Core)
+include(${ROOT_USE_FILE})
 file(GLOB SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
 file(GLOB HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp)
 set(LIB_SOURCES ${SOURCES})
@@ -37,7 +40,8 @@ target_include_directories(kfcmd-test
   ${KFBASE_DIR}/include)
 target_link_libraries(kfcmd-test
   ${CCGO_DIR}/lib/libccgo.so
-  ${KFBASE_DIR}/lib/libkfbase.so)
+  ${KFBASE_DIR}/lib/libkfbase.so
+  ${ROOT_LIBRARIES})
 add_library(kfcmd SHARED ${LIB_SOURCES})
 target_include_directories(kfcmd
   PUBLIC
@@ -48,6 +52,7 @@ target_include_directories(kfcmd
   ${KFBASE_DIR}/include)
 target_link_libraries(kfcmd
   ${CCGO_DIR}/lib/libccgo.so
+  ${ROOT_LIBRARIES}
   ${KFBASE_DIR}/lib/libkfbase.so)
 set(PUBLIC_HEADERS ${HEADERS})
 set_target_properties(kfcmd
