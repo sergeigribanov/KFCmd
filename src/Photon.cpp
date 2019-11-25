@@ -3,6 +3,7 @@
 
 KFCmd::Photon::Photon(const std::string& name):
   KFBase::Particle(name, 5) {
+  setPeriod(2, 0, 2 * TMath::Pi());
 }
 
 KFCmd::Photon::~Photon(){
