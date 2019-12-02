@@ -3,6 +3,13 @@ project(KFCmd)
 option(EIGEN3_INCLUDE_DIR "Path to the Eigen3 include directory")
 option(CCGO_DIR "Path to the CCGO installation")
 option(KFBASE_DIR "Path to the KFBase installation")
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Release)
+endif()
+
+set(CMAKE_CXX_FLAGS "-Wall")
+set(CMAKE_CXX_FLAGS_DEBUG "-g")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 if (NOT EIGEN3_INCLUDE_DIR)
   if (DEFINED ENV{EIGEN3_INCLUDE_DIR})
     set(EIGEN3_INCLUDE_DIR $ENV{EIGEN3_INCLUDE_DIR})
@@ -33,6 +40,7 @@ set(LIB_SOURCES ${SOURCES})
 list(REMOVE_ITEM LIB_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/test.cpp)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/env.sh.in env.sh)
 add_executable(kfcmd-test ${SOURCES})
+set_property(TARGET kfcmd-test PROPERTY CXX_STANDARD 17)
 target_include_directories(kfcmd-test
   PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}/include
@@ -44,6 +52,7 @@ target_link_libraries(kfcmd-test
   ${KFBASE_DIR}/lib/libkfbase.so
   ${ROOT_LIBRARIES})
 add_library(kfcmd SHARED ${LIB_SOURCES})
+set_property(TARGET kfcmd PROPERTY CXX_STANDARD 17)
 target_include_directories(kfcmd
   PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}/include

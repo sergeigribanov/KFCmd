@@ -16,7 +16,7 @@ double KFCmd::ChargedParticle::calcMomentumComponent(const Eigen::VectorXd& x,
   // 0 --- pt
   // 1 --- ctg theta
   // 2 --- phi
-  double result;
+  double result = 0;
   switch (component) {
   case KFBase::MOMENT_X:
     result = x(bi) * std::cos(x(bi + 2));

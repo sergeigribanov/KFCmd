@@ -12,7 +12,7 @@ KFCmd::Photon::~Photon(){
 double KFCmd::Photon::calcMomentumComponent(const Eigen::VectorXd& x,
 						 KFBase::MOMENT_COMPONENT component) const {
   long bi = getBeginIndex();
-  double result;
+  double result = 0;
   // 0 --- energy
   // 1 --- R
   // 2 --- phi
@@ -97,6 +97,8 @@ Eigen::MatrixXd KFCmd::Photon::calcD2MomentumComponent
     result(bi, bi + 4) = -std::sin(x(bi + 4));
     result(bi + 4, bi) = result(bi, bi + 4);
     result(bi + 4, bi + 4) = -x(bi) * std::cos(x(bi + 4));
+    break;
+  case KFBase::MOMENT_E:
     break;
   }
   return result;
