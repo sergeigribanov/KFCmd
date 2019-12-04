@@ -6,13 +6,31 @@
 #include "Hypo2ChPions2Photons.hpp"
 
 KFCmd::Hypo2ChPions2Photons::Hypo2ChPions2Photons(double energy) {
+  addCommonParams(new ccgo::CommonParams("vtx-x", 1));
+  addCommonParams(new ccgo::CommonParams("vtx-y", 1));
   addCommonParams(new ccgo::CommonParams("vtx-z", 1));
+
+  auto vtxXPiPl = new KFBase::VertexConstraint("vtx-x-pi+", KFBase::VERTEX_X);
+  addConstraint(vtxXPiPl);
+  vtxXPiPl->setVertexCommonParams("vtx-x");
+  auto vtxXPiMi = new KFBase::VertexConstraint("vtx-x-pi-", KFBase::VERTEX_X);
+  addConstraint(vtxXPiMi);
+  vtxXPiMi->setVertexCommonParams("vtx-x");
+
+  auto vtxYPiPl = new KFBase::VertexConstraint("vtx-y-pi+", KFBase::VERTEX_Y);
+  addConstraint(vtxYPiPl);
+  vtxYPiPl->setVertexCommonParams("vtx-y");
+  auto vtxYPiMi = new KFBase::VertexConstraint("vtx-y-pi-", KFBase::VERTEX_Y);
+  addConstraint(vtxYPiMi);
+  vtxYPiMi->setVertexCommonParams("vtx-y");
+  
   auto vtxZPiPl = new KFBase::VertexConstraint("vtx-z-pi+", KFBase::VERTEX_Z);
   addConstraint(vtxZPiPl);
   vtxZPiPl->setVertexCommonParams("vtx-z");
   auto vtxZPiMi = new KFBase::VertexConstraint("vtx-z-pi-", KFBase::VERTEX_Z);
   addConstraint(vtxZPiMi);
   vtxZPiMi->setVertexCommonParams("vtx-z");
+  
   auto vtxZG0 = new KFBase::VertexConstraint("vtx-z-g0", KFBase::VERTEX_Z);
   addConstraint(vtxZG0);
   vtxZG0->setVertexCommonParams("vtx-z");
@@ -27,6 +45,10 @@ KFCmd::Hypo2ChPions2Photons::Hypo2ChPions2Photons(double energy) {
   addParticle(new KFCmd::ChargedPiMeson("pi-"));
   addParticle(new KFCmd::Photon("g0"));
   addParticle(new KFCmd::Photon("g1"));
+  addParticleToConstraint("pi+", "vtx-x-pi+");
+  addParticleToConstraint("pi-", "vtx-x-pi-");
+  addParticleToConstraint("pi+", "vtx-y-pi+");
+  addParticleToConstraint("pi-", "vtx-y-pi-");
   addParticleToConstraint("pi+", "vtx-z-pi+");
   addParticleToConstraint("pi-", "vtx-z-pi-");
   addParticleToConstraint("g0", "vtx-z-g0");
@@ -55,7 +77,13 @@ KFCmd::Hypo2ChPions2Photons::Hypo2ChPions2Photons(double energy) {
   enableConstraint("py");
   enableConstraint("pz");
   enableConstraint("pe");
+  enableCommonParams("vtx-x");
+  enableCommonParams("vtx-y");
   enableCommonParams("vtx-z");
+  enableConstraint("vtx-x-pi+");
+  enableConstraint("vtx-x-pi-");
+  enableConstraint("vtx-y-pi+");
+  enableConstraint("vtx-y-pi-");
   enableConstraint("vtx-z-pi+");
   enableConstraint("vtx-z-pi-");
   enableConstraint("vtx-z-g0");
