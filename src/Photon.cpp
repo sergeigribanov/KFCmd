@@ -103,3 +103,58 @@ Eigen::MatrixXd KFCmd::Photon::calcD2MomentumComponent
   }
   return result;
 }
+
+double KFCmd::Photon::calcVertexComponent
+(const Eigen::VectorXd& x, KFBase::VERTEX_COMPONENT component) const {
+  long bi = getBeginIndex();
+  double result = 0;
+  switch (component) {
+  case KFBase::VERTEX_X:
+    break;
+  case KFBase::VERTEX_Y:
+    break;
+  case KFBase::VERTEX_Z:
+    result = x(bi + 3) - x(bi + 1) / std::tan(x(bi + 4));
+    break;
+  }
+  return result;
+}
+
+Eigen::VectorXd KFCmd::Photon::calcDVertexComponent
+(const Eigen::VectorXd& x, KFBase::VERTEX_COMPONENT component) const {
+  long bi = getBeginIndex();
+  Eigen::VectorXd result = Eigen::VectorXd::Zero(x.size());
+  switch (component) {
+    case KFBase::VERTEX_X:
+    break;
+  case KFBase::VERTEX_Y:
+    break;
+  case KFBase::VERTEX_Z:
+    result(bi + 1) = -1. / std::tan(x(bi + 4));
+    result(bi + 3) = 1;
+    double tmp = std::sin(x(bi + 4));
+    result(bi + 4) = x(bi + 1) / tmp / tmp;
+    break;
+  }
+  return result;
+}
+
+Eigen::MatrixXd KFCmd::Photon::calcD2VertexComponent
+(const Eigen::VectorXd& x, KFBase::VERTEX_COMPONENT component) const {
+  long bi = getBeginIndex();
+  Eigen::MatrixXd result = Eigen::MatrixXd::Zero(x.size(), x.size());
+  switch (component) {
+  case KFBase::VERTEX_X:
+    break;
+  case KFBase::VERTEX_Y:
+    break;
+  case KFBase::VERTEX_Z:
+    double tmp = std::sin(x(bi + 4));
+    result(bi + 1, bi + 4) = 1. / tmp / tmp;
+    result(bi + 4, bi + 1) = result(bi + 1, bi + 4);
+    result(bi + 4, bi + 4) =
+      -2 * x(bi + 1) * std::cos(x(bi + 4)) / tmp / tmp / tmp;
+    break;
+  }
+  return result;
+}
