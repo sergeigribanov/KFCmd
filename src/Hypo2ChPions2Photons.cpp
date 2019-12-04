@@ -1,5 +1,6 @@
 #include <KFBase/MomentumConstraint.hpp>
 #include <KFBase/VertexConstraint.hpp>
+#include <KFBase/MassConstraint.hpp>
 #include <ccgo/CommonParams.hpp>
 #include "ChargedPiMeson.hpp"
 #include "Photon.hpp"
@@ -37,6 +38,9 @@ KFCmd::Hypo2ChPions2Photons::Hypo2ChPions2Photons(double energy) {
   auto vtxZG1 = new KFBase::VertexConstraint("vtx-z-g1", KFBase::VERTEX_Z);
   addConstraint(vtxZG1);
   vtxZG1->setVertexCommonParams("vtx-z");
+
+  // addConstraint(new KFBase::MassConstraint("eta-mass", 547.862));
+  
   addConstraint(new KFBase::MomentumConstraint("px", KFBase::MOMENT_X, 0));
   addConstraint(new KFBase::MomentumConstraint("py", KFBase::MOMENT_Y, 0));
   addConstraint(new KFBase::MomentumConstraint("pz", KFBase::MOMENT_Z, 0));
@@ -45,6 +49,8 @@ KFCmd::Hypo2ChPions2Photons::Hypo2ChPions2Photons(double energy) {
   addParticle(new KFCmd::ChargedPiMeson("pi-"));
   addParticle(new KFCmd::Photon("g0"));
   addParticle(new KFCmd::Photon("g1"));
+  // addParticleToConstraint("g0", "eta-mass");
+  // addParticleToConstraint("g1", "eta-mass");
   addParticleToConstraint("pi+", "vtx-x-pi+");
   addParticleToConstraint("pi-", "vtx-x-pi-");
   addParticleToConstraint("pi+", "vtx-y-pi+");
@@ -73,6 +79,7 @@ KFCmd::Hypo2ChPions2Photons::Hypo2ChPions2Photons(double energy) {
   enableParticle("pi-");
   enableParticle("g0");
   enableParticle("g1");
+  // enableConstraint("eta-mass");
   enableConstraint("px");
   enableConstraint("py");
   enableConstraint("pz");
