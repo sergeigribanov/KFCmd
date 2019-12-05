@@ -2,8 +2,9 @@
 #include <TMath.h>
 #include "ChargedParticle.hpp"
 
-KFCmd::ChargedParticle::ChargedParticle(const std::string& name, double mass):
-  KFBase::Particle(name, 5, mass) {
+KFCmd::ChargedParticle::ChargedParticle(const std::string& name,
+					double mass, double charge):
+  KFBase::Particle(name, 5, mass, charge) {
   setPeriod(2, 0, 2 * TMath::Pi());
 }
 

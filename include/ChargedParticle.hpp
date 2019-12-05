@@ -5,7 +5,7 @@
 namespace KFCmd {
   class ChargedParticle : public KFBase::Particle {
   public:
-    ChargedParticle(const std::string&, double);
+    ChargedParticle(const std::string&, double, double);
     virtual ~ChargedParticle();
     virtual double calcMomentumComponent(const Eigen::VectorXd&,
 					 KFBase::MOMENT_COMPONENT) const override final;

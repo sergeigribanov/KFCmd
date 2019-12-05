@@ -2,7 +2,8 @@
 #include <KFBase/VertexConstraint.hpp>
 #include <KFBase/MassConstraint.hpp>
 #include <ccgo/CommonParams.hpp>
-#include "ChargedPiMeson.hpp"
+#include "PiPlusMeson.hpp"
+#include "PiMinusMeson.hpp"
 #include "Photon.hpp"
 #include "Hypo2ChPions2Photons.hpp"
 
@@ -45,8 +46,8 @@ KFCmd::Hypo2ChPions2Photons::Hypo2ChPions2Photons(double energy) {
   addConstraint(new KFBase::MomentumConstraint("py", KFBase::MOMENT_Y, 0));
   addConstraint(new KFBase::MomentumConstraint("pz", KFBase::MOMENT_Z, 0));
   addConstraint(new KFBase::MomentumConstraint("pe", KFBase::MOMENT_E, energy));
-  addParticle(new KFCmd::ChargedPiMeson("pi+"));
-  addParticle(new KFCmd::ChargedPiMeson("pi-"));
+  addParticle(new KFCmd::PiPlusMeson("pi+"));
+  addParticle(new KFCmd::PiMinusMeson("pi-"));
   addParticle(new KFCmd::Photon("g0"));
   addParticle(new KFCmd::Photon("g1"));
   // addParticleToConstraint("g0", "eta-mass");
