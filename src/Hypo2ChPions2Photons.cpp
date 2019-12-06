@@ -7,10 +7,13 @@
 #include "Photon.hpp"
 #include "Hypo2ChPions2Photons.hpp"
 
-KFCmd::Hypo2ChPions2Photons::Hypo2ChPions2Photons(double energy) {
+KFCmd::Hypo2ChPions2Photons::Hypo2ChPions2Photons(double energy, double magnetField) {
   addCommonParams(new ccgo::CommonParams("vtx-x", 1));
   addCommonParams(new ccgo::CommonParams("vtx-y", 1));
   addCommonParams(new ccgo::CommonParams("vtx-z", 1));
+  addCommonParams(new ccgo::CommonParams("t-pi+", 1));
+  addCommonParams(new ccgo::CommonParams("t-pi-", 1));
+  addConstant("m-field", magnetField);
 
   auto vtxXPiPl = new KFBase::VertexConstraint("vtx-x-pi+", KFBase::VERTEX_X);
   addConstraint(vtxXPiPl);
@@ -46,8 +49,14 @@ KFCmd::Hypo2ChPions2Photons::Hypo2ChPions2Photons(double energy) {
   addConstraint(new KFBase::MomentumConstraint("py", KFBase::MOMENT_Y, 0));
   addConstraint(new KFBase::MomentumConstraint("pz", KFBase::MOMENT_Z, 0));
   addConstraint(new KFBase::MomentumConstraint("pe", KFBase::MOMENT_E, energy));
-  addParticle(new KFCmd::PiPlusMeson("pi+"));
-  addParticle(new KFCmd::PiMinusMeson("pi-"));
+  auto pipl = new KFCmd::PiPlusMeson("pi+");
+  addParticle(pipl);
+  pipl->setMagnetField("m-field");
+  pipl->setTimeParameter("t-pi+");
+  auto pimi = new KFCmd::PiMinusMeson("pi-");
+  addParticle(pimi);
+  pimi->setMagnetField("m-field");
+  pimi->setTimeParameter("t-pi-");
   addParticle(new KFCmd::Photon("g0"));
   addParticle(new KFCmd::Photon("g1"));
   // addParticleToConstraint("g0", "eta-mass");
@@ -59,7 +68,7 @@ KFCmd::Hypo2ChPions2Photons::Hypo2ChPions2Photons(double energy) {
   addParticleToConstraint("pi+", "vtx-z-pi+");
   addParticleToConstraint("pi-", "vtx-z-pi-");
   addParticleToConstraint("g0", "vtx-z-g0");
-  addParticleToConstraint("g1", "vtx-z-g1");
+  addParticleToConstraint("g1", "vtx-z-g1"); 
   addParticleToConstraint("pi+", "px");
   addParticleToConstraint("pi+", "py");
   addParticleToConstraint("pi+", "pz");
@@ -88,6 +97,8 @@ KFCmd::Hypo2ChPions2Photons::Hypo2ChPions2Photons(double energy) {
   enableCommonParams("vtx-x");
   enableCommonParams("vtx-y");
   enableCommonParams("vtx-z");
+  enableCommonParams("t-pi+");
+  enableCommonParams("t-pi-");
   enableConstraint("vtx-x-pi+");
   enableConstraint("vtx-x-pi-");
   enableConstraint("vtx-y-pi+");
@@ -100,3 +111,5 @@ KFCmd::Hypo2ChPions2Photons::Hypo2ChPions2Photons(double energy) {
 
 KFCmd::Hypo2ChPions2Photons::~Hypo2ChPions2Photons() {
 }
+
+// TO DO : exception in constraint when used common parameter is not enabled

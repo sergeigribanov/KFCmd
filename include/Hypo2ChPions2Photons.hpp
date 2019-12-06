@@ -5,7 +5,7 @@
 namespace KFCmd {
   class Hypo2ChPions2Photons : public KFBase::Hypothesis {
   public:
-    explicit Hypo2ChPions2Photons(double);
+    explicit Hypo2ChPions2Photons(double, double);
     virtual ~Hypo2ChPions2Photons();
   };
 }
