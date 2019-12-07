@@ -7,7 +7,9 @@
 #include "Photon.hpp"
 #include "Hypo2ChPions2Photons.hpp"
 
-KFCmd::Hypo2ChPions2Photons::Hypo2ChPions2Photons(double energy, double magnetField) {
+KFCmd::Hypo2ChPions2Photons::Hypo2ChPions2Photons(double energy, double magnetField,
+						  long nIter, double tolerance) :
+  KFBase::Hypothesis(nIter, tolerance) {
   addCommonParams(new ccgo::CommonParams("vtx-x", 1));
   addCommonParams(new ccgo::CommonParams("vtx-y", 1));
   addCommonParams(new ccgo::CommonParams("vtx-z", 1));

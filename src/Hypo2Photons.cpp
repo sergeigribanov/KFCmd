@@ -2,7 +2,7 @@
 #include "Photon.hpp"
 #include "Hypo2Photons.hpp"
 
-KFCmd::Hypo2Photons::Hypo2Photons(double energy):
+KFCmd::Hypo2Photons::Hypo2Photons(double energy) :
   KFBase::Hypothesis() {
   addConstraint(new KFBase::MomentumConstraint("px", KFBase::MOMENT_X, 0));
   addConstraint(new KFBase::MomentumConstraint("py", KFBase::MOMENT_Y, 0));
