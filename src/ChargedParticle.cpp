@@ -212,7 +212,7 @@ Eigen::MatrixXd KFCmd::ChargedParticle::calcD2VertexComponent
   double cosA = std::cos(alpha);
   double denom6 = std::pow(denominator, 6);
   double pt4 = pt2 * pt2;
-  double pt5 = pt2 * x(bi);
+  double pt5 = pt4 * x(bi);
   switch (component) {
   case KFBase::VERTEX_X:
     result(bi, bi) =
