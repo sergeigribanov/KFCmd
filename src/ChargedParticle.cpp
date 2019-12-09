@@ -272,7 +272,7 @@ Eigen::MatrixXd KFCmd::ChargedParticle::calcD2VertexComponent
     result(bi + 1, _timeParam->getBeginIndex()) = -pt3 * eta * sinA / denom3 -
       pt3 * eta * w * ct * cosA / denom3;
     result(_timeParam->getBeginIndex(), bi + 1) = result(bi + 1, _timeParam->getBeginIndex());
-    result(bi + 2, bi + 2) = -(x(bi + 3) + r) * cosA + r * cosA;
+    result(bi + 2, bi + 2) = -(x(bi + 3) + r) * cosP + r * cosA;
     result(bi + 2, bi + 3) = -sinP;
     result(bi + 3, bi + 2) = result(bi + 2, bi + 3);
     result(bi + 2, _timeParam->getBeginIndex()) = r * w * cosA;
