@@ -255,17 +255,17 @@ Eigen::MatrixXd KFCmd::Photon::calcD2MomentumComponent
     result(biZ, bi + 1) = result(bi + 1, biZ);
     result(bi + 2, bi + 2) = -x(bi) * x(bi + 1) * sinP / q -
       2. * x(bi) * x(bi + 1) * cosP * dqP / q3 -
-      x(bi) * dy * x(bi + 1) * (vY * sinP + vX * cosP) / q3 + 
+      x(bi) * dy * x(bi + 1) * (vX * cosP + vY * sinP) / q3 + 
       3. * x(bi) * dy * dqP * dqP / q5;
     result(bi + 2, bi + 3) = -x(bi) * x(bi + 1) * dz * cosP / q3 + 3. * x(bi) * dydz * dqP / q5;
     result(bi + 3, bi + 2) = result(bi + 2, bi + 3);
-    result(bi + 2, biX) = x(bi) * x(bi + 1) * dx * cosP / q3 -
-      x(bi) * x(bi + 1) * dy * sinP / q3 - 3. * x(bi) * dxdy * dqP / q5;
+    result(bi + 2, biX) = x(bi) * x(bi + 1) * dx * cosP / q3 - x(bi) * x(bi + 1) * dy * sinP / q3 -
+      3. * x(bi) * dxdy * dqP / q5;
     result(biX, bi + 2) = result(bi + 2, biX);
-    result(bi + 2, biY) = x(bi) * x(bi + 1) * dy * cosP / q3 +
-      x(bi) * dqP / q3 + x(bi) * x(bi + 1) * dy * cosP / q3 - 3. * x(bi) * dy2 * dqP / q5;
+    result(bi + 2, biY) = x(bi) * x(bi + 1) * dy * cosP / q3 + x(bi) * dqP / q3 +
+      x(bi) * x(bi + 1) * dy * cosP / q3 - 3. * x(bi) * dy2 * dqP / q5;
     result(biY, bi + 2) = result(bi + 2, biY);
-    result(bi + 2, biZ) = result(bi + 2, bi + 3);
+    result(bi + 2, biZ) = -result(bi + 2, bi + 3);
     result(biZ, bi + 2) = result(bi + 2, biZ);
     result(bi + 3, bi + 3) = -x(bi) * dy / q3 + 3. * x(bi) * dy * dz2 / q5;
     result(bi + 3, biX) = -3. * x(bi) * dxdy * dz / q5;
