@@ -38,12 +38,12 @@ KFCmd::Hypo2ChPions2Photons::Hypo2ChPions2Photons(double energy, double magnetFi
   addConstraint(vtxZPiMi);
   vtxZPiMi->setVertexCommonParams("vtx-z");
   
-  auto vtxZG0 = new KFBase::VertexConstraint("vtx-z-g0", KFBase::VERTEX_Z);
-  addConstraint(vtxZG0);
-  vtxZG0->setVertexCommonParams("vtx-z");
-  auto vtxZG1 = new KFBase::VertexConstraint("vtx-z-g1", KFBase::VERTEX_Z);
-  addConstraint(vtxZG1);
-  vtxZG1->setVertexCommonParams("vtx-z");
+  // auto vtxZG0 = new KFBase::VertexConstraint("vtx-z-g0", KFBase::VERTEX_Z);
+  // addConstraint(vtxZG0);
+  // vtxZG0->setVertexCommonParams("vtx-z");
+  // auto vtxZG1 = new KFBase::VertexConstraint("vtx-z-g1", KFBase::VERTEX_Z);
+  // addConstraint(vtxZG1);
+  // vtxZG1->setVertexCommonParams("vtx-z");
 
   // addConstraint(new KFBase::MassConstraint("eta-mass", 547.862));
   
@@ -59,8 +59,17 @@ KFCmd::Hypo2ChPions2Photons::Hypo2ChPions2Photons(double energy, double magnetFi
   addParticle(pimi);
   pimi->setMagnetField("m-field");
   pimi->setTimeParameter("t-pi-");
-  addParticle(new KFCmd::Photon("g0"));
-  addParticle(new KFCmd::Photon("g1"));
+
+  auto g0 = new KFCmd::Photon("g0");
+  addParticle(g0);
+  g0->setVertexX("vtx-x");
+  g0->setVertexY("vtx-y");
+  g0->setVertexZ("vtx-z");
+  auto g1 = new KFCmd::Photon("g1");
+  addParticle(g1);
+  g1->setVertexX("vtx-x");
+  g1->setVertexY("vtx-y");
+  g1->setVertexZ("vtx-z");
   // addParticleToConstraint("g0", "eta-mass");
   // addParticleToConstraint("g1", "eta-mass");
   addParticleToConstraint("pi+", "vtx-x-pi+");
@@ -69,8 +78,8 @@ KFCmd::Hypo2ChPions2Photons::Hypo2ChPions2Photons(double energy, double magnetFi
   addParticleToConstraint("pi-", "vtx-y-pi-");
   addParticleToConstraint("pi+", "vtx-z-pi+");
   addParticleToConstraint("pi-", "vtx-z-pi-");
-  addParticleToConstraint("g0", "vtx-z-g0");
-  addParticleToConstraint("g1", "vtx-z-g1"); 
+  // addParticleToConstraint("g0", "vtx-z-g0");
+  // addParticleToConstraint("g1", "vtx-z-g1"); 
   addParticleToConstraint("pi+", "px");
   addParticleToConstraint("pi+", "py");
   addParticleToConstraint("pi+", "pz");
@@ -107,8 +116,8 @@ KFCmd::Hypo2ChPions2Photons::Hypo2ChPions2Photons(double energy, double magnetFi
   enableConstraint("vtx-y-pi-");
   enableConstraint("vtx-z-pi+");
   enableConstraint("vtx-z-pi-");
-  enableConstraint("vtx-z-g0");
-  enableConstraint("vtx-z-g1");
+  // enableConstraint("vtx-z-g0");
+  // enableConstraint("vtx-z-g1");
 }
 
 KFCmd::Hypo2ChPions2Photons::~Hypo2ChPions2Photons() {

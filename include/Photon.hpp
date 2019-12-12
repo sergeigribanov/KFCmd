@@ -19,6 +19,13 @@ namespace KFCmd {
 						 KFBase::VERTEX_COMPONENT) const override final;
     virtual Eigen::MatrixXd calcD2VertexComponent(const Eigen::VectorXd&,
 						  KFBase::VERTEX_COMPONENT) const override final;
+    void setVertexX(const std::string&);
+    void setVertexY(const std::string&);
+    void setVertexZ(const std::string&);
+  private:
+    ccgo::CommonParams* _vertexX;
+    ccgo::CommonParams* _vertexY;
+    ccgo::CommonParams* _vertexZ;
   };
 }
 
