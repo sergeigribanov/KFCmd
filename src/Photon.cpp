@@ -24,17 +24,14 @@ double KFCmd::Photon::calcMomentumComponent(const Eigen::VectorXd& x,
   switch (component) {
   case KFBase::MOMENT_X:
     // result = x(bi) * std::sin(x(bi + 4)) * std::cos(x(bi + 2));
-
     result = x(bi) * (x(bi + 1) * std::cos(x(bi + 2)) - x(_vertexX->getBeginIndex())) / q;
     break;
   case KFBase::MOMENT_Y:
     // result = x(bi) * std::sin(x(bi + 4)) * std::sin(x(bi + 2));
-
     result = x(bi) * (x(bi + 1) * std::sin(x(bi + 2)) - x(_vertexY->getBeginIndex())) / q;
     break;
   case KFBase::MOMENT_Z:
     // result = x(bi) * std::cos(x(bi + 4));
-
     result = x(bi) * (x(bi + 3) - x(_vertexZ->getBeginIndex())) / q;
     break;
   case KFBase::MOMENT_E:

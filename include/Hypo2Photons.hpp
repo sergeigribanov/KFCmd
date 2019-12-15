@@ -1,11 +1,11 @@
 #ifndef __KFCMD_HYPO2PHOTONS_HPP__
 #define __KFCMD_HYPO2PHOTONS_HPP__
-#include <KFBase/Hypothesis.hpp>
+#include "Hypothesis.hpp"
 
 namespace KFCmd {
-  class Hypo2Photons : public KFBase::Hypothesis {
+  class Hypo2Photons : public Hypothesis {
   public:
-    explicit Hypo2Photons(double);
+    Hypo2Photons(double, long = 20, double = 1.e-3);
     virtual ~Hypo2Photons();
   };
 }
