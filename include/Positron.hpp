@@ -3,11 +3,11 @@
 #include "ChargedParticle.hpp"
 
 namespace KFCmd {
-  class Positron : public ChargedParticle {
-  public:
-    explicit Positron(const std::string&);
-    virtual ~Positron();
-  };
-}
+class Positron : public ChargedParticle {
+ public:
+  explicit Positron(const std::string&);
+  virtual ~Positron();
+};
+}  // namespace KFCmd
 
 #endif

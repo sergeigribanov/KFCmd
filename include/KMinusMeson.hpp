@@ -3,11 +3,11 @@
 #include "ChargedParticle.hpp"
 
 namespace KFCmd {
-  class KMinusMeson : public ChargedParticle {
-  public:
-    explicit KMinusMeson(const std::string&);
-    virtual ~KMinusMeson();
-  };
-}
+class KMinusMeson : public ChargedParticle {
+ public:
+  explicit KMinusMeson(const std::string&);
+  virtual ~KMinusMeson();
+};
+}  // namespace KFCmd
 
 #endif

@@ -3,11 +3,11 @@
 #include "Hypothesis.hpp"
 
 namespace KFCmd {
-  class Hypo2ChPions2Photons : public Hypothesis {
-  public:
-    Hypo2ChPions2Photons(double, double, long = 20, double = 1.e-3);
-    virtual ~Hypo2ChPions2Photons();
-  };
-}
+class Hypo2ChPions2Photons : public Hypothesis {
+ public:
+  Hypo2ChPions2Photons(double, double, long = 20, double = 1.e-3);
+  virtual ~Hypo2ChPions2Photons();
+};
+}  // namespace KFCmd
 
 #endif

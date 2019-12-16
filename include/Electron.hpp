@@ -3,11 +3,11 @@
 #include "ChargedParticle.hpp"
 
 namespace KFCmd {
-  class Electron : public ChargedParticle {
-  public:
-    explicit Electron(const std::string&);
-    virtual ~Electron();
-  };
-}
+class Electron : public ChargedParticle {
+ public:
+  explicit Electron(const std::string&);
+  virtual ~Electron();
+};
+}  // namespace KFCmd
 
 #endif

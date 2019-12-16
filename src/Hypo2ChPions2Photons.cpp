@@ -1,10 +1,12 @@
-#include "PiPlusMeson.hpp"
-#include "PiMinusMeson.hpp"
 #include "Hypo2ChPions2Photons.hpp"
 
-KFCmd::Hypo2ChPions2Photons::Hypo2ChPions2Photons(double energy, double magnetField,
-						  long nIter, double tolerance) :
-  KFCmd::Hypothesis(energy, magnetField, nIter, tolerance) {
+#include "PiMinusMeson.hpp"
+#include "PiPlusMeson.hpp"
+
+KFCmd::Hypo2ChPions2Photons::Hypo2ChPions2Photons(double energy,
+                                                  double magnetField,
+                                                  long nIter, double tolerance)
+    : KFCmd::Hypothesis(energy, magnetField, nIter, tolerance) {
   addVertex("vtx0");
   addChargedParticle(new KFCmd::PiPlusMeson("pi+"));
   addChargedParticle(new KFCmd::PiMinusMeson("pi-"));
@@ -14,5 +16,4 @@ KFCmd::Hypo2ChPions2Photons::Hypo2ChPions2Photons(double energy, double magnetFi
   addVertexConstraintsXYZ("pi-", "vtx0");
 }
 
-KFCmd::Hypo2ChPions2Photons::~Hypo2ChPions2Photons() {
-}
+KFCmd::Hypo2ChPions2Photons::~Hypo2ChPions2Photons() {}
