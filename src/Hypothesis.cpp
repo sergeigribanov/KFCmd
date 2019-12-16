@@ -5,7 +5,7 @@
 
 KFCmd::Hypothesis::Hypothesis(double energy, double magnetField,
 			      long nIter, double tolerance) :
-  KFBase::Hypothesis(nIter, tolerance) {
+  KFBase::Hypothesis(nIter, tolerance), _energy(energy) {
   addConstant("#m-field", magnetField);
   addConstraint(new KFBase::MomentumConstraint("#constraint-px", KFBase::MOMENT_X, 0));
   addConstraint(new KFBase::MomentumConstraint("#constraint-py", KFBase::MOMENT_Y, 0));
@@ -121,7 +121,6 @@ void KFCmd::Hypothesis::addChargedParticle(KFCmd::ChargedParticle* particle) {
   addParticleToConstraint(particle->getName(), "#constraint-py");
   addParticleToConstraint(particle->getName(), "#constraint-pz");
   addParticleToConstraint(particle->getName(), "#constraint-pe");
-  _chargedParticles.insert(particle->getName());
 }
 
 void KFCmd::Hypothesis::disableChargedParticle(const std::string& chargedParticleName) {
@@ -145,7 +144,6 @@ void KFCmd::Hypothesis::addPhoton(KFCmd::Photon* photon,
   addParticleToConstraint(photon->getName(), "#constraint-py");
   addParticleToConstraint(photon->getName(), "#constraint-pz");
   addParticleToConstraint(photon->getName(), "#constraint-pe");
-  _photons.insert(photon->getName());
 }
 
 void KFCmd::Hypothesis::disablePhoton(const std::string& photonName) {
@@ -241,4 +239,37 @@ double KFCmd::Hypothesis::getInitialChargedParticleTime(const std::string& charg
 
 double KFCmd::Hypothesis::getFinalChargedParticleTime(const std::string& chargedParticleName) const {
   return getFinalCommonParameters("#time-" + chargedParticleName)(0);
+}
+
+void KFCmd::Hypothesis::addMassConstraint(const std::string& constraintName,
+					  double value,
+					  const std::set<std::string>& particleNames) {
+  auto constraint = new KFBase::MassConstraint(constraintName, value);
+  addConstraint(constraint);
+  for (const auto& name : particleNames) {
+    addParticleToConstraint(name, constraintName);
+  }
+  enableConstraint(constraintName);
+}
+
+double KFCmd::Hypothesis::getEnergy() const {
+  return _energy;
+}
+
+TLorentzVector KFCmd::Hypothesis::getInitialRecoilMomentum
+(const std::set<std::string>& particleNames) const {
+  TLorentzVector result(0, 0, 0, getEnergy());
+  for (const auto& name : particleNames) {
+    result -= getInitialMomentum(name);
+  }
+  return result;
+}
+
+TLorentzVector KFCmd::Hypothesis::getFinalRecoilMomentum
+(const std::set<std::string>& particleNames) const {
+  TLorentzVector result(0, 0, 0, getEnergy());
+  for (const auto& name : particleNames) {
+    result -= getFinalMomentum(name);
+  }
+  return result;
 }

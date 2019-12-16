@@ -1,3 +1,4 @@
+#include <TDatabasePDG.h>
 #include "PiPlusMeson.hpp"
 #include "PiMinusMeson.hpp"
 #include "Hypo4ChPions2Photons.hpp"
@@ -16,6 +17,10 @@ KFCmd::Hypo4ChPions2Photons::Hypo4ChPions2Photons(double energy, double magnetFi
   addVertexConstraintsXYZ("pi+_1", "vtx0");
   addVertexConstraintsXYZ("pi-_0", "vtx0");
   addVertexConstraintsXYZ("pi-_1", "vtx0");
+  addMassConstraint("m-pi0-constraint",
+		    TDatabasePDG::Instance()->GetParticle(111)->Mass() * 1000,
+		    {"g0", "g1"});
+  disableConstraint("m-pi0-constraint");
 }
 
 KFCmd::Hypo4ChPions2Photons::~Hypo4ChPions2Photons() {
