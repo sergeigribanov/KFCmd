@@ -172,7 +172,7 @@ void KFCmd::Hypothesis::addVertexConstraintsXYZ(
   addConstraint(vtxY);
   vtxY->setVertexCommonParams("#" + vertexName + "-y");
   auto vtxZ = new KFBase::VertexConstraint(
-      chargedParticleName + "-constraint-z", KFBase::VERTEX_Z);
+      "#" + chargedParticleName + "-constraint-z", KFBase::VERTEX_Z);
   addConstraint(vtxZ);
   vtxZ->setVertexCommonParams("#" + vertexName + "-z");
   addParticleToConstraint(chargedParticleName, vtxX->getName());
@@ -188,21 +188,25 @@ void KFCmd::Hypothesis::disableVertexConstraintXYZ(
   disableConstraint("#" + chargedParticleName + "-constraint-x");
   disableConstraint("#" + chargedParticleName + "-constraint-y");
   disableConstraint("#" + chargedParticleName + "-constraint-z");
+  disableCommonParams("#time-" + chargedParticleName);
 }
 
 void KFCmd::Hypothesis::disableVertexConstraintX(
     const std::string& chargedParticleName) {
   disableConstraint("#" + chargedParticleName + "-constraint-x");
+  // !!! disable t
 }
 
 void KFCmd::Hypothesis::disableVertexConstraintY(
     const std::string& chargedParticleName) {
   disableConstraint("#" + chargedParticleName + "-constraint-y");
+  // !!! disable t
 }
 
 void KFCmd::Hypothesis::disableVertexConstraintZ(
     const std::string& chargedParticleName) {
   disableConstraint("#" + chargedParticleName + "-constraint-z");
+  // !!! disable t
 }
 
 void KFCmd::Hypothesis::enableVertexConstraintXYZ(
@@ -210,21 +214,25 @@ void KFCmd::Hypothesis::enableVertexConstraintXYZ(
   enableConstraint("#" + chargedParticleName + "-constraint-x");
   enableConstraint("#" + chargedParticleName + "-constraint-y");
   enableConstraint("#" + chargedParticleName + "-constraint-z");
+  enableCommonParams("#time-" + chargedParticleName);
 }
 
 void KFCmd::Hypothesis::enableVertexConstraintX(
     const std::string& chargedParticleName) {
   enableConstraint("#" + chargedParticleName + "-constraint-x");
+  enableCommonParams("#time-" + chargedParticleName);
 }
 
 void KFCmd::Hypothesis::enableVertexConstraintY(
     const std::string& chargedParticleName) {
   enableConstraint("#" + chargedParticleName + "-constraint-y");
+  enableCommonParams("#time-" + chargedParticleName);
 }
 
 void KFCmd::Hypothesis::enableVertexConstraintZ(
     const std::string& chargedParticleName) {
   enableConstraint("#" + chargedParticleName + "-constraint-z");
+  enableCommonParams("#time-" + chargedParticleName);
 }
 
 double KFCmd::Hypothesis::getInitialVertexX(
