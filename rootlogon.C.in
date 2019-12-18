@@ -1,0 +1,12 @@
+{
+  gSystem->AddIncludePath("-I@CMAKE_INSTALL_PREFIX@/include");
+  gSystem->AddIncludePath("-I@EIGEN3_INCLUDE_DIR@");
+  gSystem->AddIncludePath("-I@CCGO_DIR@/include");
+  gSystem->AddIncludePath("-I@KFBASE_DIR@/include");
+  gSystem->AddDynamicPath("@CCGO_DIR@/lib");
+  gSystem->AddDynamicPath("@KFBASE_DIR@/lib");
+  gSystem->AddDynamicPath("@CMAKE_INSTALL_PREFIX@/lib");
+  gSystem->Load("libccgo");
+  gSystem->Load("libkfbase");
+  gSystem->Load("libkfcmd");
+}

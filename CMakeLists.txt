@@ -39,6 +39,7 @@ file(GLOB HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp)
 set(LIB_SOURCES ${SOURCES})
 list(REMOVE_ITEM LIB_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/test.cpp)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/env.sh.in env.sh)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/rootlogon.C.in rootlogon.C)
 add_executable(kfcmd-test ${SOURCES})
 set_property(TARGET kfcmd-test PROPERTY CXX_STANDARD 17)
 target_include_directories(kfcmd-test
@@ -73,3 +74,4 @@ install(TARGETS kfcmd
   LIBRARY DESTINATION lib
   PUBLIC_HEADER DESTINATION include/KFCmd)
 install(FILES ${PROJECT_BINARY_DIR}/env.sh DESTINATION env)
+install(FILES ${PROJECT_BINARY_DIR}/rootlogon.C DESTINATION env)
