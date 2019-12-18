@@ -84,16 +84,17 @@ void KFCmd::Hypothesis::enableVertexComponent(
 }
 
 void KFCmd::Hypothesis::fixVertexComponent(const std::string& vertexName,
+                                           double value,
                                            KFBase::VERTEX_COMPONENT component) {
   switch (component) {
     case KFBase::VERTEX_X:
-      _commonParams.at("#" + vertexName + "-x")->fixParameter(0);
+      _commonParams.at("#" + vertexName + "-x")->fixParameter(value);
       break;
     case KFBase::VERTEX_Y:
-      _commonParams.at("#" + vertexName + "-y")->fixParameter(0);
+      _commonParams.at("#" + vertexName + "-y")->fixParameter(value);
       break;
     case KFBase::VERTEX_Z:
-      _commonParams.at("#" + vertexName + "-z")->fixParameter(0);
+      _commonParams.at("#" + vertexName + "-z")->fixParameter(value);
       break;
   }
 }
@@ -292,4 +293,16 @@ TLorentzVector KFCmd::Hypothesis::getFinalRecoilMomentum(
     result -= getFinalMomentum(name);
   }
   return result;
+}
+
+bool KFCmd::Hypothesis::checkMatrixInvertibility(
+    const Eigen::MatrixXd& matrix) {
+  Eigen::JacobiSVD<Eigen::MatrixXd> svd(matrix);
+  if (svd.singularValues()(svd.singularValues().size() - 1) == 0) return false;
+  return true;
+}
+
+Eigen::MatrixXd KFCmd::Hypothesis::inverseMatrix(
+    const Eigen::MatrixXd& matrix) {
+  return matrix.inverse();
 }

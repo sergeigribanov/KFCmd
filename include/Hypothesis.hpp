@@ -24,11 +24,13 @@ class Hypothesis : public KFBase::Hypothesis {
   TLorentzVector getInitialRecoilMomentum(const std::set<std::string>&) const;
   TLorentzVector getFinalRecoilMomentum(const std::set<std::string>&) const;
   double getEnergy() const;
+  static bool checkMatrixInvertibility(const Eigen::MatrixXd&);
+  static Eigen::MatrixXd inverseMatrix(const Eigen::MatrixXd&);
   void disableVertex(const std::string&);
   void enableVertex(const std::string&);
   void disableVertexComponent(const std::string&, KFBase::VERTEX_COMPONENT);
   void enableVertexComponent(const std::string&, KFBase::VERTEX_COMPONENT);
-  void fixVertexComponent(const std::string&, KFBase::VERTEX_COMPONENT);
+  void fixVertexComponent(const std::string&, double, KFBase::VERTEX_COMPONENT);
   void releaseVertexComponent(const std::string&, KFBase::VERTEX_COMPONENT);
   void disableChargedParticle(const std::string&);
   void enableChargedParticle(const std::string&);
