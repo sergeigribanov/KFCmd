@@ -41,7 +41,6 @@ list(REMOVE_ITEM LIB_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/test.cpp)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/env.sh.in env.sh)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/rootlogon.C.in rootlogon.C)
 add_executable(kfcmd-test ${SOURCES})
-set_property(TARGET kfcmd-test PROPERTY CXX_STANDARD 17)
 target_include_directories(kfcmd-test
   PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}/include
@@ -53,7 +52,6 @@ target_link_libraries(kfcmd-test
   ${KFBASE_DIR}/lib/libkfbase.so
   ${ROOT_LIBRARIES})
 add_library(kfcmd SHARED ${LIB_SOURCES})
-set_property(TARGET kfcmd PROPERTY CXX_STANDARD 17)
 target_include_directories(kfcmd
   PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}/include
