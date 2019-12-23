@@ -8,7 +8,7 @@ const double KFCmd::ChargedParticle::_c = 2.99792458;
 
 KFCmd::ChargedParticle::ChargedParticle(const std::string& name, double mass,
                                         double charge)
-    : KFBase::Particle(name, 5, mass, charge) {
+    : KFBase::VertexParticle(name, 5, mass, charge) {
   setPeriod(2, 0, 2 * TMath::Pi());
 }
 

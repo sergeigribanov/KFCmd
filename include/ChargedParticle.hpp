@@ -1,10 +1,10 @@
 #ifndef __KFCMD_CHARGEDPARTICLE_HPP__
 #define __KFCMD_CHARGEDPARTICLE_HPP__
-#include <KFBase/Particle.hpp>
+#include <KFBase/VertexParticle.hpp>
 #include <ccgo/CommonParams.hpp>
 
 namespace KFCmd {
-class ChargedParticle : public KFBase::Particle {
+class ChargedParticle : public KFBase::VertexParticle {
  public:
   ChargedParticle(const std::string&, double, double);
   virtual ~ChargedParticle();
