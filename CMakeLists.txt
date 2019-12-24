@@ -40,17 +40,6 @@ set(LIB_SOURCES ${SOURCES})
 list(REMOVE_ITEM LIB_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/test.cpp)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/env.sh.in env.sh)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/rootlogon.C.in rootlogon.C)
-add_executable(kfcmd-test ${SOURCES})
-target_include_directories(kfcmd-test
-  PRIVATE
-  ${CMAKE_CURRENT_SOURCE_DIR}/include
-  ${EIGEN3_INCLUDE_DIR}
-  ${CCGO_DIR}/include
-  ${KFBASE_DIR}/include)
-target_link_libraries(kfcmd-test
-  ${CCGO_DIR}/lib/libccgo.so
-  ${KFBASE_DIR}/lib/libkfbase.so
-  ${ROOT_LIBRARIES})
 add_library(kfcmd SHARED ${LIB_SOURCES})
 target_include_directories(kfcmd
   PUBLIC
@@ -67,7 +56,6 @@ set(PUBLIC_HEADERS ${HEADERS})
 set_target_properties(kfcmd
   PROPERTIES
   PUBLIC_HEADER "${PUBLIC_HEADERS}")
-install(TARGETS kfcmd-test DESTINATION bin)
 install(TARGETS kfcmd
   LIBRARY DESTINATION lib
   PUBLIC_HEADER DESTINATION include/KFCmd)
