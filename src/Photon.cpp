@@ -33,7 +33,7 @@
 
 #include <cmath>
 
-KFCmd::Photon::Photon(const std::string& name) : KFBase::Particle(name, 5) {
+KFCmd::Photon::Photon(const std::string& name) : KFBase::Particle(name, 4) {
   setPeriod(2, 0, 2 * TMath::Pi());
 }
 
@@ -47,7 +47,6 @@ double KFCmd::Photon::calcMomentumComponent(
   // 1 --- R
   // 2 --- phi
   // 3 --- z0
-  // 4 --- theta
   double q = std::sqrt(
       std::pow(x(bi + 3) - x(_vertexZ->getBeginIndex()), 2) +
       std::pow(x(bi + 1) * std::cos(x(bi + 2)) - x(_vertexX->getBeginIndex()),
@@ -56,19 +55,16 @@ double KFCmd::Photon::calcMomentumComponent(
                2));
   switch (component) {
     case KFBase::MOMENT_X:
-      // result = x(bi) * std::sin(x(bi + 4)) * std::cos(x(bi + 2));
       result =
           x(bi) *
           (x(bi + 1) * std::cos(x(bi + 2)) - x(_vertexX->getBeginIndex())) / q;
       break;
     case KFBase::MOMENT_Y:
-      // result = x(bi) * std::sin(x(bi + 4)) * std::sin(x(bi + 2));
       result =
           x(bi) *
           (x(bi + 1) * std::sin(x(bi + 2)) - x(_vertexY->getBeginIndex())) / q;
       break;
     case KFBase::MOMENT_Z:
-      // result = x(bi) * std::cos(x(bi + 4));
       result = x(bi) * (x(bi + 3) - x(_vertexZ->getBeginIndex())) / q;
       break;
     case KFBase::MOMENT_E:
@@ -104,11 +100,6 @@ Eigen::VectorXd KFCmd::Photon::calcDMomentumComponent(
   double dqP = x(bi + 1) * (vX * sinP - vY * cosP);
   switch (component) {
     case KFBase::MOMENT_X:
-      // // x(bi) * std::sin(x(bi + 4)) * std::cos(x(bi + 2));
-      // result(bi) = std::sin(x(bi + 4)) * std::cos(x(bi + 2));
-      // result(bi + 2) = -x(bi) * std::sin(x(bi + 4)) * std::sin(x(bi + 2));
-      // result(bi + 4) = x(bi) * std::cos(x(bi + 4)) * std::cos(x(bi + 2));
-
       result(bi) = dx / q;
       result(bi + 1) = x(bi) * cosP / q - x(bi) * dx / q3 * dqR;
       result(bi + 2) = -x(bi) * x(bi + 1) * sinP / q - x(bi) * dx * dqP / q3;
@@ -118,11 +109,6 @@ Eigen::VectorXd KFCmd::Photon::calcDMomentumComponent(
       result(biZ) = -result(bi + 3);
       break;
     case KFBase::MOMENT_Y:
-      // //  x(bi) * std::sin(x(bi + 4)) * std::sin(x(bi + 2));
-      // result(bi) = std::sin(x(bi + 4)) * std::sin(x(bi + 2));
-      // result(bi + 2) = x(bi) * std::sin(x(bi + 4)) * std::cos(x(bi + 2));
-      // result(bi + 4) = x(bi) * std::cos(x(bi + 4)) * std::sin(x(bi + 2));
-
       result(bi) = dy / q;
       result(bi + 1) = x(bi) * sinP / q - x(bi) * dy * dqR / q3;
       result(bi + 2) = x(bi) * x(bi + 1) * cosP / q - x(bi) * dy * dqP / q3;
@@ -132,10 +118,6 @@ Eigen::VectorXd KFCmd::Photon::calcDMomentumComponent(
       result(biZ) = -result(bi + 3);
       break;
     case KFBase::MOMENT_Z:
-      // // x(bi) * std::cos(x(bi + 4));
-      // result(bi) = std::cos(x(bi + 4));
-      // result(bi + 4) = -x(bi) * std::sin(x(bi + 4));
-
       result(bi) = dz / q;
       result(bi + 1) = -x(bi) * dz * dqR / q3;
       result(bi + 2) = -x(bi) * dz * dqP / q3;
@@ -184,16 +166,6 @@ Eigen::MatrixXd KFCmd::Photon::calcD2MomentumComponent(
   double dqP = x(bi + 1) * (vX * sinP - vY * cosP);
   switch (component) {
     case KFBase::MOMENT_X:
-      // // x(bi) * std::sin(x(bi + 4)) * std::cos(x(bi + 2));
-      // result(bi, bi + 2) = -std::sin(x(bi + 4)) * std::sin(x(bi + 2));
-      // result(bi + 2, bi) = result(bi, bi + 2);
-      // result(bi, bi + 4) = std::cos(x(bi + 4)) * std::cos(x(bi + 2));
-      // result(bi + 4, bi) = result(bi, bi + 4);
-      // result(bi + 2, bi + 2) = -x(bi) * std::sin(x(bi + 4)) * std::cos(x(bi +
-      // 2)); result(bi + 2, bi + 4) = -x(bi) * std::cos(x(bi + 4)) *
-      // std::sin(x(bi + 2)); result(bi + 4, bi + 2) = result(bi + 2, bi + 4);
-      // result(bi + 4, bi + 4) = result(bi + 2, bi + 2);
-
       result(bi, bi + 1) = cosP / q - dx * dqR / q3;
       result(bi + 1, bi) = result(bi, bi + 1);
       result(bi, bi + 2) = -x(bi + 1) * sinP / q - dx * dqP / q3;
@@ -259,16 +231,6 @@ Eigen::MatrixXd KFCmd::Photon::calcD2MomentumComponent(
       result(biZ, biZ) = result(bi + 3, bi + 3);
       break;
     case KFBase::MOMENT_Y:
-      // //  x(bi) * std::sin(x(bi + 4)) * std::sin(x(bi + 2));
-      // result(bi, bi + 2) = std::sin(x(bi + 4)) * std::cos(x(bi + 2));
-      // result(bi + 2, bi) = result(bi, bi + 2);
-      // result(bi, bi + 4) = std::cos(x(bi + 4)) * std::sin(x(bi + 2));
-      // result(bi + 4, bi) = result(bi, bi + 4);
-      // result(bi + 2, bi + 2) = -x(bi) * std::sin(x(bi + 4)) * std::sin(x(bi +
-      // 2)); result(bi + 2, bi + 4) = x(bi) * std::cos(x(bi + 4)) *
-      // std::cos(x(bi + 2)); result(bi + 4, bi + 2) = result(bi + 2, bi + 4);
-      // result(bi + 4, bi + 4) = result(bi + 2, bi + 2);
-
       result(bi, bi + 1) = sinP / q - dy * dqR / q3;
       result(bi + 1, bi) = result(bi, bi + 1);
       result(bi, bi + 2) = x(bi + 1) * cosP / q - dy * dqP / q3;
@@ -336,11 +298,6 @@ Eigen::MatrixXd KFCmd::Photon::calcD2MomentumComponent(
       result(biZ, biZ) = result(bi + 3, bi + 3);
       break;
     case KFBase::MOMENT_Z:
-      // // x(bi) * std::cos(x(bi + 4));
-      // result(bi, bi + 4) = -std::sin(x(bi + 4));
-      // result(bi + 4, bi) = result(bi, bi + 4);
-      // result(bi + 4, bi + 4) = -x(bi) * std::cos(x(bi + 4));
-
       result(bi, bi + 1) = -dz * dqR / q3;
       result(bi + 1, bi) = result(bi, bi + 1);
       result(bi, bi + 2) = -dz * dqP / q3;
