@@ -1,6 +1,6 @@
 /*
  * KFCmd library
- * See COPYRIGHT file at the top of the source tree.
+ * See LICENSE file at the top of the source tree.
  *
  * This product includes software developed by the
  * CMD-3 collaboration (https://cmd.inp.nsk.su/).
