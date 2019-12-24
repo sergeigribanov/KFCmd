@@ -1,3 +1,34 @@
+/*
+ * KFCmd library
+ * See COPYRIGHT file at the top of the source tree.
+ *
+ * This product includes software developed by the
+ * CMD-3 collaboration (https://cmd.inp.nsk.su/).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ */
+
+/**
+ * @file Photon.cpp
+ *
+ * @brief Implementation of Photon methods
+ *
+ * @ingroup KFCmd
+ *
+ * @author Sergei Gribanov
+ * Contact: ssgribanov@gmail.com
+ *
+ */
+
 #include "Photon.hpp"
 
 #include <cmath>
@@ -374,24 +405,24 @@ Eigen::MatrixXd KFCmd::Photon::calcD2MomentumComponent(
   return result;
 }
 
-void KFCmd::Photon::setVertexX(const std::string& vertexName) {
-  auto it = getCommonParameters()->find(vertexName);
+void KFCmd::Photon::setVertexX(const std::string& name) {
+  auto it = getCommonParameters()->find(name);
   if (it == getCommonParameters()->end()) {
     // TO DO : exception
   }
   _vertexX = it->second;
 }
 
-void KFCmd::Photon::setVertexY(const std::string& vertexName) {
-  auto it = getCommonParameters()->find(vertexName);
+void KFCmd::Photon::setVertexY(const std::string& name) {
+  auto it = getCommonParameters()->find(name);
   if (it == getCommonParameters()->end()) {
     // TO DO : exception
   }
   _vertexY = it->second;
 }
 
-void KFCmd::Photon::setVertexZ(const std::string& vertexName) {
-  auto it = getCommonParameters()->find(vertexName);
+void KFCmd::Photon::setVertexZ(const std::string& name) {
+  auto it = getCommonParameters()->find(name);
   if (it == getCommonParameters()->end()) {
     // TO DO : exception
   }

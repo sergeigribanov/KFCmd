@@ -1,13 +1,44 @@
+/*
+ * KFCmd library
+ * See COPYRIGHT file at the top of the source tree.
+ *
+ * This product includes software developed by the
+ * CMD-3 collaboration (https://cmd.inp.nsk.su/).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ */
+
+/**
+ * @file Hypothesis.cpp
+ *
+ * @brief Implementation of Hypothesis methods
+ *
+ * @ingroup KFCmd
+ *
+ * @author Sergei Gribanov
+ * Contact: ssgribanov@gmail.com
+ *
+ */
+
 #include "Hypothesis.hpp"
 
 #include <KFBase/MassConstraint.hpp>
 #include <KFBase/MomentumConstraint.hpp>
 #include <ccgo/CommonParams.hpp>
 
-KFCmd::Hypothesis::Hypothesis(double energy, double magnetField, long nIter,
+KFCmd::Hypothesis::Hypothesis(double energy, double magneticField, long nIter,
                               double tolerance)
     : KFBase::Hypothesis(nIter, tolerance), _energy(energy) {
-  addConstant("#m-field", magnetField);
+  addConstant("#m-field", magneticField);
   addConstraint(
       new KFBase::MomentumConstraint("#constraint-px", KFBase::MOMENT_X, 0));
   addConstraint(
@@ -116,7 +147,7 @@ void KFCmd::Hypothesis::releaseVertexComponent(
 
 void KFCmd::Hypothesis::addChargedParticle(KFCmd::ChargedParticle* particle) {
   addParticle(particle);
-  particle->setMagnetField("#m-field");
+  particle->setMagneticField("#m-field");
   const std::string timeParameter = "#time-" + particle->getName();
   addCommonParams(new ccgo::CommonParams(timeParameter, 1));
   particle->setTimeParameter(timeParameter);
@@ -195,8 +226,8 @@ void KFCmd::Hypothesis::disableVertexConstraintX(
     const std::string& chargedParticleName) {
   disableConstraint("#" + chargedParticleName + "-constraint-x");
   bool flag =
-    isConstraintEnabled("#" + chargedParticleName + "-constraint-y") ||
-    isConstraintEnabled("#" + chargedParticleName + "-constraint-z");
+      isConstraintEnabled("#" + chargedParticleName + "-constraint-y") ||
+      isConstraintEnabled("#" + chargedParticleName + "-constraint-z");
   if (!flag) {
     disableCommonParams("#time-" + chargedParticleName);
   }
@@ -206,8 +237,8 @@ void KFCmd::Hypothesis::disableVertexConstraintY(
     const std::string& chargedParticleName) {
   disableConstraint("#" + chargedParticleName + "-constraint-y");
   bool flag =
-    isConstraintEnabled("#" + chargedParticleName + "-constraint-x") ||
-    isConstraintEnabled("#" + chargedParticleName + "-constraint-z");
+      isConstraintEnabled("#" + chargedParticleName + "-constraint-x") ||
+      isConstraintEnabled("#" + chargedParticleName + "-constraint-z");
   if (!flag) {
     disableCommonParams("#time-" + chargedParticleName);
   }
@@ -217,8 +248,8 @@ void KFCmd::Hypothesis::disableVertexConstraintZ(
     const std::string& chargedParticleName) {
   disableConstraint("#" + chargedParticleName + "-constraint-z");
   bool flag =
-    isConstraintEnabled("#" + chargedParticleName + "-constraint-x") ||
-    isConstraintEnabled("#" + chargedParticleName + "-constraint-y");
+      isConstraintEnabled("#" + chargedParticleName + "-constraint-x") ||
+      isConstraintEnabled("#" + chargedParticleName + "-constraint-y");
   if (!flag) {
     disableCommonParams("#time-" + chargedParticleName);
   }
@@ -288,9 +319,9 @@ double KFCmd::Hypothesis::getFinalChargedParticleTime(
 }
 
 void KFCmd::Hypothesis::addMassConstraint(
-    const std::string& constraintName, double value,
+    const std::string& constraintName, double mass,
     const std::set<std::string>& particleNames) {
-  auto constraint = new KFBase::MassConstraint(constraintName, value);
+  auto constraint = new KFBase::MassConstraint(constraintName, mass);
   addConstraint(constraint);
   for (const auto& name : particleNames) {
     addParticleToConstraint(name, constraintName);

@@ -1,3 +1,34 @@
+/*
+ * KFCmd library
+ * See COPYRIGHT file at the top of the source tree.
+ *
+ * This product includes software developed by the
+ * CMD-3 collaboration (https://cmd.inp.nsk.su/).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ */
+
+/**
+ * @file ChargedParticle.cpp
+ *
+ * @brief Implementation of ChargedParticle methods
+ *
+ * @ingroup KFCmd
+ *
+ * @author Sergei Gribanov
+ * Contact: ssgribanov@gmail.com
+ *
+ */
+
 #include "ChargedParticle.hpp"
 
 #include <TMath.h>
@@ -117,7 +148,7 @@ double KFCmd::ChargedParticle::calcVertexComponent(
   double eta = x(bi + 1);
   double eta2 = eta * eta;
   double denominator = std::sqrt(m2 + (1 + eta2) * x(bi) * x(bi));
-  double qBc = getCharge() * getMagnetField() * _c;
+  double qBc = getCharge() * getMagneticField() * _c;
   double r = x(bi) / qBc;
   double w = qBc / denominator;
   switch (component) {
@@ -149,7 +180,7 @@ Eigen::VectorXd KFCmd::ChargedParticle::calcDVertexComponent(
   double denominator = std::sqrt(m2 + (1 + eta2) * x(bi) * x(bi));
   double denom3 = std::pow(denominator, 3);
   double pt2 = x(bi) * x(bi);
-  double qBc = getCharge() * getMagnetField() * _c;
+  double qBc = getCharge() * getMagneticField() * _c;
   double r = x(bi) / qBc;
   double w = qBc / denominator;
   double sinP = std::sin(x(bi + 2));
@@ -203,7 +234,7 @@ Eigen::MatrixXd KFCmd::ChargedParticle::calcD2VertexComponent(
   double a1 = 1 + eta2;
   double a2 = a1 * a1;
   double ct2 = ct * ct;
-  double qBc = getCharge() * getMagnetField() * _c;
+  double qBc = getCharge() * getMagneticField() * _c;
   double r = x(bi) / qBc;
   double w = qBc / denominator;
   double sinP = std::sin(x(bi + 2));
@@ -305,7 +336,7 @@ Eigen::MatrixXd KFCmd::ChargedParticle::calcD2VertexComponent(
   return result;
 }
 
-void KFCmd::ChargedParticle::setMagnetField(const std::string& name) {
+void KFCmd::ChargedParticle::setMagneticField(const std::string& name) {
   const auto it = getConstants()->find(name);
   if (it == getConstants()->end()) {
     // TO DO : exception
@@ -321,6 +352,6 @@ void KFCmd::ChargedParticle::setTimeParameter(const std::string& name) {
   _timeParam = it->second;
 }
 
-double KFCmd::ChargedParticle::getMagnetField() const {
+double KFCmd::ChargedParticle::getMagneticField() const {
   return _magnetFieldIterator->second;
 }
