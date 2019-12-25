@@ -282,6 +282,18 @@ void KFCmd::Hypothesis::enableVertexConstraintZ(
   enableCommonParams("#time-" + chargedParticleName);
 }
 
+TVector3 KFCmd::Hypothesis::getInitialVertex(const std::string& vertexName) const {
+  return TVector3(getInitialCommonParameters("#" + vertexName + "-x")(0),
+		  getInitialCommonParameters("#" + vertexName + "-y")(0),
+		  getInitialCommonParameters("#" + vertexName + "-z")(0));
+}
+
+TVector3 KFCmd::Hypothesis::getFinalVertex(const std::string& vertexName) const {
+  return TVector3(getFinalCommonParameters("#" + vertexName + "-x")(0),
+		  getFinalCommonParameters("#" + vertexName + "-y")(0),
+		  getFinalCommonParameters("#" + vertexName + "-z")(0));
+}
+
 double KFCmd::Hypothesis::getInitialVertexX(
     const std::string& vertexName) const {
   return getInitialCommonParameters("#" + vertexName + "-x")(0);

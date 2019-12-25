@@ -37,6 +37,8 @@
 #include <set>
 #include <string>
 
+#include <TVector3.h>
+
 #include "ChargedParticle.hpp"
 #include "Photon.hpp"
 #include "TrPh.hpp"
@@ -60,6 +62,16 @@ class Hypothesis : public KFBase::Hypothesis {
   Hypothesis(double, double, long = 20, double = 1.e-3);
   //! A destructor
   virtual ~Hypothesis();
+  //! A getter for an initial vertex
+  /*!
+   * @param vertexName (vertex name)
+   */
+  TVector3 getInitialVertex(const std::string&) const;
+  //! A getter for a final vertex
+  /*!
+   * @param vertexName (vertex name)
+   */
+  TVector3 getFinalVertex(const std::string&) const;
   //! A getter for an inital vertex X coordinate by name
   /*!
    * @param vertexName (vertex name)
