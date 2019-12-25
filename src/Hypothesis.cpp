@@ -29,13 +29,12 @@
  *
  */
 
-#include <cmath>
-
 #include "Hypothesis.hpp"
 
 #include <KFBase/MassConstraint.hpp>
 #include <KFBase/MomentumConstraint.hpp>
 #include <ccgo/CommonParams.hpp>
+#include <cmath>
 
 KFCmd::Hypothesis::Hypothesis(double energy, double magneticField, long nIter,
                               double tolerance)
@@ -363,7 +362,8 @@ Eigen::MatrixXd KFCmd::Hypothesis::inverseMatrix(
   return matrix.inverse();
 }
 
-bool KFCmd::Hypothesis::fillTrack(const std::string& name, std::size_t index, const KFCmd::TrPh& data) {
+bool KFCmd::Hypothesis::fillTrack(const std::string& name, std::size_t index,
+                                  const KFCmd::TrPh& data) {
   Eigen::VectorXd par = Eigen::VectorXd::Zero(5);
   Eigen::MatrixXd cov = Eigen::MatrixXd::Zero(5, 5);
   cov(0, 0) = (data.terr0)[index][0][0];  // p, p
@@ -410,7 +410,8 @@ bool KFCmd::Hypothesis::fillTrack(const std::string& name, std::size_t index, co
   return true;
 }
 
-bool KFCmd::Hypothesis::fillPhoton(const std::string& name, std::size_t index, const KFCmd::TrPh& data) {
+bool KFCmd::Hypothesis::fillPhoton(const std::string& name, std::size_t index,
+                                   const KFCmd::TrPh& data) {
   Eigen::VectorXd par = Eigen::VectorXd::Zero(4);
   Eigen::MatrixXd cov = Eigen::MatrixXd::Zero(4, 4);
   double sigma2_z = 0.3;

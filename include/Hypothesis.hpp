@@ -37,9 +37,9 @@
 #include <set>
 #include <string>
 
-#include "TrPh.hpp"
 #include "ChargedParticle.hpp"
 #include "Photon.hpp"
+#include "TrPh.hpp"
 
 namespace KFCmd {
 /**
