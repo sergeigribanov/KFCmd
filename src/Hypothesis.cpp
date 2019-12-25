@@ -29,6 +29,8 @@
  *
  */
 
+#include <cmath>
+
 #include "Hypothesis.hpp"
 
 #include <KFBase/MassConstraint.hpp>
@@ -359,4 +361,84 @@ bool KFCmd::Hypothesis::checkMatrixInvertibility(
 Eigen::MatrixXd KFCmd::Hypothesis::inverseMatrix(
     const Eigen::MatrixXd& matrix) {
   return matrix.inverse();
+}
+
+bool KFCmd::Hypothesis::fillTrack(const std::string& name, std::size_t index, const KFCmd::TrPh& data) {
+  Eigen::VectorXd par = Eigen::VectorXd::Zero(5);
+  Eigen::MatrixXd cov = Eigen::MatrixXd::Zero(5, 5);
+  cov(0, 0) = (data.terr0)[index][0][0];  // p, p
+  cov(0, 1) = (data.terr0)[index][0][3];  // p, ctg
+  cov(0, 2) = (data.terr0)[index][0][1];  // p, phi
+  cov(0, 3) = (data.terr0)[index][0][2];  // p, rho
+  cov(0, 4) = (data.terr0)[index][0][4];  // p, z
+
+  cov(1, 0) = (data.terr0)[index][3][0];  // ctg, p
+  cov(1, 1) = (data.terr0)[index][3][3];  // ctg, ctg
+  cov(1, 2) = (data.terr0)[index][3][1];  // ctg, phi
+  cov(1, 3) = (data.terr0)[index][3][2];  // ctg, rho
+  cov(1, 4) = (data.terr0)[index][3][4];  // ctg, z
+
+  cov(2, 0) = (data.terr0)[index][1][0];  // phi, p
+  cov(2, 1) = (data.terr0)[index][1][3];  // phi, ctg
+  cov(2, 2) = (data.terr0)[index][1][1];  // phi, phi
+  cov(2, 3) = (data.terr0)[index][1][2];  // phi, rho
+  cov(2, 4) = (data.terr0)[index][1][4];  // phi, z
+
+  cov(3, 0) = (data.terr0)[index][2][0];  // rho, p
+  cov(3, 1) = (data.terr0)[index][2][3];  // rho, ctg
+  cov(3, 2) = (data.terr0)[index][2][1];  // rho, phi
+  cov(3, 3) = (data.terr0)[index][2][2];  // rho, rho
+  cov(3, 4) = (data.terr0)[index][2][4];  // rho, z
+
+  cov(4, 0) = (data.terr0)[index][4][0];  // z, p
+  cov(4, 1) = (data.terr0)[index][4][3];  // z, ctg
+  cov(4, 2) = (data.terr0)[index][4][1];  // z, phi
+  cov(4, 3) = (data.terr0)[index][4][2];  // z, rho
+  cov(4, 4) = (data.terr0)[index][4][4];  // z, z
+
+  if (0 == cov.determinant()) return false;
+
+  par(0) = (data.tptot)[index] * std::sin((data.tth)[index]);
+  par(1) = 1. / std::tan((data.tth)[index]);
+  par(2) = (data.tphi)[index];
+  par(3) = (data.trho)[index];
+  par(4) = (data.tz)[index];
+
+  this->setInitialParticleParams(name, par);
+  Eigen::MatrixXd inv = cov.inverse();
+  this->setParticleInverseErrorMatrix(name, inv);
+  return true;
+}
+
+bool KFCmd::Hypothesis::fillPhoton(const std::string& name, std::size_t index, const KFCmd::TrPh& data) {
+  Eigen::VectorXd par = Eigen::VectorXd::Zero(4);
+  Eigen::MatrixXd cov = Eigen::MatrixXd::Zero(4, 4);
+  double sigma2_z = 0.3;
+  double sigma2_rho = 0.3;
+  const int cl_bgo_flag = 3;
+  if ((data.phflag)[index] == cl_bgo_flag)
+    sigma2_rho = sigma2_z * pow(tan((data.phth)[index]), 2) +
+                 pow((data.phrho)[index] * (data.pherr)[index][1] /
+                         sin((data.phth)[index]) * cos((data.phth)[index]),
+                     2);
+  else
+    sigma2_z = sigma2_rho / pow(tan((data.phth)[index]), 2) +
+               pow((data.phrho)[index] * (data.pherr)[index][1], 2) /
+                   pow(sin((data.phth)[index]), 4);
+
+  cov(0, 0) = pow((data.pherr)[index][0], 2);
+  cov(1, 1) = sigma2_rho;
+  cov(2, 2) = pow((data.pherr)[index][2], 2);
+  cov(3, 3) = sigma2_z;
+  if (0 == cov.determinant()) return false;
+
+  par(0) = (data.phen)[index];
+  par(1) = (data.phrho)[index];
+  par(2) = (data.phphi)[index];
+  par(3) = (data.z0) + (data.phrho)[index] / tan((data.phth)[index]);
+
+  this->setInitialParticleParams(name, par);
+  Eigen::MatrixXd inv = cov.inverse();
+  this->setParticleInverseErrorMatrix(name, inv);
+  return true;
 }

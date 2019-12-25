@@ -37,6 +37,7 @@
 #include <set>
 #include <string>
 
+#include "TrPh.hpp"
 #include "ChargedParticle.hpp"
 #include "Photon.hpp"
 
@@ -131,6 +132,10 @@ class Hypothesis : public KFBase::Hypothesis {
    * @param matrix (matrix)
    */
   static Eigen::MatrixXd inverseMatrix(const Eigen::MatrixXd&);
+  //! A method that used to fill track from TrPh
+  bool fillTrack(const std::string&, std::size_t, const TrPh&);
+  //! A method that used to fill photon from TrPh
+  bool fillPhoton(const std::string&, std::size_t, const TrPh&);
   //! A method that used to disable vertex by name
   /*!
    * This method disabless common parameter containers that
