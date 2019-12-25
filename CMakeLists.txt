@@ -41,6 +41,7 @@ list(REMOVE_ITEM LIB_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/test.cpp)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/env.sh.in env.sh)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/rootlogon.C.in rootlogon.C)
 add_library(kfcmd SHARED ${LIB_SOURCES})
+set_property(TARGET kfcmd PROPERTY CXX_STANDARD 11)
 target_include_directories(kfcmd
   PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}/include
