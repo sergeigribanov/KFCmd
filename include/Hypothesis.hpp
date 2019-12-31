@@ -62,6 +62,7 @@ class Hypothesis : public KFBase::Hypothesis {
   Hypothesis(double, double, long = 20, double = 1.e-3);
   //! A destructor
   virtual ~Hypothesis();
+  TVector3 calcVertexComponent(const std::string&);
   //! A getter for an initial vertex
   /*!
    * @param vertexName (vertex name)
