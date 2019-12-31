@@ -115,18 +115,32 @@ void KFCmd::Hypothesis::enableVertexComponent(
   }
 }
 
+TVector3 KFCmd::Hypothesis::calcVertexComponent(const std::string& chargedParticleName) {
+  const auto& particle = dynamic_cast<KFCmd::ChargedParticle*>(_particles.at(chargedParticleName));
+  Eigen::VectorXd x(_opt.getN());
+  x.segment(particle->getBeginIndex(), particle->getN()) = particle->getBeginParameters();
+  const std::string timeParameter = "#time-" + particle->getName();
+  const auto& cp = dynamic_cast<ccgo::CommonParams*>(_commonParams.at(timeParameter));
+  x.segment(cp->getBeginIndex(), cp->getN()) = cp->getBeginParameters();
+  TVector3 result;
+  result(0) = particle->calcVertexComponent(x, KFBase::VERTEX_X);
+  result(1) = particle->calcVertexComponent(x, KFBase::VERTEX_Y);
+  result(2) = particle->calcVertexComponent(x, KFBase::VERTEX_Z);
+  return result;
+}
+
 void KFCmd::Hypothesis::fixVertexComponent(const std::string& vertexName,
                                            double value,
                                            KFBase::VERTEX_COMPONENT component) {
   switch (component) {
     case KFBase::VERTEX_X:
-      _commonParams.at("#" + vertexName + "-x")->fixParameter(value);
+      _commonParams.at("#" + vertexName + "-x")->fixParameter(0, value);
       break;
     case KFBase::VERTEX_Y:
-      _commonParams.at("#" + vertexName + "-y")->fixParameter(value);
+      _commonParams.at("#" + vertexName + "-y")->fixParameter(0, value);
       break;
     case KFBase::VERTEX_Z:
-      _commonParams.at("#" + vertexName + "-z")->fixParameter(value);
+      _commonParams.at("#" + vertexName + "-z")->fixParameter(0, value);
       break;
   }
 }
@@ -175,14 +189,26 @@ void KFCmd::Hypothesis::enableChargedParticle(
 void KFCmd::Hypothesis::addPhoton(KFCmd::Photon* photon,
                                   const std::string& vertexName) {
   addParticle(photon);
-  photon->setVertexX("#" + vertexName + "-x");
-  photon->setVertexY("#" + vertexName + "-y");
-  photon->setVertexZ("#" + vertexName + "-z");
+  const std::string vertexXname = "#" + vertexName + "-x";
+  photon->setVertexX(vertexXname);
+  const std::string vertexYname = "#" + vertexName + "-y";
+  photon->setVertexY(vertexYname);
+  const std::string vertexZname = "#" + vertexName + "-z";
+  photon->setVertexZ(vertexZname);
   enableParticle(photon->getName());
   addParticleToConstraint(photon->getName(), "#constraint-px");
   addParticleToConstraint(photon->getName(), "#constraint-py");
   addParticleToConstraint(photon->getName(), "#constraint-pz");
   addParticleToConstraint(photon->getName(), "#constraint-pe");
+  _constraints.at("#constraint-px")->includeUsedCommonParameter(vertexXname);
+  _constraints.at("#constraint-px")->includeUsedCommonParameter(vertexYname);
+  _constraints.at("#constraint-px")->includeUsedCommonParameter(vertexZname);
+  _constraints.at("#constraint-py")->includeUsedCommonParameter(vertexXname);
+  _constraints.at("#constraint-py")->includeUsedCommonParameter(vertexYname);
+  _constraints.at("#constraint-py")->includeUsedCommonParameter(vertexZname);
+  _constraints.at("#constraint-pz")->includeUsedCommonParameter(vertexXname);
+  _constraints.at("#constraint-pz")->includeUsedCommonParameter(vertexYname);
+  _constraints.at("#constraint-pz")->includeUsedCommonParameter(vertexZname);
 }
 
 void KFCmd::Hypothesis::disablePhoton(const std::string& photonName) {
@@ -198,18 +224,28 @@ void KFCmd::Hypothesis::addVertexConstraintsXYZ(
   auto vtxX = new KFBase::VertexConstraint(
       "#" + chargedParticleName + "-constraint-x", KFBase::VERTEX_X);
   addConstraint(vtxX);
-  vtxX->setVertexCommonParams("#" + vertexName + "-x");
+  const std::string vertexXname = "#" + vertexName + "-x";
+  vtxX->setVertexCommonParams(vertexXname);
   auto vtxY = new KFBase::VertexConstraint(
       "#" + chargedParticleName + "-constraint-y", KFBase::VERTEX_Y);
   addConstraint(vtxY);
-  vtxY->setVertexCommonParams("#" + vertexName + "-y");
+  const std::string vertexYname = "#" + vertexName + "-y";
+  vtxY->setVertexCommonParams(vertexYname);
   auto vtxZ = new KFBase::VertexConstraint(
       "#" + chargedParticleName + "-constraint-z", KFBase::VERTEX_Z);
   addConstraint(vtxZ);
-  vtxZ->setVertexCommonParams("#" + vertexName + "-z");
+  const std::string vertexZname = "#" + vertexName + "-z";
+  vtxZ->setVertexCommonParams(vertexZname);
   addParticleToConstraint(chargedParticleName, vtxX->getName());
   addParticleToConstraint(chargedParticleName, vtxY->getName());
   addParticleToConstraint(chargedParticleName, vtxZ->getName());
+  const std::string timeParameter = "#time-" + chargedParticleName;
+  _constraints.at(vtxX->getName())->includeUsedCommonParameter(timeParameter);
+  _constraints.at(vtxY->getName())->includeUsedCommonParameter(timeParameter);
+  _constraints.at(vtxZ->getName())->includeUsedCommonParameter(timeParameter);
+  _constraints.at(vtxX->getName())->includeUsedCommonParameter(vertexXname);
+  _constraints.at(vtxY->getName())->includeUsedCommonParameter(vertexYname);
+  _constraints.at(vtxZ->getName())->includeUsedCommonParameter(vertexZname);
   enableConstraint(vtxX->getName());
   enableConstraint(vtxY->getName());
   enableConstraint(vtxZ->getName());
