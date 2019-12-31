@@ -1,22 +1,14 @@
 cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
 project(KFCmd)
-option(EIGEN3_INCLUDE_DIR "Path to the Eigen3 include directory")
 option(CCGO_DIR "Path to the CCGO installation")
 option(KFBASE_DIR "Path to the KFBase installation")
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)
 endif()
-
 set(CMAKE_CXX_FLAGS "-Wall")
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
-if (NOT EIGEN3_INCLUDE_DIR)
-  if (DEFINED ENV{EIGEN3_INCLUDE_DIR})
-    set(EIGEN3_INCLUDE_DIR $ENV{EIGEN3_INCLUDE_DIR})
-  else()
-    message(FATAL_ERROR "EIGEN3_INCLUDE_DIR option is not set")
-  endif()
-endif()
+find_package(Eigen3 REQUIRED NO_MODULE)
 if (NOT CCGO_DIR)
   if (DEFINED ENV{CCGO_DIR})
     set(CCGO_DIR $ENV{CCGO_DIR})
@@ -46,10 +38,10 @@ target_include_directories(kfcmd
   PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}/include
   PRIVATE
-  ${EIGEN3_INCLUDE_DIR}
   ${CCGO_DIR}/include
   ${KFBASE_DIR}/include)
 target_link_libraries(kfcmd
+  Eigen3::Eigen
   ${CCGO_DIR}/lib/libccgo.so
   ${ROOT_LIBRARIES}
   ${KFBASE_DIR}/lib/libkfbase.so)
