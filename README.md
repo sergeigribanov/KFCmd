@@ -14,7 +14,8 @@ The KFCmd is based on abstract classes from KFBase library (https://github.com/s
 1. git clone https://github.com/sergeigribanov/KFCmd.git
 2. Create a directory to build the package in a suitable location and change the current directory to this one.
 3. Setup ROOT environment.
-4. To build the package run the following commands:
-    1. cmake  -DCMAKE_INSTALL_PREFIX=\<KFCmd installation prefix\> -DCCGO_DIR=\<path to CCGO installation\> -DKFBASE_DIR=\<path to KFBase installation\> \<path to KFCmd source code\>
+4. Make sure that CCGO and KFBase packages have been installed.
+5. To build the package run the following commands:
+    1. cmake  -DCMAKE_INSTALL_PREFIX=\<KFCmd installation prefix\> \<path to KFCmd source code\>
     2. make
     3. make install
