@@ -47,7 +47,7 @@ KFCmd::ChargedParticle::~ChargedParticle() {}
 
 double KFCmd::ChargedParticle::calcMomentumComponent(
     const Eigen::VectorXd& x, KFBase::MOMENT_COMPONENT component) const {
-  long bi = getBeginIndex();
+  const long bi = getBeginIndex();
   // 0 --- pt
   // 1 --- ctg theta
   // 2 --- phi
@@ -84,9 +84,10 @@ double KFCmd::ChargedParticle::calcMomentumComponent(
 
 Eigen::VectorXd KFCmd::ChargedParticle::calcDMomentumComponent(
     const Eigen::VectorXd& x, KFBase::MOMENT_COMPONENT component) const {
-  long bi = getBeginIndex();
+  const long bi = getBeginIndex();
+  const long ti = _timeParam->getBeginIndex();
   Eigen::VectorXd result = Eigen::VectorXd::Zero(x.size());
-  double ct = x(_timeParam->getBeginIndex());
+  double ct = x(ti);
   double m = getMass();
   double m2 = m * m;
   double eta = x(bi + 1);
@@ -107,13 +108,13 @@ Eigen::VectorXd KFCmd::ChargedParticle::calcDMomentumComponent(
       result(bi) = cosA - x(bi) * dw_dpt * ct * sinA;
       result(bi + 1) = -x(bi) * dw_deta * ct * sinA;
       result(bi + 2) = -x(bi) * sinA;
-      result(_timeParam->getBeginIndex()) = -w * x(bi) * sinA;
+      result(ti) = w * result(bi + 2);
       break;
     case KFBase::MOMENT_Y:
       result(bi) = sinA + x(bi) * dw_dpt * ct * cosA;
       result(bi + 1) = x(bi) * dw_deta * ct * cosA;
       result(bi + 2) = x(bi) * cosA;
-      result(_timeParam->getBeginIndex()) = w * x(bi) * cosA;
+      result(ti) = w * result(bi + 2);
       break;
     case KFBase::MOMENT_Z:
       result(bi) = x(bi + 1);
@@ -133,9 +134,10 @@ Eigen::VectorXd KFCmd::ChargedParticle::calcDMomentumComponent(
 
 Eigen::MatrixXd KFCmd::ChargedParticle::calcD2MomentumComponent(
     const Eigen::VectorXd& x, KFBase::MOMENT_COMPONENT component) const {
-  long bi = getBeginIndex();
+  const long bi = getBeginIndex();
+  const long ti = _timeParam->getBeginIndex();
   Eigen::MatrixXd result = Eigen::MatrixXd::Zero(x.size(), x.size());
-  double ct = x(_timeParam->getBeginIndex());
+  double ct = x(ti);
   double ct2 = ct * ct;
   double m = getMass();
   double m2 = m * m;
@@ -159,7 +161,7 @@ Eigen::MatrixXd KFCmd::ChargedParticle::calcD2MomentumComponent(
   double d2w_d2pt = 3. * qBc * pt2 * y0 * y0 / denom5 - qBc * y0 / denom3;
   double d2w_dpt_deta = -2. * x(bi) * eta * qBc / denom3 +
     3. * pt3 * eta * qBc * y0 / denom5;
-  double d2w_d2eta = - x(bi) * qBc / denom3 + 3. * eta2 * pt3 * qBc / denom5;
+  double d2w_d2eta = -pt2 * qBc / denom3 + 3. * eta2 * pt2 * pt2 * qBc / denom5;
   switch (component) {
     case KFBase::MOMENT_X:
       result(bi, bi) = -2 * dw_dpt * ct * sinA -
@@ -171,20 +173,18 @@ Eigen::MatrixXd KFCmd::ChargedParticle::calcD2MomentumComponent(
       result(bi + 1, bi) = result(bi, bi + 1);
       result(bi, bi + 2) = -sinA - x(bi) * dw_dpt * ct * cosA;
       result(bi + 2, bi) = result(bi, bi + 2);
-      result(bi, _timeParam->getBeginIndex()) =  -w * sinA -
-	w * x(bi) * dw_dpt * ct * cosA - x(bi) * dw_dpt * sinA;
-      result(_timeParam->getBeginIndex(), bi) = result(bi, _timeParam->getBeginIndex());
-      result(bi + 1, bi + 1) = -x(bi) * cosA * dw_deta2 * ct2 -
+      result(bi, ti) = w * result(bi, bi + 2) - x(bi) * dw_dpt * sinA;
+      result(ti, bi) = result(bi, ti);
+      result(bi + 1, bi + 1) = -x(bi) * dw_deta2 * ct2 * cosA -
 	x(bi) * d2w_d2eta * ct * sinA;
      result(bi + 1, bi + 2) = - x(bi) * dw_deta * ct * cosA;
      result(bi + 2, bi + 1) = result(bi + 1, bi + 2);
-     result(bi + 1, _timeParam->getBeginIndex()) = -w * x(bi) * dw_deta * ct * cosA -
-       x(bi) * dw_deta * sinA;
-     result(_timeParam->getBeginIndex(), bi + 1) = result(bi + 1, _timeParam->getBeginIndex());
+     result(bi + 1, ti) = w * result(bi + 1, bi + 2) - x(bi) * dw_deta * sinA;
+     result(ti, bi + 1) = result(bi + 1, ti);
      result(bi + 2, bi + 2) = -x(bi) * cosA;
-     result(bi + 2, _timeParam->getBeginIndex()) = -w * x(bi) * cosA;
-     result(_timeParam->getBeginIndex(), bi + 2) = result(bi + 2, _timeParam->getBeginIndex());
-     result(_timeParam->getBeginIndex(), _timeParam->getBeginIndex()) = -w * w * x(bi) * cosA;
+     result(bi + 2, ti) = w * result(bi + 2, bi + 2);
+     result(ti, bi + 2) = result(bi + 2, ti);
+     result(ti, ti) = w * w * result(bi + 2, bi + 2);
      break;
     case KFBase::MOMENT_Y:
       result(bi, bi) = 2 * dw_dpt * ct * cosA - x(bi) * dw_dpt2 * ct2 * sinA +
@@ -195,20 +195,18 @@ Eigen::MatrixXd KFCmd::ChargedParticle::calcD2MomentumComponent(
       result(bi + 1, bi) = result(bi, bi + 1);
       result(bi, bi + 2) = cosA - x(bi) * dw_dpt * ct * sinA;
       result(bi + 2, bi) = result(bi, bi + 2);
-      result(bi, _timeParam->getBeginIndex()) = w * cosA -
-	w * x(bi) * dw_dpt * ct * sinA + x(bi) * dw_dpt * cosA;
-      result(_timeParam->getBeginIndex(), bi) = result(bi, _timeParam->getBeginIndex());
+      result(bi, ti) = w * result(bi, bi + 2) + x(bi) * dw_dpt * cosA;
+      result(ti, bi) = result(bi, ti);
       result(bi + 1, bi + 1) = -x(bi) * dw_deta2 * ct2 * sinA +
 	x(bi) * d2w_d2eta * ct * cosA;
       result(bi + 1, bi + 2) = -x(bi) * dw_deta * ct * sinA;
       result(bi + 2, bi + 1) = result(bi + 1, bi + 2);
-      result(bi + 1, _timeParam->getBeginIndex()) = -w * x(bi) * dw_deta * ct * sinA +
-	x(bi) * dw_deta * cosA;
-      result(_timeParam->getBeginIndex(), bi + 1) = result(bi + 1, _timeParam->getBeginIndex());
+      result(bi + 1, ti) = w * result(bi + 1, bi + 2) + x(bi) * dw_deta * cosA;
+      result(ti, bi + 1) = result(bi + 1, ti);
       result(bi + 2, bi + 2) = -x(bi) * sinA;
-      result(bi + 2, _timeParam->getBeginIndex()) = -w * x(bi) * sinA;
-      result(_timeParam->getBeginIndex(), bi + 2) = result(bi + 2, _timeParam->getBeginIndex());
-      result(_timeParam->getBeginIndex(), _timeParam->getBeginIndex()) = -w * w * x(bi) * sinA;
+      result(bi + 2, ti) = w * result(bi + 2, bi + 2);
+      result(ti, bi + 2) = result(bi + 2, ti);
+      result(ti, ti) = w * w * result(bi + 2, bi + 2);
       break;
     case KFBase::MOMENT_Z:
       result(bi, bi + 1) = 1;
