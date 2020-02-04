@@ -47,36 +47,33 @@ KFCmd::ChargedParticle::~ChargedParticle() {}
 
 double KFCmd::ChargedParticle::calcMomentumComponent(
     const Eigen::VectorXd& x, KFBase::MOMENT_COMPONENT component) const {
-  const long bi = getBeginIndex();
   // 0 --- pt
   // 1 --- ctg theta
   // 2 --- phi
-  // 3 --- R
-  // 4 --- z
+  // 3 --- rho
+  // 4 --- tz
+  const long pt_i = getBeginIndex();
   double result = 0;
   double ct = x(_timeParam->getBeginIndex());
+  double pt = x(pt_i);
+  double eta = x(pt_i + 1);
   double m = getMass();
-  double m2 = m * m;
-  double eta = x(bi + 1);
-  double eta2 = eta * eta;
-  double denominator = std::sqrt(m2 + (1 + eta2) * x(bi) * x(bi));
+  double energy = std::sqrt(m * m + (1 + eta * eta) * pt * pt);
   double qBc = getCharge() * getMagneticField() * _c;
-  double w = qBc / denominator;
-  double alpha = w * ct + x(bi + 2);
+  double w = qBc / energy;
+  double alpha = w * ct - x(pt_i + 2);
   switch (component) {
     case KFBase::MOMENT_X:
-      result = x(bi) * std::cos(alpha);
+      result = pt * std::cos(alpha);
       break;
     case KFBase::MOMENT_Y:
-      result = x(bi) * std::sin(alpha);
+      result = -pt * std::sin(alpha);
       break;
     case KFBase::MOMENT_Z:
-      result = x(bi) * x(bi + 1);
+      result = pt * eta;
       break;
     case KFBase::MOMENT_E:
-      double pt = x(bi);
-      double ctg = x(bi + 1);
-      result = std::pow(pt * pt * (1 + ctg * ctg) + getMass() * getMass(), 0.5);
+      result = energy;
       break;
   }
   return result;
@@ -84,49 +81,54 @@ double KFCmd::ChargedParticle::calcMomentumComponent(
 
 Eigen::VectorXd KFCmd::ChargedParticle::calcDMomentumComponent(
     const Eigen::VectorXd& x, KFBase::MOMENT_COMPONENT component) const {
-  const long bi = getBeginIndex();
-  const long ti = _timeParam->getBeginIndex();
+  // 0 --- pt
+  // 1 --- ctg theta
+  // 2 --- phi
+  // 3 --- rho
+  // 4 --- tz
+  const long pt_i = getBeginIndex();
+  const long time_i = _timeParam->getBeginIndex();
   Eigen::VectorXd result = Eigen::VectorXd::Zero(x.size());
-  double ct = x(ti);
+  double ct = x(time_i);
   double m = getMass();
   double m2 = m * m;
-  double eta = x(bi + 1);
+  double eta = x(pt_i + 1);
   double eta2 = eta * eta;
-  double pt2 = x(bi) * x(bi);
-  double y0 = 1 + eta2;
-  double denominator = std::sqrt(m2 + y0 * pt2);
+  double pt = x(pt_i);
+  double pt2 = pt * pt;
+  double energy = std::sqrt(m2 + (1 + eta2) * pt2);
   double qBc = getCharge() * getMagneticField() * _c;
-  double w = qBc / denominator;
-  double denom3 = std::pow(denominator, 3);
-  double alpha = w * ct + x(bi + 2);
-  double dw_dpt = -qBc * x(bi) * y0 / denom3;
-  double dw_deta = -qBc * pt2 * eta / denom3;
+  double w = qBc / energy;
+  double dw_de = -w / energy;
+  double de_dpt = pt * (1 + eta2) / energy;
+  double de_deta = pt2 * eta / energy;
+  double dw_dpt = dw_de * de_dpt;
+  double dw_deta = dw_de * de_deta;
+  double alpha = w * ct - x(pt_i + 2);
   double sinA = std::sin(alpha);
   double cosA = std::cos(alpha);
+  double px = pt * cosA;
+  double py = -pt * sinA;
   switch (component) {
     case KFBase::MOMENT_X:
-      result(bi) = cosA - x(bi) * dw_dpt * ct * sinA;
-      result(bi + 1) = -x(bi) * dw_deta * ct * sinA;
-      result(bi + 2) = -x(bi) * sinA;
-      result(ti) = w * result(bi + 2);
+      result(pt_i + 2) = -py;
+      result(pt_i) = cosA + dw_dpt * py * ct;
+      result(pt_i + 1) = dw_deta * py * ct;
+      result(time_i) = w * py;
       break;
     case KFBase::MOMENT_Y:
-      result(bi) = sinA + x(bi) * dw_dpt * ct * cosA;
-      result(bi + 1) = x(bi) * dw_deta * ct * cosA;
-      result(bi + 2) = x(bi) * cosA;
-      result(ti) = w * result(bi + 2);
+      result(pt_i + 2) = px;
+      result(pt_i) = -sinA - dw_dpt * px * ct;
+      result(pt_i + 1) = -dw_deta * px * ct;
+      result(time_i) = -w * px;
       break;
     case KFBase::MOMENT_Z:
-      result(bi) = x(bi + 1);
-      result(bi + 1) = x(bi);
+      result(pt_i) = eta;
+      result(pt_i + 1) = pt;
       break;
     case KFBase::MOMENT_E:
-      double pt = x(bi);
-      double ctg = x(bi + 1);
-      double en =
-          std::pow(pt * pt * (1 + ctg * ctg) + getMass() * getMass(), 0.5);
-      result(bi) = pt * (1 + ctg * ctg) / en;
-      result(bi + 1) = ctg * pt * pt / en;
+      result(pt_i) = de_dpt;
+      result(pt_i + 1) = de_deta;
       break;
   }
   return result;
@@ -134,96 +136,104 @@ Eigen::VectorXd KFCmd::ChargedParticle::calcDMomentumComponent(
 
 Eigen::MatrixXd KFCmd::ChargedParticle::calcD2MomentumComponent(
     const Eigen::VectorXd& x, KFBase::MOMENT_COMPONENT component) const {
-  const long bi = getBeginIndex();
-  const long ti = _timeParam->getBeginIndex();
+  // 0 --- pt
+  // 1 --- ctg theta
+  // 2 --- phi
+  // 3 --- rho
+  // 4 --- tz
+  const long pt_i = getBeginIndex();
+  const long eta_i = pt_i + 1;
+  const long phi_i = pt_i + 2;
+  const long time_i = _timeParam->getBeginIndex();
   Eigen::MatrixXd result = Eigen::MatrixXd::Zero(x.size(), x.size());
-  double ct = x(ti);
-  double ct2 = ct * ct;
+  double ct = x(time_i);
   double m = getMass();
   double m2 = m * m;
-  double eta = x(bi + 1);
+  double eta = x(eta_i);
   double eta2 = eta * eta;
-  double pt2 = x(bi) * x(bi);
-  double pt3 = pt2 * x(bi);
-  double y0 = 1 + eta2;
-  double denominator = std::sqrt(m2 + y0 * pt2);
+  double pt = x(pt_i);
+  double pt2 = pt * pt;
+  double c0 = 1 + eta2;
+  double energy = std::sqrt(m2 + c0 * pt2);
   double qBc = getCharge() * getMagneticField() * _c;
-  double w = qBc / denominator;
-  double denom3 = std::pow(denominator, 3);
-  double denom5 = std::pow(denominator, 5);
-  double alpha = w * ct + x(bi + 2);
-  double dw_dpt = -qBc * x(bi) * y0 / denom3;
-  double dw_dpt2 = dw_dpt * dw_dpt;
-  double dw_deta = -qBc * pt2 * eta / denom3;
-  double dw_deta2 = dw_deta * dw_deta;
+  double w = qBc / energy;
+  double dw_de = -w / energy;
+  double d2w_d2e = 2. * w / energy / energy;
+  double de_dpt = pt * c0 / energy;
+  double de_deta = pt2 * eta / energy;
+  double d2e_d2pt = c0 / energy - de_dpt * de_dpt / energy;
+  double d2e_dpt_deta = 2. * eta * pt / energy - de_dpt * de_deta / energy;
+  double d2e_d2eta = pt2 / energy - de_deta * de_deta / energy;
+  double dw_dpt = dw_de * de_dpt;
+  double dw_deta = dw_de * de_deta;
+  double d2w_d2pt = d2w_d2e * de_dpt * de_dpt + dw_de * d2e_d2pt;
+  double d2w_dpt_deta = d2w_d2e * de_dpt * de_deta + dw_de * d2e_dpt_deta;
+  double d2w_d2eta = d2w_d2e * de_deta * de_deta + dw_de * d2e_d2eta;
+  double alpha = w * ct - x(phi_i);
   double sinA = std::sin(alpha);
   double cosA = std::cos(alpha);
-  double d2w_d2pt = 3. * qBc * pt2 * y0 * y0 / denom5 - qBc * y0 / denom3;
-  double d2w_dpt_deta = -2. * x(bi) * eta * qBc / denom3 +
-    3. * pt3 * eta * qBc * y0 / denom5;
-  double d2w_d2eta = -pt2 * qBc / denom3 + 3. * eta2 * pt2 * pt2 * qBc / denom5;
+  double px = pt * cosA;
+  double py = -pt * sinA;
+  double dpy_dpt = -sinA - dw_dpt * px * ct;
+  double dpy_deta = -dw_deta * px * ct;
+  double dpy_dct = -w * px;
+  double dpx_dpt = cosA + dw_dpt * py * ct;
+  double dpx_deta = dw_deta * py * ct;
+  double dpx_dct = w * py;
   switch (component) {
     case KFBase::MOMENT_X:
-      result(bi, bi) = -2 * dw_dpt * ct * sinA -
-	x(bi) * dw_dpt2 * ct2 * cosA -
-	x(bi) * d2w_d2pt * ct * sinA;
-      result(bi, bi + 1) = -dw_deta * ct * sinA -
-	x(bi) * dw_dpt * dw_deta * ct2 * cosA -
-	x(bi) * d2w_dpt_deta * ct * sinA;
-      result(bi + 1, bi) = result(bi, bi + 1);
-      result(bi, bi + 2) = -sinA - x(bi) * dw_dpt * ct * cosA;
-      result(bi + 2, bi) = result(bi, bi + 2);
-      result(bi, ti) = w * result(bi, bi + 2) - x(bi) * dw_dpt * sinA;
-      result(ti, bi) = result(bi, ti);
-      result(bi + 1, bi + 1) = -x(bi) * dw_deta2 * ct2 * cosA -
-	x(bi) * d2w_d2eta * ct * sinA;
-     result(bi + 1, bi + 2) = - x(bi) * dw_deta * ct * cosA;
-     result(bi + 2, bi + 1) = result(bi + 1, bi + 2);
-     result(bi + 1, ti) = w * result(bi + 1, bi + 2) - x(bi) * dw_deta * sinA;
-     result(ti, bi + 1) = result(bi + 1, ti);
-     result(bi + 2, bi + 2) = -x(bi) * cosA;
-     result(bi + 2, ti) = w * result(bi + 2, bi + 2);
-     result(ti, bi + 2) = result(bi + 2, ti);
-     result(ti, ti) = w * w * result(bi + 2, bi + 2);
+      result(phi_i, phi_i) = -px;
+      result(phi_i, pt_i) = -dpy_dpt;
+      result(pt_i, phi_i) = result(phi_i, pt_i);
+      result(phi_i, eta_i) = -dpy_deta;
+      result(eta_i, phi_i) = result(phi_i, eta_i);
+      result(phi_i, time_i) = -dpy_dct;
+      result(time_i, phi_i) = result(phi_i, time_i);
+
+      result(pt_i, pt_i) = -dw_dpt * ct * sinA +
+       	d2w_d2pt * py * ct + dw_dpt * dpy_dpt * ct;
+      result(pt_i, eta_i) = -dw_deta * ct * sinA +
+	d2w_dpt_deta * py * ct + dw_dpt * dpy_deta * ct;
+      result(eta_i, pt_i) = result(pt_i, eta_i);
+      result(pt_i, time_i) = -w * sinA + dw_dpt * py + dw_dpt * dpy_dct * ct;
+      result(time_i, pt_i) = result(pt_i, time_i);
+
+      result(eta_i, eta_i) = d2w_d2eta * py * ct + dw_deta * dpy_deta * ct;
+      result(eta_i, time_i) = dw_deta * py + dw_deta * dpy_dct * ct;
+      result(time_i, eta_i) = result(eta_i, time_i);
+      result(time_i, time_i) = w * dpy_dct;
      break;
     case KFBase::MOMENT_Y:
-      result(bi, bi) = 2 * dw_dpt * ct * cosA - x(bi) * dw_dpt2 * ct2 * sinA +
-	x(bi) * d2w_d2pt * ct * cosA;
-      result(bi, bi + 1) = dw_deta * ct * cosA -
-	x(bi) * dw_deta * dw_dpt * ct2 * sinA +
-	x(bi) * d2w_dpt_deta * ct * cosA;
-      result(bi + 1, bi) = result(bi, bi + 1);
-      result(bi, bi + 2) = cosA - x(bi) * dw_dpt * ct * sinA;
-      result(bi + 2, bi) = result(bi, bi + 2);
-      result(bi, ti) = w * result(bi, bi + 2) + x(bi) * dw_dpt * cosA;
-      result(ti, bi) = result(bi, ti);
-      result(bi + 1, bi + 1) = -x(bi) * dw_deta2 * ct2 * sinA +
-	x(bi) * d2w_d2eta * ct * cosA;
-      result(bi + 1, bi + 2) = -x(bi) * dw_deta * ct * sinA;
-      result(bi + 2, bi + 1) = result(bi + 1, bi + 2);
-      result(bi + 1, ti) = w * result(bi + 1, bi + 2) + x(bi) * dw_deta * cosA;
-      result(ti, bi + 1) = result(bi + 1, ti);
-      result(bi + 2, bi + 2) = -x(bi) * sinA;
-      result(bi + 2, ti) = w * result(bi + 2, bi + 2);
-      result(ti, bi + 2) = result(bi + 2, ti);
-      result(ti, ti) = w * w * result(bi + 2, bi + 2);
+      result(phi_i, phi_i) = -py;
+      result(phi_i, pt_i) = dpx_dpt;
+      result(pt_i, phi_i) = result(phi_i, pt_i);
+      result(phi_i, eta_i) = dpx_deta;
+      result(eta_i, phi_i) = result(phi_i, eta_i);
+      result(phi_i, time_i) = dpx_dct;
+      result(time_i, phi_i) = result(phi_i, time_i);
+
+      result(pt_i, pt_i) = -dw_dpt * ct * cosA -
+       	d2w_d2pt * px * ct - dw_dpt * dpx_dpt * ct;
+      result(pt_i, eta_i) = -dw_deta * ct * cosA -
+	d2w_dpt_deta * px * ct - dw_dpt * dpx_deta * ct;
+      result(eta_i, pt_i) = result(pt_i, eta_i);
+      result(pt_i, time_i) = -w * cosA - dw_dpt * px - dw_dpt * dpx_dct * ct;
+      result(time_i, pt_i) = result(pt_i, time_i);
+
+      result(eta_i, eta_i) = -d2w_d2eta * px * ct - dw_deta * dpx_deta * ct;
+      result(eta_i, time_i) = -dw_deta * px - dw_deta * dpx_dct * ct;
+      result(time_i, eta_i) = result(eta_i, time_i);
+      result(time_i, time_i) = -w * dpx_dct;
       break;
     case KFBase::MOMENT_Z:
-      result(bi, bi + 1) = 1;
-      result(bi + 1, bi) = 1;
+      result(pt_i, eta_i) = 1;
+      result(eta_i, pt_i) = result(pt_i, eta_i);
       break;
     case KFBase::MOMENT_E:
-      double pt = x(bi);
-      double ctg = x(bi + 1);
-      double en =
-          std::pow(pt * pt * (1 + ctg * ctg) + getMass() * getMass(), 0.5);
-      double tmp = 1 + ctg * ctg;
-      result(bi, bi) = tmp / en - std::pow(pt * tmp, 2) / std::pow(en, 3);
-      result(bi, bi + 1) =
-          2 * pt * ctg / en - std::pow(pt, 3) * ctg * tmp / std::pow(en, 3);
-      result(bi + 1, bi) = result(bi, bi + 1);
-      result(bi + 1, bi + 1) =
-          pt * pt / en - std::pow(ctg * pt * pt, 2) / std::pow(en, 3);
+      result(pt_i, pt_i) = d2e_d2pt;
+      result(pt_i, eta_i) = d2e_dpt_deta;
+      result(eta_i, pt_i) = result(pt_i, eta_i);
+      result(eta_i, eta_i) = d2e_d2eta;
       break;
   }
   return result;
@@ -231,28 +241,33 @@ Eigen::MatrixXd KFCmd::ChargedParticle::calcD2MomentumComponent(
 
 double KFCmd::ChargedParticle::calcVertexComponent(
     const Eigen::VectorXd& x, KFBase::VERTEX_COMPONENT component) const {
-  long bi = getBeginIndex();
+  // 0 --- pt
+  // 1 --- ctg theta
+  // 2 --- phi
+  // 3 --- rho
+  // 4 --- tz
+  long pt_i = getBeginIndex();
   double result = 0;
   double ct = x(_timeParam->getBeginIndex());
   double m = getMass();
-  double m2 = m * m;
-  double eta = x(bi + 1);
-  double eta2 = eta * eta;
-  double denominator = std::sqrt(m2 + (1 + eta2) * x(bi) * x(bi));
+  double eta = x(pt_i + 1);
+  double pt = x(pt_i);
+  double energy = std::sqrt(m * m + (1 + eta * eta) * pt * pt);
   double qBc = getCharge() * getMagneticField() * _c;
-  double r = x(bi) / qBc;
-  double w = qBc / denominator;
+  double r = pt / qBc;
+  double w = qBc / energy;
+  double phi = x(pt_i + 2);
+  double alpha = w * ct - phi;
+  double a = r - x(pt_i + 3);
   switch (component) {
     case KFBase::VERTEX_X:
-      result = -(x(bi + 3) + r) * std::sin(x(bi + 2)) +
-               r * std::sin(w * ct + x(bi + 2));
+      result = a * std::sin(phi) + r * std::sin(alpha);
       break;
     case KFBase::VERTEX_Y:
-      result = (x(bi + 3) + r) * std::cos(x(bi + 2)) -
-               r * std::cos(w * ct + x(bi + 2));
+      result = -a * std::cos(phi) + r * std::cos(alpha);
       break;
     case KFBase::VERTEX_Z:
-      result = x(bi + 4) + x(bi) * eta * ct / denominator;
+      result = x(pt_i + 4) + pt * eta * ct / energy;
       break;
   }
 
@@ -261,48 +276,58 @@ double KFCmd::ChargedParticle::calcVertexComponent(
 
 Eigen::VectorXd KFCmd::ChargedParticle::calcDVertexComponent(
     const Eigen::VectorXd& x, KFBase::VERTEX_COMPONENT component) const {
-  long bi = getBeginIndex();
+  // 0 --- pt
+  // 1 --- ctg theta
+  // 2 --- phi
+  // 3 --- rho
+  // 4 --- tz
+  long pt_i = getBeginIndex();
+  const long time_i = _timeParam->getBeginIndex();
   Eigen::VectorXd result = Eigen::VectorXd::Zero(x.size());
   double ct = x(_timeParam->getBeginIndex());
   double m = getMass();
-  double m2 = m * m;
-  double eta = x(bi + 1);
+  double eta = x(pt_i + 1);
   double eta2 = eta * eta;
-  double denominator = std::sqrt(m2 + (1 + eta2) * x(bi) * x(bi));
-  double denom3 = std::pow(denominator, 3);
-  double pt2 = x(bi) * x(bi);
+  double pt = x(pt_i);
+  double pt2 = pt * pt;
+  double c0 = 1 + eta2;
+  double energy = std::sqrt(m * m + c0 * pt2);
   double qBc = getCharge() * getMagneticField() * _c;
-  double r = x(bi) / qBc;
-  double w = qBc / denominator;
-  double sinP = std::sin(x(bi + 2));
-  double cosP = std::cos(x(bi + 2));
-  double alpha = w * ct + x(bi + 2);
-  double sinA = std::sin(alpha);
+  double r = pt / qBc;
+  double w = qBc / energy;
+  double phi = x(pt_i + 2);
+  double alpha = w * ct - phi;
+  double a = r - x(pt_i + 3);
+  double dw_de = -w / energy;
+  double de_dpt = pt * c0 / energy;
+  double de_deta = pt2 * eta / energy;
+  double dw_dpt = dw_de * de_dpt;
+  double dw_deta = dw_de * de_deta;
   double cosA = std::cos(alpha);
+  double sinA = std::sin(alpha);
+  double cosP = std::cos(phi);
+  double sinP = std::sin(phi);
+  double dz = pt * eta * ct / energy;
   switch (component) {
     case KFBase::VERTEX_X:
-      result(bi) =
-          -sinP / qBc + sinA / qBc - pt2 * (1 + eta2) * ct * cosA / denom3;
-      result(bi + 1) = -eta * pt2 * x(bi) * ct * cosA / denom3;
-      result(bi + 2) = -(x(bi + 3) + r) * std::cos(x(bi + 2)) + r * cosA;
-      result(bi + 3) = -sinP;
-      result(_timeParam->getBeginIndex()) = r * w * cosA;
+      result(pt_i) = (sinP + sinA) / qBc + r * dw_dpt * ct * cosA;
+      result(pt_i + 1) = r * dw_deta * ct * cosA;
+      result(pt_i + 2) = a * cosP - r * cosA;
+      result(pt_i + 3) = -sinP;
+      result(time_i) = w * r * cosA;
       break;
     case KFBase::VERTEX_Y:
-      result(bi) =
-          cosP / qBc - cosA / qBc - pt2 * (1 + eta2) * ct * sinA / denom3;
-      result(bi + 1) = -eta * pt2 * x(bi) * ct * sinA / denom3;
-      result(bi + 2) = -(x(bi + 3) + r) * std::sin(x(bi + 2)) + r * sinA;
-      result(bi + 3) = cosP;
-      result(_timeParam->getBeginIndex()) = r * w * sinA;
+      result(pt_i) = (cosA - cosP) / qBc - r * dw_dpt * ct * sinA;
+      result(pt_i + 1) = -r * dw_deta * ct * sinA;
+      result(pt_i + 2) = a * sinP + r * sinA;
+      result(pt_i + 3) = cosP;
+      result(time_i) = -w * r * sinA;
       break;
     case KFBase::VERTEX_Z:
-      result(bi) =
-          eta * ct / denominator - pt2 * eta * (1 + eta2) * ct / denom3;
-      result(bi + 1) =
-          x(bi) * ct / denominator - eta2 * pt2 * x(bi) * ct / denom3;
-      result(bi + 4) = 1;
-      result(_timeParam->getBeginIndex()) = x(bi) * eta / denominator;
+      result(pt_i) = eta * ct / energy - dz * de_dpt / energy;
+      result(pt_i + 1) = pt * ct / energy - dz * de_deta / energy;
+      result(pt_i + 4) = 1;
+      result(time_i) = pt * eta / energy;
       break;
   }
   return result;
@@ -310,118 +335,113 @@ Eigen::VectorXd KFCmd::ChargedParticle::calcDVertexComponent(
 
 Eigen::MatrixXd KFCmd::ChargedParticle::calcD2VertexComponent(
     const Eigen::VectorXd& x, KFBase::VERTEX_COMPONENT component) const {
-  long bi = getBeginIndex();
+  // 0 --- pt
+  // 1 --- ctg theta
+  // 2 --- phi
+  // 3 --- rho
+  // 4 --- tz
+  long pt_i = getBeginIndex();
+  const long eta_i = pt_i + 1;
+  const long phi_i = pt_i + 2;
+  const long rho_i = pt_i + 3;
+  const long time_i = _timeParam->getBeginIndex();
   Eigen::MatrixXd result = Eigen::MatrixXd::Zero(x.size(), x.size());
   double ct = x(_timeParam->getBeginIndex());
-  double m = getMass();
-  double m2 = m * m;
-  double eta = x(bi + 1);
-  double eta2 = eta * eta;
-  double denominator = std::sqrt(m2 + (1 + eta2) * x(bi) * x(bi));
-  double denom3 = std::pow(denominator, 3);
-  double denom5 = std::pow(denominator, 5);
-  double pt2 = x(bi) * x(bi);
-  double pt3 = pt2 * x(bi);
-  double a1 = 1 + eta2;
-  double a2 = a1 * a1;
   double ct2 = ct * ct;
+  double m = getMass();
+  double eta = x(pt_i + 1);
+  double eta2 = eta * eta;
+  double pt = x(pt_i);
+  double pt2 = pt * pt;
+  double c0 = 1 + eta2;
+  double energy = std::sqrt(m * m + c0 * pt2);
   double qBc = getCharge() * getMagneticField() * _c;
-  double r = x(bi) / qBc;
-  double w = qBc / denominator;
-  double sinP = std::sin(x(bi + 2));
-  double cosP = std::cos(x(bi + 2));
-  double alpha = w * ct + x(bi + 2);
-  double sinA = std::sin(alpha);
+  double r = pt / qBc;
+  double w = qBc / energy;
+  double phi = x(pt_i + 2);
+  double alpha = w * ct - phi;
+  double a = r - x(pt_i + 3);
+  double dw_de = -w / energy;
+  double d2w_d2e = 2. * w / energy / energy;
+  double de_dpt = pt * c0 / energy;
+  double de_deta = pt2 * eta / energy;
+  double d2e_d2pt = c0 / energy - de_dpt * de_dpt / energy;
+  double d2e_dpt_deta = 2. * eta * pt / energy - de_dpt * de_deta / energy;
+  double d2e_d2eta = pt2 / energy - de_deta * de_deta / energy;
+  double dw_dpt = dw_de * de_dpt;
+  double dw_deta = dw_de * de_deta;
+  double d2w_d2pt = d2w_d2e * de_dpt * de_dpt + dw_de * d2e_d2pt;
+  double d2w_dpt_deta = d2w_d2e * de_dpt * de_deta + dw_de * d2e_dpt_deta;
+  double d2w_d2eta = d2w_d2e * de_deta * de_deta + dw_de * d2e_d2eta;
   double cosA = std::cos(alpha);
-  double denom6 = std::pow(denominator, 6);
-  double pt4 = pt2 * pt2;
-  double pt5 = pt4 * x(bi);
+  double sinA = std::sin(alpha);
+  double cosP = std::cos(phi);
+  double sinP = std::sin(phi);
+  double dz = pt * eta * ct / energy;
   switch (component) {
     case KFBase::VERTEX_X:
-      result(bi, bi) = -3. * x(bi) * a1 * ct * cosA / denom3 +
-                       3. * pt3 * a2 * ct * cosA / denom5 -
-                       pt3 * a2 * ct2 * qBc * sinA / denom6;
-      result(bi, bi + 1) = -3. * pt2 * eta * ct * cosA / denom3 +
-                           3. * pt4 * a1 * eta * ct * cosA / denom5 -
-                           pt4 * a1 * eta * ct2 * qBc * sinA / denom6;
-      result(bi + 1, bi) = result(bi, bi + 1);
-      result(bi, bi + 2) =
-          -cosP / qBc + cosA / qBc + pt2 * a1 * ct * sinA / denom3;
-      result(bi + 2, bi) = result(bi, bi + 2);
-      result(bi, _timeParam->getBeginIndex()) =
-          cosA / denominator - pt2 * a1 * cosA / denom3 +
-          pt2 * a1 * w * ct * sinA / denom3;
-      result(_timeParam->getBeginIndex(), bi) =
-          result(bi, _timeParam->getBeginIndex());
-      result(bi + 1, bi + 1) = -pt3 * ct * cosA / denom3 +
-                               3. * pt5 * eta2 * ct * cosA / denom5 -
-                               pt5 * eta2 * ct2 * qBc * sinA / denom6;
-      result(bi + 1, bi + 2) = pt3 * eta * ct * sinA / denom3;
-      result(bi + 2, bi + 1) = result(bi + 1, bi + 2);
-      result(bi + 1, _timeParam->getBeginIndex()) =
-          -pt3 * eta * cosA / denom3 + pt3 * eta * w * ct * sinA / denom3;
-      result(_timeParam->getBeginIndex(), bi + 1) =
-          result(bi + 1, _timeParam->getBeginIndex());
-      result(bi + 2, bi + 2) = (x(bi + 3) + r) * sinP - r * sinA;
-      result(bi + 2, bi + 3) = -cosP;
-      result(bi + 3, bi + 2) = result(bi + 2, bi + 3);
-      result(bi + 2, _timeParam->getBeginIndex()) = -r * w * sinA;
-      result(_timeParam->getBeginIndex(), bi + 2) =
-          result(bi + 2, _timeParam->getBeginIndex());
-      result(_timeParam->getBeginIndex(), _timeParam->getBeginIndex()) =
-          -r * w * w * sinA;
+      result(pt_i, pt_i) = 2. * dw_dpt * ct * cosA / qBc + r * d2w_d2pt * ct * cosA -
+	r * dw_dpt * dw_dpt * ct2 * sinA;
+      result(pt_i, eta_i) = dw_deta * ct * cosA / qBc +
+      	r * d2w_dpt_deta * ct * cosA - r * dw_dpt * dw_deta * ct2 * sinA;
+      result(eta_i, pt_i) = result(pt_i, eta_i);
+      result(pt_i, phi_i) = (cosP - cosA) / qBc + r * dw_dpt * ct * sinA;
+      result(phi_i, pt_i) = result(pt_i, phi_i);
+      result(pt_i, time_i) = w * cosA / qBc + r * dw_dpt * cosA -
+       	w * r * dw_dpt * ct * sinA;
+      result(time_i, pt_i) = result(pt_i, time_i);
+
+      result(eta_i, eta_i) = r * d2w_d2eta * ct * cosA - r * dw_deta * dw_deta * ct2 * sinA;
+      result(eta_i, phi_i) = r * dw_deta * ct * sinA;
+      result(phi_i, eta_i) = result(eta_i, phi_i);
+      result(eta_i, time_i) = r * dw_deta * cosA - w * r * dw_deta * ct * sinA;
+      result(time_i, eta_i) = result(eta_i, time_i);
+
+      result(phi_i, phi_i) = -a * sinP - r * sinA;
+      result(phi_i, rho_i) = -cosP;
+      result(rho_i, phi_i) = result(phi_i, rho_i);
+      result(phi_i, time_i) = w * r * sinA;
+      result(time_i, phi_i) = result(phi_i, time_i);
+      result(time_i, time_i) = -w * w * r * sinA;
       break;
     case KFBase::VERTEX_Y:
-      result(bi, bi) = -3. * x(bi) * a1 * ct * sinA / denom3 +
-                       3. * pt3 * a2 * ct * sinA / denom5 +
-                       qBc * pt3 * a2 * ct2 * cosA / denom6;
-      result(bi, bi + 1) = -3. * pt2 * eta * ct * sinA / denom3 +
-                           3. * pt4 * eta * a1 * ct * sinA / denom5 +
-                           pt4 * eta * (1 + eta2) * ct2 * qBc * cosA / denom6;
-      result(bi + 1, bi) = result(bi, bi + 1);
-      result(bi, bi + 2) =
-          -sinP / qBc + sinA / qBc - pt2 * a1 * ct * cosA / denom3;
-      result(bi + 2, bi) = result(bi, bi + 2);
-      result(bi, _timeParam->getBeginIndex()) =
-          sinA * w / qBc - pt2 * a1 * sinA / denom3 -
-          pt2 * a1 * w * ct * cosA / denom3;
-      result(_timeParam->getBeginIndex(), bi) =
-          result(bi, _timeParam->getBeginIndex());
-      result(bi + 1, bi + 1) = -pt3 * ct * sinA / denom3 +
-                               3. * eta2 * pt5 * ct * sinA / denom5 +
-                               eta2 * ct2 * qBc * pt5 * cosA / denom6;
-      result(bi + 1, bi + 2) = -pt3 * eta * ct * cosA / denom3;
-      result(bi + 2, bi + 1) = result(bi + 1, bi + 2);
-      result(bi + 1, _timeParam->getBeginIndex()) =
-          -pt3 * eta * sinA / denom3 - pt3 * eta * w * ct * cosA / denom3;
-      result(_timeParam->getBeginIndex(), bi + 1) =
-          result(bi + 1, _timeParam->getBeginIndex());
-      result(bi + 2, bi + 2) = -(x(bi + 3) + r) * cosP + r * cosA;
-      result(bi + 2, bi + 3) = -sinP;
-      result(bi + 3, bi + 2) = result(bi + 2, bi + 3);
-      result(bi + 2, _timeParam->getBeginIndex()) = r * w * cosA;
-      result(_timeParam->getBeginIndex(), bi + 2) =
-          result(bi + 2, _timeParam->getBeginIndex());
-      result(_timeParam->getBeginIndex(), _timeParam->getBeginIndex()) =
-          r * w * w * cosA;
+      result(pt_i, pt_i) = -2. * dw_dpt * ct * sinA / qBc - r * d2w_d2pt * ct * sinA -
+	r * dw_dpt * dw_dpt * ct2 * cosA;
+      result(pt_i, eta_i) = -dw_deta * ct * sinA / qBc - r * d2w_dpt_deta * ct * sinA -
+      	r * dw_dpt * dw_deta * ct2 * cosA;
+      result(eta_i, pt_i) = result(pt_i, eta_i);
+      result(pt_i, phi_i) = (sinP + sinA) / qBc + r * dw_dpt * ct * cosA;
+      result(phi_i, pt_i) = result(pt_i, phi_i);
+      result(pt_i, time_i) = -w * sinA / qBc - r * dw_dpt * sinA - r * dw_dpt * w * ct * cosA;
+      result(time_i, pt_i) = result(pt_i, time_i);
+
+      result(eta_i, eta_i) = -r * d2w_d2eta * ct * sinA -r * dw_deta * dw_deta * ct2 * cosA;
+      result(eta_i, phi_i) = r * dw_deta * ct * cosA;
+      result(phi_i, eta_i) = result(eta_i, phi_i);
+      result(eta_i, time_i) = -r * dw_deta * sinA - w * r * dw_deta * ct * cosA;
+      result(time_i, eta_i) = result(eta_i, time_i);
+
+      result(phi_i, phi_i) = a * cosP - r * cosA;
+      result(phi_i, rho_i) = -sinP;
+      result(rho_i, phi_i) = result(phi_i, rho_i);
+      result(phi_i, time_i) = w * r * cosA;
+      result(time_i, phi_i) = result(phi_i, time_i);
+      result(time_i, time_i) = -w * w * r * cosA;
       break;
     case KFBase::VERTEX_Z:
-      result(bi, bi) = -3. * x(bi) * eta * a1 * ct / denom3 +
-                       3. * pt3 * a2 * eta * ct / denom5;
-      result(bi, bi + 1) = ct / denominator -
-                           pt2 * (1 + 4 * eta2) * ct / denom3 +
-                           3. * eta2 * a1 * pt4 * ct / denom5;
-      result(bi + 1, bi) = result(bi, bi + 1);
-      result(bi, _timeParam->getBeginIndex()) =
-          eta / denominator - pt2 * eta * a1 / denom3;
-      result(_timeParam->getBeginIndex(), bi) =
-          result(bi, _timeParam->getBeginIndex());
-      result(bi + 1, bi + 1) =
-          -3. * eta * pt3 * ct / denom3 + 3. * eta * eta2 * pt5 * ct / denom5;
-      result(bi + 1, _timeParam->getBeginIndex()) =
-          x(bi) / denominator - eta2 * pt3 / denom3;
-      result(_timeParam->getBeginIndex(), bi + 1) =
-          result(bi + 1, _timeParam->getBeginIndex());
+      result(pt_i, pt_i) = -2. * eta * ct * de_dpt / energy / energy +
+      	2. * dz * de_dpt * de_dpt / energy / energy - dz * d2e_d2pt / energy;
+      result(pt_i, eta_i) = ct / energy - eta * ct * de_deta / energy / energy -
+      	pt * ct * de_dpt / energy / energy + 2. * dz * de_dpt * de_deta / energy / energy -
+      	dz * d2e_dpt_deta / energy;
+      result(eta_i, pt_i) = result(pt_i, eta_i);
+      result(pt_i, time_i) = eta / energy - pt * eta * de_dpt / energy / energy;
+      result(time_i, pt_i) = result(pt_i, time_i);
+
+      result(eta_i, eta_i) = -2. * pt * ct * de_deta / energy / energy +
+       	2. * dz * de_deta * de_deta / energy / energy - dz * d2e_d2eta / energy;
+      result(eta_i, time_i) = pt / energy - pt * eta * de_deta / energy / energy;
+      result(time_i, eta_i) = result(eta_i, time_i);
       break;
   }
   return result;
