@@ -203,6 +203,9 @@ class Hypothesis : public KFBase::Hypothesis {
    * @param component (vertex component)
    */
   void releaseVertexComponent(const std::string&, KFBase::VERTEX_COMPONENT);
+  void fixTrackNaturalParameter(const std::string&, double);
+  void releaseTrackNaturalParameter(const std::string&);
+  
   //! A method that used to disable a charged particle
   /*!
    * @param chargedParticleName (charged particle name)
@@ -271,6 +274,8 @@ class Hypothesis : public KFBase::Hypothesis {
    * @param chargedParticleName (charged particle name)
    */
   void enableVertexConstraintZ(const std::string&);
+
+  void setBeamXY(double, double);
 
  protected:
   //! A method that used to add vertex to a hypothesis

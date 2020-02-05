@@ -160,6 +160,15 @@ void KFCmd::Hypothesis::releaseVertexComponent(
   }
 }
 
+void KFCmd::Hypothesis::fixTrackNaturalParameter(const std::string& charged_particle_name,
+						 double value) {
+  _commonParams.at("#time-" + charged_particle_name)->fixParameter(0, value);
+}
+
+void KFCmd::Hypothesis::releaseTrackNaturalParameter(const std::string& charged_particle_name) {
+  _commonParams.at("#time-" + charged_particle_name)->releaseParameter(0);
+}
+
 void KFCmd::Hypothesis::addChargedParticle(KFCmd::ChargedParticle* particle) {
   addParticle(particle);
   particle->setMagneticField("#m-field");
@@ -489,4 +498,22 @@ bool KFCmd::Hypothesis::fillPhoton(const std::string& name, std::size_t index,
   Eigen::MatrixXd inv = cov.inverse();
   this->setParticleInverseErrorMatrix(name, inv);
   return true;
+}
+
+void KFCmd::Hypothesis::setBeamXY(double xbeam, double ybeam) {
+  for (auto& el : _constraints) {
+      auto cnt = dynamic_cast<KFBase::VertexConstraint*>(el.second);
+      if (cnt) {
+	switch (cnt->getComponent()) {
+	case KFBase::VERTEX_X:
+	  cnt->setConstraintValue(-xbeam);
+	  break;
+	case KFBase::VERTEX_Y:
+	  cnt->setConstraintValue(-ybeam);
+	  break;
+	case KFBase::VERTEX_Z:
+	  break;
+	}
+      }
+  }
 }
