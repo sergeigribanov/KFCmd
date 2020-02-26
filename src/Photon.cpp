@@ -36,6 +36,7 @@
 KFCmd::Photon::Photon(const std::string& name) : KFBase::Particle(name, 4) {
   setPeriod(2, 0, 2 * TMath::Pi());
   setLowerLimit(0, 10);
+  setUpperLimit(0, 2000);
   setLowerLimit(1, 5);
   setUpperLimit(1, 100);
   setLowerLimit(3, -90);
