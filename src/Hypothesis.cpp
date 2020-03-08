@@ -471,17 +471,17 @@ bool KFCmd::Hypothesis::fillPhoton(const std::string& name, std::size_t index,
                                    const KFCmd::TrPh& data) {
   Eigen::VectorXd par = Eigen::VectorXd::Zero(4);
   Eigen::MatrixXd cov = Eigen::MatrixXd::Zero(4, 4);
-  double sigma2_z = 0.3;
-  double sigma2_rho = 0.3;
+  double sigma2_z = 0.30;
+  double sigma2_rho = 0.35;
+  double z = (data.phrho)[index] / tan((data.phth0)[index]);
+  double sigma2_theta = (data.pherr)[index][1] * (data.pherr)[index][1];
   if (3 == (data.phflag)[index]) // checking BGO index
-    sigma2_rho = sigma2_z * pow(tan((data.phth)[index]), 2) +
-                 pow((data.phrho)[index] * (data.pherr)[index][1] /
-                         sin((data.phth)[index]) * cos((data.phth)[index]),
-                     2);
+    sigma2_rho = sigma2_z * tan(data.phth0[index]) * tan(data.phth0[index]) +
+      sigma2_theta * z * z / pow(cos(data.phth0[index]), 4);
   else
-    sigma2_z = sigma2_rho / pow(tan((data.phth)[index]), 2) +
-               pow((data.phrho)[index] * (data.pherr)[index][1], 2) /
-                   pow(sin((data.phth)[index]), 4);
+    sigma2_z = sigma2_rho / pow(tan((data.phth0)[index]), 2) +
+      pow((data.phrho)[index] * (data.pherr)[index][1], 2) /
+      pow(sin((data.phth0)[index]), 4);
 
   cov(0, 0) = pow((data.pherr)[index][0], 2);
   cov(1, 1) = sigma2_rho;
@@ -491,8 +491,8 @@ bool KFCmd::Hypothesis::fillPhoton(const std::string& name, std::size_t index,
 
   par(0) = (data.phen)[index];
   par(1) = (data.phrho)[index];
-  par(2) = (data.phphi)[index];
-  par(3) = (data.z0) + (data.phrho)[index] / tan((data.phth)[index]);
+  par(2) = (data.phphi0)[index];
+  par(3) = z;
 
   this->setInitialParticleParams(name, par);
   Eigen::MatrixXd inv = cov.inverse();
