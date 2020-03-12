@@ -15,8 +15,6 @@ KFCmd::TrPh::TrPh(TTree *tree) : fChain(0) {
 }
 
 KFCmd::TrPh::~TrPh() {
-  if (!fChain) return;
-  delete fChain->GetCurrentFile();
 }
 
 Int_t KFCmd::TrPh::GetEntry(Long64_t entry) {
