@@ -32,8 +32,8 @@
 #include "ChargedParticle.hpp"
 
 #include <TMath.h>
-
 #include <cmath>
+#include <iostream>
 
 const double KFCmd::ChargedParticle::_c = 2.99792458;
 
@@ -41,6 +41,16 @@ KFCmd::ChargedParticle::ChargedParticle(const std::string& name, double mass,
                                         double charge)
     : KFBase::VertexParticle(name, 5, mass, charge) {
   setPeriod(2, 0, 2 * TMath::Pi());
+  setLowerLimit(0, 0);
+  setUpperLimit(0, 1100);
+  setLowerLimit(1, -20);
+  setUpperLimit(1, 20);
+  setLowerLimit(2, -1000 * TMath::Pi());
+  setUpperLimit(2, 1000 * TMath::Pi());
+  setLowerLimit(3, -30);
+  setUpperLimit(3, 30);
+  setLowerLimit(4, -20);
+  setUpperLimit(4, 20);
 }
 
 KFCmd::ChargedParticle::~ChargedParticle() {}
