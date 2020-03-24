@@ -33,6 +33,7 @@
 
 #include <KFBase/MassConstraint.hpp>
 #include <KFBase/MomentumConstraint.hpp>
+#include <KFBase/FlowConstraint.hpp>
 #include <ccgo/CommonParams.hpp>
 #include <cmath>
 
@@ -56,6 +57,27 @@ KFCmd::Hypothesis::Hypothesis(double energy, double magneticField, long nIter,
 
 KFCmd::Hypothesis::~Hypothesis() {}
 
+void KFCmd::Hypothesis::setInitialVertex(const std::string& vertexName,
+					 const Eigen::Vector3d& vertex) {
+  const std::string vx = "#" + vertexName + "-x";
+  const std::string vy = "#" + vertexName + "-y";
+  const std::string vz = "#" + vertexName + "-z";
+  Eigen::VectorXd xvect(1);
+  xvect(0) = vertex(0);
+  Eigen::VectorXd yvect(1);
+  yvect(0) = vertex(1);
+  Eigen::VectorXd zvect(1);
+  zvect(0) = vertex(2);
+  setInitialCommonParams(vx, xvect);
+  setInitialCommonParams(vy, yvect);
+  setInitialCommonParams(vz, zvect);
+}
+
+void KFCmd::Hypothesis::setInitialVertexRandomly(const std::string& vertexName, double distance) {
+  Eigen::Vector3d vertex = distance * Eigen::Vector3d::Random();
+  setInitialVertex(vertexName, vertex);
+}
+
 void KFCmd::Hypothesis::addVertex(const std::string& vertexName) {
   if (_vertices.find(vertexName) != _vertices.end()) {
     // TO DO : exception;
@@ -64,9 +86,18 @@ void KFCmd::Hypothesis::addVertex(const std::string& vertexName) {
   const std::string vx = "#" + vertexName + "-x";
   const std::string vy = "#" + vertexName + "-y";
   const std::string vz = "#" + vertexName + "-z";
-  addCommonParams(new ccgo::CommonParams(vx, 1));
-  addCommonParams(new ccgo::CommonParams(vy, 1));
-  addCommonParams(new ccgo::CommonParams(vz, 1));
+  auto xvertex = new ccgo::CommonParams(vx, 1);
+  xvertex->setLowerLimit(0, -30);
+  xvertex->setUpperLimit(0, 30);
+  auto yvertex = new ccgo::CommonParams(vy, 1);
+  yvertex->setLowerLimit(0, -30);
+  yvertex->setUpperLimit(0, 30);
+  auto zvertex = new ccgo::CommonParams(vz, 1);
+  zvertex->setLowerLimit(0, -20);
+  zvertex->setUpperLimit(0, 20);
+  addCommonParams(xvertex);
+  addCommonParams(yvertex);
+  addCommonParams(zvertex);
   enableCommonParams(vx);
   enableCommonParams(vy);
   enableCommonParams(vz);
@@ -173,7 +204,10 @@ void KFCmd::Hypothesis::addChargedParticle(KFCmd::ChargedParticle* particle) {
   addParticle(particle);
   particle->setMagneticField("#m-field");
   const std::string timeParameter = "#time-" + particle->getName();
-  addCommonParams(new ccgo::CommonParams(timeParameter, 1));
+  auto timep = new ccgo::CommonParams(timeParameter, 1);
+  timep->setLowerLimit(0, -100);
+  timep->setUpperLimit(0, 100);
+  addCommonParams(timep);
   particle->setTimeParameter(timeParameter);
   enableParticle(particle->getName());
   enableCommonParams(timeParameter);
@@ -258,6 +292,76 @@ void KFCmd::Hypothesis::addVertexConstraintsXYZ(
   enableConstraint(vtxX->getName());
   enableConstraint(vtxY->getName());
   enableConstraint(vtxZ->getName());
+}
+
+void KFCmd::Hypothesis::addFlowConstraintsXYZ(const std::string& flowName,
+					      const std::string& beginVertexName,
+					      const std::string& endVertexName) {
+  auto flowX = new KFBase::FlowConstraint("#" + flowName + "-x", KFBase::FLOW_X);
+  auto flowY = new KFBase::FlowConstraint("#" + flowName + "-y", KFBase::FLOW_Y);
+  auto flowZ = new KFBase::FlowConstraint("#" + flowName + "-z", KFBase::FLOW_Z);
+  addConstraint(flowX);
+  addConstraint(flowY);
+  addConstraint(flowZ);
+  const std::string bvX = "#" + beginVertexName + "-x";
+  const std::string bvY = "#" + beginVertexName + "-y";
+  const std::string bvZ = "#" + beginVertexName + "-z";
+  const std::string evX = "#" + endVertexName + "-x";
+  const std::string evY = "#" + endVertexName + "-y";
+  const std::string evZ = "#" + endVertexName + "-z";
+  flowX->setBeginVertexCommonParams(bvX, bvY, bvZ);
+  flowX->setEndVertexCommonParams(evX, evY, evZ);
+  flowY->setBeginVertexCommonParams(bvX, bvY, bvZ);
+  flowY->setEndVertexCommonParams(evX, evY, evZ);
+  flowZ->setBeginVertexCommonParams(bvX, bvY, bvZ);
+  flowZ->setEndVertexCommonParams(evX, evY, evZ);
+  flowX->includeUsedCommonParameter(bvX);
+  flowX->includeUsedCommonParameter(bvY);
+  flowX->includeUsedCommonParameter(bvZ);
+  flowX->includeUsedCommonParameter(evX);
+  flowX->includeUsedCommonParameter(evY);
+  flowX->includeUsedCommonParameter(evZ);
+  flowY->includeUsedCommonParameter(bvX);
+  flowY->includeUsedCommonParameter(bvY);
+  flowY->includeUsedCommonParameter(bvZ);
+  flowY->includeUsedCommonParameter(evX);
+  flowY->includeUsedCommonParameter(evY);
+  flowY->includeUsedCommonParameter(evZ);
+  flowZ->includeUsedCommonParameter(bvX);
+  flowZ->includeUsedCommonParameter(bvY);
+  flowZ->includeUsedCommonParameter(bvZ);
+  flowZ->includeUsedCommonParameter(evX);
+  flowZ->includeUsedCommonParameter(evY);
+  flowZ->includeUsedCommonParameter(evZ);
+  enableConstraint(flowX->getName());
+  enableConstraint(flowY->getName());
+  enableConstraint(flowZ->getName());
+}
+
+void KFCmd::Hypothesis::addParticleToFlow(const std::string& flowName,
+					  const std::string& particleName) {
+  addParticleToConstraint(particleName, "#" + flowName + "-x");
+  addParticleToConstraint(particleName, "#" + flowName + "-y");
+  addParticleToConstraint(particleName, "#" + flowName + "-z");
+  const auto& particle = dynamic_cast<KFCmd::ChargedParticle*>(_particles.at(particleName));
+  if (particle) {
+    const std::string timeParameter = "#time-" + particleName;
+    _constraints.at("#" + flowName + "-x")->includeUsedCommonParameter(timeParameter);
+    _constraints.at("#" + flowName + "-y")->includeUsedCommonParameter(timeParameter);
+    _constraints.at("#" + flowName + "-z")->includeUsedCommonParameter(timeParameter);
+  }
+}
+
+void KFCmd::Hypothesis::disableFlowConstraintXYZ(const std::string& flowName) {
+  disableConstraint("#" + flowName + "-x");
+  disableConstraint("#" + flowName + "-y");
+  disableConstraint("#" + flowName + "-z");
+}
+
+void KFCmd::Hypothesis::enableFlowConstraintXYZ(const std::string& flowName) {
+  enableConstraint("#" + flowName + "-x");
+  enableConstraint("#" + flowName + "-y");
+  enableConstraint("#" + flowName + "-z");
 }
 
 void KFCmd::Hypothesis::disableVertexConstraintXYZ(

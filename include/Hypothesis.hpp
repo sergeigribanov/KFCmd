@@ -232,6 +232,7 @@ class Hypothesis : public KFBase::Hypothesis {
    * @param chargedParticleName (charged particle name)
    */
   void disableVertexConstraintXYZ(const std::string&);
+  void disableFlowConstraintXYZ(const std::string&);
   //! A method that used to disable X vertex constraint for a certain charged
   //! particle
   /*!
@@ -256,6 +257,7 @@ class Hypothesis : public KFBase::Hypothesis {
    * @param chargedParticleName (charged particle name)
    */
   void enableVertexConstraintXYZ(const std::string&);
+  void enableFlowConstraintXYZ(const std::string&);
   //! A method that used to enable X vertex constraint for a certain charged
   //! particle
   /*!
@@ -283,6 +285,8 @@ class Hypothesis : public KFBase::Hypothesis {
    * @param vertexName (vertex name)
    */
   void addVertex(const std::string&);
+  void setInitialVertex(const std::string&, const Eigen::Vector3d&);
+  void setInitialVertexRandomly(const std::string&, double = 1.e-2);
   //! A method that used to add charged particle to a hypothesis
   /*!
    * @param particle (pointer to ChargedParticle object)
@@ -303,6 +307,10 @@ class Hypothesis : public KFBase::Hypothesis {
    * @param vertexName (vertex name)
    */
   void addVertexConstraintsXYZ(const std::string&, const std::string&);
+  void addFlowConstraintsXYZ(const std::string&,
+			     const std::string&,
+			     const std::string&);
+  void addParticleToFlow(const std::string&, const std::string&);
   //! A method that used to add mass constraint to a hypothesis
   /*!
    * @param constraintName (constraint name)
