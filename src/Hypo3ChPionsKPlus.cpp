@@ -50,6 +50,9 @@ KFCmd::Hypo3ChPionsKPlus::Hypo3ChPionsKPlus(double energy, double magnetField,
   addVertexConstraintsXYZ("k+", "vtx0");
   addVertexConstraintsXYZ("pi+_0", "vtx1");
   addVertexConstraintsXYZ("pi-_0", "vtx1");
+  addFlowConstraintsXYZ("ks-flow", "vtx0", "vtx1");
+  addParticleToFlow("ks-flow", "pi+_0");
+  addParticleToFlow("ks-flow", "pi-_0");
 }
 
 KFCmd::Hypo3ChPionsKPlus::~Hypo3ChPionsKPlus() {}
