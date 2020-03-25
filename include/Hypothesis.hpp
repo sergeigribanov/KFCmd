@@ -258,6 +258,8 @@ class Hypothesis : public KFBase::Hypothesis {
    */
   void enableVertexConstraintXYZ(const std::string&);
   void enableFlowConstraintXYZ(const std::string&);
+  void enableCommonMomentumConstraintPxPyPzE();
+  void disableCommonMomentumConstraintPxPyPzE();
   //! A method that used to enable X vertex constraint for a certain charged
   //! particle
   /*!

@@ -57,6 +57,20 @@ KFCmd::Hypothesis::Hypothesis(double energy, double magneticField, long nIter,
 
 KFCmd::Hypothesis::~Hypothesis() {}
 
+void KFCmd::Hypothesis::enableCommonMomentumConstraintPxPyPzE() {
+  enableConstraint("#constraint-px");
+  enableConstraint("#constraint-py");
+  enableConstraint("#constraint-pz");
+  enableConstraint("#constraint-pe");
+}
+
+void KFCmd::Hypothesis::disableCommonMomentumConstraintPxPyPzE() {
+  disableConstraint("#constraint-px");
+  disableConstraint("#constraint-py");
+  disableConstraint("#constraint-pz");
+  disableConstraint("#constraint-pe");
+}
+
 void KFCmd::Hypothesis::setInitialVertex(const std::string& vertexName,
 					 const Eigen::Vector3d& vertex) {
   const std::string vx = "#" + vertexName + "-x";
