@@ -301,6 +301,8 @@ class Hypothesis : public KFBase::Hypothesis {
    * @param vertexName (photon vertex)
    */
   void addPhoton(KFCmd::Photon*, const std::string&);
+  void addParticlePxPyPzE(const std::string&, double);
+  void addParticleMassLessThetaPhiE(const std::string&);
   //! A method that used to add vertex constraint for a certain charged particle
   //! to a hypothesis
   /*!

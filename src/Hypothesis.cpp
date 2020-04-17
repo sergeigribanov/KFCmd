@@ -30,6 +30,8 @@
  */
 
 #include "Hypothesis.hpp"
+#include "ParticlePxPyPzE.hpp"
+#include "ParticleMassLessThetaPhiE.hpp"
 
 #include <KFBase/MassConstraint.hpp>
 #include <KFBase/MomentumConstraint.hpp>
@@ -266,6 +268,25 @@ void KFCmd::Hypothesis::addPhoton(KFCmd::Photon* photon,
   _constraints.at("#constraint-pz")->includeUsedCommonParameter(vertexXname);
   _constraints.at("#constraint-pz")->includeUsedCommonParameter(vertexYname);
   _constraints.at("#constraint-pz")->includeUsedCommonParameter(vertexZname);
+}
+
+void KFCmd::Hypothesis::addParticlePxPyPzE(const std::string& name, double mass) {
+  auto particle = new KFCmd::ParticlePxPyPzE(name, mass);
+  addParticle(particle);
+  enableParticle(particle->getName());
+  addParticleToConstraint(particle->getName(), "#constraint-px");
+  addParticleToConstraint(particle->getName(), "#constraint-py");
+  addParticleToConstraint(particle->getName(), "#constraint-pz");
+  addParticleToConstraint(particle->getName(), "#constraint-pe");
+}
+
+void KFCmd::Hypothesis::addParticleMassLessThetaPhiE(const std::string& name) {
+  auto particle = new KFCmd::ParticleMassLessThetaPhiE(name);
+  enableParticle(particle->getName());
+  addParticleToConstraint(particle->getName(), "#constraint-px");
+  addParticleToConstraint(particle->getName(), "#constraint-py");
+  addParticleToConstraint(particle->getName(), "#constraint-pz");
+  addParticleToConstraint(particle->getName(), "#constraint-pe");
 }
 
 void KFCmd::Hypothesis::disablePhoton(const std::string& photonName) {
