@@ -55,7 +55,12 @@ KFCmd::Hypo2ChPionsKsKs::Hypo2ChPionsKsKs(double energy, double magnetField,
   addVertexConstraintsXYZ("pi-_1", "vtx1");
   addVertexConstraintsXYZ("pi+_2", "vtx2");
   addVertexConstraintsXYZ("pi-_2", "vtx2");
-  
+  addFlowConstraintsXYZ("ks1-flow", "vtx1", "vtx0");
+  addParticleToFlow("ks1-flow", "pi+_1");
+  addParticleToFlow("ks1-flow", "pi-_1");
+  addFlowConstraintsXYZ("ks2-flow", "vtx2", "vtx0");
+  addParticleToFlow("ks2-flow", "pi+_2");
+  addParticleToFlow("ks2-flow", "pi-_2");
 }
 
 KFCmd::Hypo2ChPionsKsKs::~Hypo2ChPionsKsKs() {}
