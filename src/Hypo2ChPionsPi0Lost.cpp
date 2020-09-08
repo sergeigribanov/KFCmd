@@ -34,6 +34,8 @@
 #include "PiMinusMeson.hpp"
 #include "PiPlusMeson.hpp"
 
+#include <TDatabasePDG.h>
+
 KFCmd::Hypo2ChPionsPi0Lost::Hypo2ChPionsPi0Lost(double energy,
 						double magneticField,
 						long nIter, double tolerance)
