@@ -42,7 +42,7 @@ KFCmd::HypoPiPlus2PhotonsPiMinusLost::HypoPiPlus2PhotonsPiMinusLost(double energ
     : KFCmd::Hypothesis(energy, magneticField, nIter, tolerance) {
   addVertex("vtx0");
   addChargedParticle(new KFCmd::PiPlusMeson("pi+"));
-  addParticlePxPyPzE(new KFCmd::ParticlePxPyPzE("pi-", TDatabasePDG::Instance()->GetParticle(-211)->Mass() * 1000));
+  addParticlePxPyPzE("pi-", TDatabasePDG::Instance()->GetParticle(-211)->Mass() * 1000);
   addPhoton(new KFCmd::Photon("g0"), "vtx0");
   addPhoton(new KFCmd::Photon("g1"), "vtx0");
   addVertexConstraintsXYZ("pi+", "vtx0");
