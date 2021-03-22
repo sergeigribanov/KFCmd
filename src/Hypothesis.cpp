@@ -282,6 +282,7 @@ void KFCmd::Hypothesis::addParticlePxPyPzE(const std::string& name, double mass)
 
 void KFCmd::Hypothesis::addParticleMassLessThetaPhiE(const std::string& name) {
   auto particle = new KFCmd::ParticleMassLessThetaPhiE(name);
+  addParticle(particle);
   enableParticle(particle->getName());
   addParticleToConstraint(particle->getName(), "#constraint-px");
   addParticleToConstraint(particle->getName(), "#constraint-py");
