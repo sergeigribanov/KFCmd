@@ -311,9 +311,13 @@ class Hypothesis : public KFBase::Hypothesis {
    * @param vertexName (vertex name)
    */
   void addVertexConstraintsXYZ(const std::string&, const std::string&);
+  void addDoubleParticleAngularConstraint(const std::string&,
+                                          const std::string&,
+                                          const std::string&,
+                                          double);
   void addFlowConstraintsXYZ(const std::string&,
-			     const std::string&,
-			     const std::string&);
+                             const std::string&,
+                             const std::string&);
   void addParticleToFlow(const std::string&, const std::string&);
   //! A method that used to add mass constraint to a hypothesis
   /*!

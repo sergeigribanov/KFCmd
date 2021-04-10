@@ -36,6 +36,7 @@
 #include <KFBase/MassConstraint.hpp>
 #include <KFBase/MomentumConstraint.hpp>
 #include <KFBase/FlowConstraint.hpp>
+#include <KFBase/DoubleParticleAngularConstraint.hpp>
 #include <ccgo/CommonParams.hpp>
 #include <cmath>
 
@@ -330,9 +331,22 @@ void KFCmd::Hypothesis::addVertexConstraintsXYZ(
   enableConstraint(vtxZ->getName());
 }
 
-void KFCmd::Hypothesis::addFlowConstraintsXYZ(const std::string& flowName,
-					      const std::string& beginVertexName,
-					      const std::string& endVertexName) {
+void KFCmd::Hypothesis::addDoubleParticleAngularConstraint(const std::string& constraintName,
+                                                           const std::string& firstParticle,
+                                                           const std::string& secondParticle,
+                                                           double sigma) {
+  auto angC = new KFBase::DoubleParticleAngularConstraint(constraintName);
+  angC->setLambda(1. / sigma / sigma);
+  addConstraint(angC);
+  addParticleToConstraint(firstParticle, angC->getName());
+  addParticleToConstraint(secondParticle, angC->getName());
+  enableConstraint(angC->getName());
+}
+
+void KFCmd::Hypothesis::addFlowConstraintsXYZ(
+    const std::string& flowName,
+    const std::string& beginVertexName,
+    const std::string& endVertexName) {
   auto flowX = new KFBase::FlowConstraint("#" + flowName + "-x", KFBase::FLOW_X);
   auto flowY = new KFBase::FlowConstraint("#" + flowName + "-y", KFBase::FLOW_Y);
   auto flowZ = new KFBase::FlowConstraint("#" + flowName + "-z", KFBase::FLOW_Z);
@@ -374,8 +388,9 @@ void KFCmd::Hypothesis::addFlowConstraintsXYZ(const std::string& flowName,
   enableConstraint(flowZ->getName());
 }
 
-void KFCmd::Hypothesis::addParticleToFlow(const std::string& flowName,
-					  const std::string& particleName) {
+void KFCmd::Hypothesis::addParticleToFlow(
+    const std::string& flowName,
+    const std::string& particleName) {
   addParticleToConstraint(particleName, "#" + flowName + "-x");
   addParticleToConstraint(particleName, "#" + flowName + "-y");
   addParticleToConstraint(particleName, "#" + flowName + "-z");
