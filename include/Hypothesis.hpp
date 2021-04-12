@@ -281,6 +281,9 @@ class Hypothesis : public KFBase::Hypothesis {
 
   void setBeamXY(double, double);
 
+  void setParticleAngularConstraintAxis(const std::string&, const TVector3&);
+  void setAngularConstraintSigma(const std::string&,  double);
+
  protected:
   //! A method that used to add vertex to a hypothesis
   /*!
@@ -315,6 +318,9 @@ class Hypothesis : public KFBase::Hypothesis {
                                           const std::string&,
                                           const std::string&,
                                           double);
+  void addParticleAngularConstraint(const std::string&,
+                                    const std::string&,
+                                    double);
   void addFlowConstraintsXYZ(const std::string&,
                              const std::string&,
                              const std::string&);

@@ -37,6 +37,7 @@
 #include <KFBase/MomentumConstraint.hpp>
 #include <KFBase/FlowConstraint.hpp>
 #include <KFBase/DoubleParticleAngularConstraint.hpp>
+#include <KFBase/ParticleAngularConstraint.hpp>
 #include <ccgo/CommonParams.hpp>
 #include <cmath>
 
@@ -341,6 +342,31 @@ void KFCmd::Hypothesis::addDoubleParticleAngularConstraint(const std::string& co
   addParticleToConstraint(firstParticle, angC->getName());
   addParticleToConstraint(secondParticle, angC->getName());
   enableConstraint(angC->getName());
+}
+
+void KFCmd::Hypothesis::addParticleAngularConstraint(const std::string& constraintName,
+                                                     const std::string& particleName,
+                                                     double sigma) {
+  auto angC = new KFBase::ParticleAngularConstraint(constraintName);
+  angC->setLambda(1. / sigma / sigma);
+  addConstraint(angC);
+  addParticleToConstraint(particleName, angC->getName());
+  enableConstraint(angC->getName());
+}
+
+void KFCmd::Hypothesis::setParticleAngularConstraintAxis(
+    const std::string& constraintName,
+    const TVector3& axis) {
+  auto cnt = dynamic_cast<KFBase::ParticleAngularConstraint*>(_constraints.at(constraintName));
+  // TODO: wrong class exception
+  cnt->setAxis(axis);
+}
+
+void KFCmd::Hypothesis::setAngularConstraintSigma(const std::string& constraintName,
+                                                  double sigma) {
+  auto cnt = dynamic_cast<ccgo::NonLagrangeConstraint*>(_constraints.at(constraintName));
+  // TODO: wrong class exception
+  cnt->setLambda(1. / sigma / sigma);
 }
 
 void KFCmd::Hypothesis::addFlowConstraintsXYZ(
