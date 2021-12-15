@@ -1,3 +1,6 @@
+[!] В 8-й версии tr_ph поменяй в include/TrPh.hpp terr0[7][5][5] на terr[7][6][6].
+
+
 # KFCmd
 
 A library of kinematinc fit that developing for the CMD-3 experiment. 
