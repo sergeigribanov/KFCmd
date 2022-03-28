@@ -7,6 +7,9 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
 find_package(kfbase REQUIRED)
 
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/env.sh.in env.sh)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/rootlogon.C.in rootlogon.C)
+
 include(GNUInstallDirs)
 add_subdirectory(core)
 add_subdirectory(hypos)
@@ -30,3 +33,5 @@ install(EXPORT kfcmdTargets NAMESPACE kfcmd:: DESTINATION lib/cmake)
 install(FILES
   ${CMAKE_CURRENT_BINARY_DIR}/kfcmdConfig.cmake
   DESTINATION lib/cmake)
+install(FILES ${PROJECT_BINARY_DIR}/env.sh DESTINATION bin)
+install(FILES ${PROJECT_BINARY_DIR}/rootlogon.C DESTINATION share/kfcmd)
