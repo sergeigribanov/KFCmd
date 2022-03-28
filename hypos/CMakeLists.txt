@@ -11,3 +11,8 @@ target_link_libraries(kfcmd_hypos PUBLIC kfcmd_core)
 set_target_properties(kfcmd_hypos
   PROPERTIES
   PUBLIC_HEADER "${HEADERS}")
+
+install(TARGETS kfcmd_hypos
+  EXPORT kfcmdTargets
+  LIBRARY DESTINATION lib/kfcmd
+  PUBLIC_HEADER DESTINATION include/kfcmd/hypos)

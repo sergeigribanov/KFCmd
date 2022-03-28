@@ -1,0 +1,8 @@
+@PACKAGE_INIT@
+
+include("${CMAKE_CURRENT_LIST_DIR}/kfcmdTargets.cmake" )
+set(KFCMD_ROOT_DIR @CMAKE_INSTALL_PREFIX@)
+set(KFCMD_INCLUDE_DIRS ${KFCMD_ROOT_DIR}/include)
+set(KFCMD_LIBRARIES
+  ${KFCMD_ROOT_DIR}/lib/kfcmd/libkfcmd_core.so
+  ${KFCMD_ROOT_DIR}/lib/kfcmd/libkfcmd_hypos.so)
