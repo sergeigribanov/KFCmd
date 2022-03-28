@@ -5,7 +5,6 @@ set(CMAKE_CXX_FLAGS "-Wall")
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
-find_package(Eigen3 REQUIRED NO_MODULE)
 find_package(kfbase REQUIRED)
 
 include(GNUInstallDirs)
