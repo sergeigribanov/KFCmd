@@ -29,24 +29,24 @@
  *
  */
 
-#include "Hypo4ChPions2Photons.hpp"
+#include "kfcmd/Hypo4ChPions2Photons.hpp"
 
 #include <TDatabasePDG.h>
 
-#include "PiMinusMeson.hpp"
-#include "PiPlusMeson.hpp"
+#include "kfcmd/PiMinusMeson.hpp"
+#include "kfcmd/PiPlusMeson.hpp"
 
-KFCmd::Hypo4ChPions2Photons::Hypo4ChPions2Photons(double energy,
+kfcmd::Hypo4ChPions2Photons::Hypo4ChPions2Photons(double energy,
                                                   double magnetField,
                                                   long nIter, double tolerance)
-    : KFCmd::Hypothesis(energy, magnetField, nIter, tolerance) {
+    : kfcmd::Hypothesis(energy, magnetField, nIter, tolerance) {
   addVertex("vtx0");
-  addChargedParticle(new KFCmd::PiPlusMeson("pi+_0"));
-  addChargedParticle(new KFCmd::PiPlusMeson("pi+_1"));
-  addChargedParticle(new KFCmd::PiMinusMeson("pi-_0"));
-  addChargedParticle(new KFCmd::PiMinusMeson("pi-_1"));
-  addPhoton(new KFCmd::Photon("g0"), "vtx0");
-  addPhoton(new KFCmd::Photon("g1"), "vtx0");
+  addChargedParticle(new kfcmd::PiPlusMeson("pi+_0"));
+  addChargedParticle(new kfcmd::PiPlusMeson("pi+_1"));
+  addChargedParticle(new kfcmd::PiMinusMeson("pi-_0"));
+  addChargedParticle(new kfcmd::PiMinusMeson("pi-_1"));
+  addPhoton(new kfcmd::Photon("g0"), "vtx0");
+  addPhoton(new kfcmd::Photon("g1"), "vtx0");
   addVertexConstraintsXYZ("pi+_0", "vtx0");
   addVertexConstraintsXYZ("pi+_1", "vtx0");
   addVertexConstraintsXYZ("pi-_0", "vtx0");
@@ -57,4 +57,4 @@ KFCmd::Hypo4ChPions2Photons::Hypo4ChPions2Photons(double energy,
   disableConstraint("m-pi0-constraint");
 }
 
-KFCmd::Hypo4ChPions2Photons::~Hypo4ChPions2Photons() {}
+kfcmd::Hypo4ChPions2Photons::~Hypo4ChPions2Photons() {}

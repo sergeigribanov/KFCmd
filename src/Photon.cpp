@@ -29,11 +29,13 @@
  *
  */
 
-#include "Photon.hpp"
+#include "kfcmd/Photon.hpp"
 
 #include <cmath>
 
-KFCmd::Photon::Photon(const std::string& name) : KFBase::Particle(name, 4) {
+namespace core = kfbase::core;
+
+kfcmd::Photon::Photon(const std::string& name) : core::Particle(name, 4) {
   setPeriod(2, 0, 2 * TMath::Pi());
   setLowerLimit(0, 10);
   setUpperLimit(0, 1100);
@@ -46,10 +48,10 @@ KFCmd::Photon::Photon(const std::string& name) : KFBase::Particle(name, 4) {
   setUpperLimit(3, 50);
 }
 
-KFCmd::Photon::~Photon() {}
+kfcmd::Photon::~Photon() {}
 
-double KFCmd::Photon::calcMomentumComponent(
-    const Eigen::VectorXd& x, KFBase::MOMENT_COMPONENT component) const {
+double kfcmd::Photon::calcMomentumComponent(
+    const Eigen::VectorXd& x, core::MOMENT_COMPONENT component) const {
   long bi = getBeginIndex();
   double result = 0;
   // 0 --- energy
@@ -63,28 +65,28 @@ double KFCmd::Photon::calcMomentumComponent(
       std::pow(x(bi + 1) * std::sin(x(bi + 2)) - x(_vertexY->getBeginIndex()),
                2));
   switch (component) {
-    case KFBase::MOMENT_X:
+    case core::MOMENT_X:
       result =
           x(bi) *
           (x(bi + 1) * std::cos(x(bi + 2)) - x(_vertexX->getBeginIndex())) / q;
       break;
-    case KFBase::MOMENT_Y:
+    case core::MOMENT_Y:
       result =
           x(bi) *
           (x(bi + 1) * std::sin(x(bi + 2)) - x(_vertexY->getBeginIndex())) / q;
       break;
-    case KFBase::MOMENT_Z:
+    case core::MOMENT_Z:
       result = x(bi) * (x(bi + 3) - x(_vertexZ->getBeginIndex())) / q;
       break;
-    case KFBase::MOMENT_E:
+    case core::MOMENT_E:
       result = x(bi);
       break;
   }
   return result;
 }
 
-Eigen::VectorXd KFCmd::Photon::calcDMomentumComponent(
-    const Eigen::VectorXd& x, KFBase::MOMENT_COMPONENT component) const {
+Eigen::VectorXd kfcmd::Photon::calcDMomentumComponent(
+    const Eigen::VectorXd& x, core::MOMENT_COMPONENT component) const {
   long bi = getBeginIndex();
   Eigen::VectorXd result = Eigen::VectorXd::Zero(x.size());
   double q = std::sqrt(
@@ -108,7 +110,7 @@ Eigen::VectorXd KFCmd::Photon::calcDMomentumComponent(
   double dqR = x(bi + 1) - vX * cosP - vY * sinP;
   double dqP = x(bi + 1) * (vX * sinP - vY * cosP);
   switch (component) {
-    case KFBase::MOMENT_X:
+    case core::MOMENT_X:
       result(bi) = dx / q;
       result(bi + 1) = x(bi) * cosP / q - x(bi) * dx / q3 * dqR;
       result(bi + 2) = -x(bi) * x(bi + 1) * sinP / q - x(bi) * dx * dqP / q3;
@@ -117,7 +119,7 @@ Eigen::VectorXd KFCmd::Photon::calcDMomentumComponent(
       result(biY) = x(bi) * dx * dy / q3;
       result(biZ) = -result(bi + 3);
       break;
-    case KFBase::MOMENT_Y:
+    case core::MOMENT_Y:
       result(bi) = dy / q;
       result(bi + 1) = x(bi) * sinP / q - x(bi) * dy * dqR / q3;
       result(bi + 2) = x(bi) * x(bi + 1) * cosP / q - x(bi) * dy * dqP / q3;
@@ -126,7 +128,7 @@ Eigen::VectorXd KFCmd::Photon::calcDMomentumComponent(
       result(biY) = -x(bi) / q + x(bi) * dy * dy / q3;
       result(biZ) = -result(bi + 3);
       break;
-    case KFBase::MOMENT_Z:
+    case core::MOMENT_Z:
       result(bi) = dz / q;
       result(bi + 1) = -x(bi) * dz * dqR / q3;
       result(bi + 2) = -x(bi) * dz * dqP / q3;
@@ -135,15 +137,15 @@ Eigen::VectorXd KFCmd::Photon::calcDMomentumComponent(
       result(biY) = x(bi) * dz * dy / q3;
       result(biZ) = -result(bi + 3);
       break;
-    case KFBase::MOMENT_E:
+    case core::MOMENT_E:
       result(bi) = 1;
       break;
   }
   return result;
 }
 
-Eigen::MatrixXd KFCmd::Photon::calcD2MomentumComponent(
-    const Eigen::VectorXd& x, KFBase::MOMENT_COMPONENT component) const {
+Eigen::MatrixXd kfcmd::Photon::calcD2MomentumComponent(
+    const Eigen::VectorXd& x, core::MOMENT_COMPONENT component) const {
   long bi = getBeginIndex();
   Eigen::MatrixXd result = Eigen::MatrixXd::Zero(x.size(), x.size());
   double q = std::sqrt(
@@ -174,7 +176,7 @@ Eigen::MatrixXd KFCmd::Photon::calcD2MomentumComponent(
   double dqR = x(bi + 1) - vX * cosP - vY * sinP;
   double dqP = x(bi + 1) * (vX * sinP - vY * cosP);
   switch (component) {
-    case KFBase::MOMENT_X:
+    case core::MOMENT_X:
       result(bi, bi + 1) = cosP / q - dx * dqR / q3;
       result(bi + 1, bi) = result(bi, bi + 1);
       result(bi, bi + 2) = -x(bi + 1) * sinP / q - dx * dqP / q3;
@@ -239,7 +241,7 @@ Eigen::MatrixXd KFCmd::Photon::calcD2MomentumComponent(
       result(biZ, biY) = result(biY, biZ);
       result(biZ, biZ) = result(bi + 3, bi + 3);
       break;
-    case KFBase::MOMENT_Y:
+    case core::MOMENT_Y:
       result(bi, bi + 1) = sinP / q - dy * dqR / q3;
       result(bi + 1, bi) = result(bi, bi + 1);
       result(bi, bi + 2) = x(bi + 1) * cosP / q - dy * dqP / q3;
@@ -306,7 +308,7 @@ Eigen::MatrixXd KFCmd::Photon::calcD2MomentumComponent(
       result(biZ, biY) = result(biY, biZ);
       result(biZ, biZ) = result(bi + 3, bi + 3);
       break;
-    case KFBase::MOMENT_Z:
+    case core::MOMENT_Z:
       result(bi, bi + 1) = -dz * dqR / q3;
       result(bi + 1, bi) = result(bi, bi + 1);
       result(bi, bi + 2) = -dz * dqP / q3;
@@ -365,13 +367,13 @@ Eigen::MatrixXd KFCmd::Photon::calcD2MomentumComponent(
       result(biZ, biY) = result(biY, biZ);
       result(biZ, biZ) = result(bi + 3, bi + 3);
       break;
-    case KFBase::MOMENT_E:
+    case core::MOMENT_E:
       break;
   }
   return result;
 }
 
-void KFCmd::Photon::setVertexX(const std::string& name) {
+void kfcmd::Photon::setVertexX(const std::string& name) {
   auto it = getCommonParameters()->find(name);
   if (it == getCommonParameters()->end()) {
     // TO DO : exception
@@ -379,7 +381,7 @@ void KFCmd::Photon::setVertexX(const std::string& name) {
   _vertexX = it->second;
 }
 
-void KFCmd::Photon::setVertexY(const std::string& name) {
+void kfcmd::Photon::setVertexY(const std::string& name) {
   auto it = getCommonParameters()->find(name);
   if (it == getCommonParameters()->end()) {
     // TO DO : exception
@@ -387,7 +389,7 @@ void KFCmd::Photon::setVertexY(const std::string& name) {
   _vertexY = it->second;
 }
 
-void KFCmd::Photon::setVertexZ(const std::string& name) {
+void kfcmd::Photon::setVertexZ(const std::string& name) {
   auto it = getCommonParameters()->find(name);
   if (it == getCommonParameters()->end()) {
     // TO DO : exception

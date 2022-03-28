@@ -30,10 +30,12 @@
  */
 
 #include <cmath>
-#include "ParticlePxPyPzE.hpp"
+#include "kfcmd/ParticlePxPyPzE.hpp"
 
-KFCmd::ParticlePxPyPzE::ParticlePxPyPzE(const std::string& name, double mass) :
-  KFBase::ParticlePxPyPzE(name, mass) {
+namespace core = kfbase::core;
+
+kfcmd::ParticlePxPyPzE::ParticlePxPyPzE(const std::string& name, double mass) :
+  core::ParticlePxPyPzE(name, mass) {
   setLowerLimit(0, -1100);
   setUpperLimit(0, 1100);
   setLowerLimit(1, -1100);
@@ -42,4 +44,4 @@ KFCmd::ParticlePxPyPzE::ParticlePxPyPzE(const std::string& name, double mass) :
   setUpperLimit(2, 1100);
 }
 
-KFCmd::ParticlePxPyPzE::~ParticlePxPyPzE() {}
+kfcmd::ParticlePxPyPzE::~ParticlePxPyPzE() {}

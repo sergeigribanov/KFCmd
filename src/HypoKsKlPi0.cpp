@@ -29,21 +29,21 @@
  *
  */
 
-#include "HypoKsKlPi0.hpp"
-#include "PiMinusMeson.hpp"
-#include "PiPlusMeson.hpp"
+#include "kfcmd/HypoKsKlPi0.hpp"
+#include "kfcmd/PiMinusMeson.hpp"
+#include "kfcmd/PiPlusMeson.hpp"
 
 #include <TDatabasePDG.h>
 
-KFCmd::HypoKsKlPi0::HypoKsKlPi0(double energy, double magnetField,
+kfcmd::HypoKsKlPi0::HypoKsKlPi0(double energy, double magnetField,
                                             long nIter, double tolerance)
-  : KFCmd::Hypothesis(energy, magnetField, nIter, tolerance) {
+  : kfcmd::Hypothesis(energy, magnetField, nIter, tolerance) {
   addVertex("vtx0");
   addVertex("vtx1");
-  addChargedParticle(new KFCmd::PiPlusMeson("pi+_1"));
-  addChargedParticle(new KFCmd::PiMinusMeson("pi-_1"));
-  addPhoton(new KFCmd::Photon("g0"), "vtx0");
-  addPhoton(new KFCmd::Photon("g1"), "vtx0");
+  addChargedParticle(new kfcmd::PiPlusMeson("pi+_1"));
+  addChargedParticle(new kfcmd::PiMinusMeson("pi-_1"));
+  addPhoton(new kfcmd::Photon("g0"), "vtx0");
+  addPhoton(new kfcmd::Photon("g1"), "vtx0");
   addParticlePxPyPzE("kl", TDatabasePDG::Instance()->GetParticle(130)->Mass() * 1000);
   addVertexConstraintsXYZ("pi+_1", "vtx1");
   addVertexConstraintsXYZ("pi-_1", "vtx1");
@@ -56,4 +56,4 @@ KFCmd::HypoKsKlPi0::HypoKsKlPi0(double energy, double magnetField,
   disableConstraint("m-pi0-constraint");
 }
 
-KFCmd::HypoKsKlPi0::~HypoKsKlPi0() {}
+kfcmd::HypoKsKlPi0::~HypoKsKlPi0() {}

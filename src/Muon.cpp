@@ -29,12 +29,12 @@
  *
  */
 
-#include "Muon.hpp"
+#include "kfcmd/Muon.hpp"
 
 #include <TDatabasePDG.h>
 
-KFCmd::Muon::Muon(const std::string& name)
+kfcmd::Muon::Muon(const std::string& name)
     : ChargedParticle(
           name, TDatabasePDG::Instance()->GetParticle(13)->Mass() * 1000, -1) {}
 
-KFCmd::Muon::~Muon() {}
+kfcmd::Muon::~Muon() {}

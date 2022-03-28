@@ -29,13 +29,13 @@
  *
  */
 
-#include "PiMinusMeson.hpp"
+#include "kfcmd/PiMinusMeson.hpp"
 
 #include <TDatabasePDG.h>
 
-KFCmd::PiMinusMeson::PiMinusMeson(const std::string& name)
+kfcmd::PiMinusMeson::PiMinusMeson(const std::string& name)
     : ChargedParticle(
           name, TDatabasePDG::Instance()->GetParticle(-211)->Mass() * 1000,
           -1) {}
 
-KFCmd::PiMinusMeson::~PiMinusMeson() {}
+kfcmd::PiMinusMeson::~PiMinusMeson() {}

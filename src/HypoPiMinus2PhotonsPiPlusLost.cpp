@@ -29,23 +29,23 @@
  *
  */
 
-#include "HypoPiMinus2PhotonsPiPlusLost.hpp"
+#include "kfcmd/HypoPiMinus2PhotonsPiPlusLost.hpp"
 
 #include <TDatabasePDG.h>
 
-#include "PiMinusMeson.hpp"
-#include "PiPlusMeson.hpp"
+#include "kfcmd/PiMinusMeson.hpp"
+#include "kfcmd/PiPlusMeson.hpp"
 
-KFCmd::HypoPiMinus2PhotonsPiPlusLost::HypoPiMinus2PhotonsPiPlusLost(double energy,
+kfcmd::HypoPiMinus2PhotonsPiPlusLost::HypoPiMinus2PhotonsPiPlusLost(double energy,
                                                   double magneticField,
                                                   long nIter, double tolerance)
-    : KFCmd::Hypothesis(energy, magneticField, nIter, tolerance) {
+    : kfcmd::Hypothesis(energy, magneticField, nIter, tolerance) {
   addVertex("vtx0");
   addParticlePxPyPzE("pi+", TDatabasePDG::Instance()->GetParticle(211)->Mass() * 1000);
-  addChargedParticle(new KFCmd::PiMinusMeson("pi-"));
-  addPhoton(new KFCmd::Photon("g0"), "vtx0");
-  addPhoton(new KFCmd::Photon("g1"), "vtx0");
+  addChargedParticle(new kfcmd::PiMinusMeson("pi-"));
+  addPhoton(new kfcmd::Photon("g0"), "vtx0");
+  addPhoton(new kfcmd::Photon("g1"), "vtx0");
   addVertexConstraintsXYZ("pi-", "vtx0");
 }
 
-KFCmd::HypoPiMinus2PhotonsPiPlusLost::~HypoPiMinus2PhotonsPiPlusLost() {}
+kfcmd::HypoPiMinus2PhotonsPiPlusLost::~HypoPiMinus2PhotonsPiPlusLost() {}

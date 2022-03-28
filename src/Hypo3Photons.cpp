@@ -29,17 +29,17 @@
  *
  */
 
-#include "Hypo3Photons.hpp"
+#include "kfcmd/Hypo3Photons.hpp"
 
-#include "PiMinusMeson.hpp"
-#include "PiPlusMeson.hpp"
+#include "kfcmd/PiMinusMeson.hpp"
+#include "kfcmd/PiPlusMeson.hpp"
 
-KFCmd::Hypo3Photons::Hypo3Photons(double energy, long nIter, double tolerance)
-    : KFCmd::Hypothesis(energy, 0., nIter, tolerance) {
+kfcmd::Hypo3Photons::Hypo3Photons(double energy, long nIter, double tolerance)
+    : kfcmd::Hypothesis(energy, 0., nIter, tolerance) {
   addVertex("vtx0");
-  addPhoton(new KFCmd::Photon("g0"), "vtx0");
-  addPhoton(new KFCmd::Photon("g1"), "vtx0");
-  addPhoton(new KFCmd::Photon("g2"), "vtx0");
+  addPhoton(new kfcmd::Photon("g0"), "vtx0");
+  addPhoton(new kfcmd::Photon("g1"), "vtx0");
+  addPhoton(new kfcmd::Photon("g2"), "vtx0");
 }
 
-KFCmd::Hypo3Photons::~Hypo3Photons() {}
+kfcmd::Hypo3Photons::~Hypo3Photons() {}

@@ -29,17 +29,19 @@
  *
  */
 
-#include "ChargedParticle.hpp"
+#include "kfcmd/ChargedParticle.hpp"
 
 #include <TMath.h>
 #include <cmath>
 #include <iostream>
 
-const double KFCmd::ChargedParticle::_c = 2.99792458;
+namespace core = kfbase::core;
 
-KFCmd::ChargedParticle::ChargedParticle(const std::string& name, double mass,
+const double kfcmd::ChargedParticle::_c = 2.99792458;
+
+kfcmd::ChargedParticle::ChargedParticle(const std::string& name, double mass,
                                         double charge)
-    : KFBase::VertexParticle(name, 5, mass, charge) {
+    : core::VertexParticle(name, 5, mass, charge) {
   setPeriod(2, 0, 2 * TMath::Pi());
   setLowerLimit(0, 0);
   setUpperLimit(0, 1100);
@@ -53,10 +55,10 @@ KFCmd::ChargedParticle::ChargedParticle(const std::string& name, double mass,
   setUpperLimit(4, 20);
 }
 
-KFCmd::ChargedParticle::~ChargedParticle() {}
+kfcmd::ChargedParticle::~ChargedParticle() {}
 
-double KFCmd::ChargedParticle::calcMomentumComponent(
-    const Eigen::VectorXd& x, KFBase::MOMENT_COMPONENT component) const {
+double kfcmd::ChargedParticle::calcMomentumComponent(
+    const Eigen::VectorXd& x, core::MOMENT_COMPONENT component) const {
   // 0 --- pt
   // 1 --- ctg theta
   // 2 --- phi
@@ -73,24 +75,24 @@ double KFCmd::ChargedParticle::calcMomentumComponent(
   double w = qBc / energy;
   double alpha = w * ct - x(pt_i + 2);
   switch (component) {
-    case KFBase::MOMENT_X:
+    case core::MOMENT_X:
       result = pt * std::cos(alpha);
       break;
-    case KFBase::MOMENT_Y:
+    case core::MOMENT_Y:
       result = -pt * std::sin(alpha);
       break;
-    case KFBase::MOMENT_Z:
+    case core::MOMENT_Z:
       result = pt * eta;
       break;
-    case KFBase::MOMENT_E:
+    case core::MOMENT_E:
       result = energy;
       break;
   }
   return result;
 }
 
-Eigen::VectorXd KFCmd::ChargedParticle::calcDMomentumComponent(
-    const Eigen::VectorXd& x, KFBase::MOMENT_COMPONENT component) const {
+Eigen::VectorXd kfcmd::ChargedParticle::calcDMomentumComponent(
+    const Eigen::VectorXd& x, core::MOMENT_COMPONENT component) const {
   // 0 --- pt
   // 1 --- ctg theta
   // 2 --- phi
@@ -120,23 +122,23 @@ Eigen::VectorXd KFCmd::ChargedParticle::calcDMomentumComponent(
   double px = pt * cosA;
   double py = -pt * sinA;
   switch (component) {
-    case KFBase::MOMENT_X:
+    case core::MOMENT_X:
       result(pt_i + 2) = -py;
       result(pt_i) = cosA + dw_dpt * py * ct;
       result(pt_i + 1) = dw_deta * py * ct;
       result(time_i) = w * py;
       break;
-    case KFBase::MOMENT_Y:
+    case core::MOMENT_Y:
       result(pt_i + 2) = px;
       result(pt_i) = -sinA - dw_dpt * px * ct;
       result(pt_i + 1) = -dw_deta * px * ct;
       result(time_i) = -w * px;
       break;
-    case KFBase::MOMENT_Z:
+    case core::MOMENT_Z:
       result(pt_i) = eta;
       result(pt_i + 1) = pt;
       break;
-    case KFBase::MOMENT_E:
+    case core::MOMENT_E:
       result(pt_i) = de_dpt;
       result(pt_i + 1) = de_deta;
       break;
@@ -144,8 +146,8 @@ Eigen::VectorXd KFCmd::ChargedParticle::calcDMomentumComponent(
   return result;
 }
 
-Eigen::MatrixXd KFCmd::ChargedParticle::calcD2MomentumComponent(
-    const Eigen::VectorXd& x, KFBase::MOMENT_COMPONENT component) const {
+Eigen::MatrixXd kfcmd::ChargedParticle::calcD2MomentumComponent(
+    const Eigen::VectorXd& x, core::MOMENT_COMPONENT component) const {
   // 0 --- pt
   // 1 --- ctg theta
   // 2 --- phi
@@ -191,7 +193,7 @@ Eigen::MatrixXd KFCmd::ChargedParticle::calcD2MomentumComponent(
   double dpx_deta = dw_deta * py * ct;
   double dpx_dct = w * py;
   switch (component) {
-    case KFBase::MOMENT_X:
+    case core::MOMENT_X:
       result(phi_i, phi_i) = -px;
       result(phi_i, pt_i) = -dpy_dpt;
       result(pt_i, phi_i) = result(phi_i, pt_i);
@@ -213,7 +215,7 @@ Eigen::MatrixXd KFCmd::ChargedParticle::calcD2MomentumComponent(
       result(time_i, eta_i) = result(eta_i, time_i);
       result(time_i, time_i) = w * dpy_dct;
      break;
-    case KFBase::MOMENT_Y:
+    case core::MOMENT_Y:
       result(phi_i, phi_i) = -py;
       result(phi_i, pt_i) = dpx_dpt;
       result(pt_i, phi_i) = result(phi_i, pt_i);
@@ -235,11 +237,11 @@ Eigen::MatrixXd KFCmd::ChargedParticle::calcD2MomentumComponent(
       result(time_i, eta_i) = result(eta_i, time_i);
       result(time_i, time_i) = -w * dpx_dct;
       break;
-    case KFBase::MOMENT_Z:
+    case core::MOMENT_Z:
       result(pt_i, eta_i) = 1;
       result(eta_i, pt_i) = result(pt_i, eta_i);
       break;
-    case KFBase::MOMENT_E:
+    case core::MOMENT_E:
       result(pt_i, pt_i) = d2e_d2pt;
       result(pt_i, eta_i) = d2e_dpt_deta;
       result(eta_i, pt_i) = result(pt_i, eta_i);
@@ -249,8 +251,8 @@ Eigen::MatrixXd KFCmd::ChargedParticle::calcD2MomentumComponent(
   return result;
 }
 
-double KFCmd::ChargedParticle::calcVertexComponent(
-    const Eigen::VectorXd& x, KFBase::VERTEX_COMPONENT component) const {
+double kfcmd::ChargedParticle::calcVertexComponent(
+    const Eigen::VectorXd& x, core::VERTEX_COMPONENT component) const {
   // 0 --- pt
   // 1 --- ctg theta
   // 2 --- phi
@@ -270,13 +272,13 @@ double KFCmd::ChargedParticle::calcVertexComponent(
   double alpha = w * ct - phi;
   double a = r - x(pt_i + 3);
   switch (component) {
-    case KFBase::VERTEX_X:
+    case core::VERTEX_X:
       result = a * std::sin(phi) + r * std::sin(alpha);
       break;
-    case KFBase::VERTEX_Y:
+    case core::VERTEX_Y:
       result = -a * std::cos(phi) + r * std::cos(alpha);
       break;
-    case KFBase::VERTEX_Z:
+    case core::VERTEX_Z:
       result = x(pt_i + 4) + pt * eta * ct / energy;
       break;
   }
@@ -284,8 +286,8 @@ double KFCmd::ChargedParticle::calcVertexComponent(
   return result;
 }
 
-Eigen::VectorXd KFCmd::ChargedParticle::calcDVertexComponent(
-    const Eigen::VectorXd& x, KFBase::VERTEX_COMPONENT component) const {
+Eigen::VectorXd kfcmd::ChargedParticle::calcDVertexComponent(
+    const Eigen::VectorXd& x, core::VERTEX_COMPONENT component) const {
   // 0 --- pt
   // 1 --- ctg theta
   // 2 --- phi
@@ -319,21 +321,21 @@ Eigen::VectorXd KFCmd::ChargedParticle::calcDVertexComponent(
   double sinP = std::sin(phi);
   double dz = pt * eta * ct / energy;
   switch (component) {
-    case KFBase::VERTEX_X:
+    case core::VERTEX_X:
       result(pt_i) = (sinP + sinA) / qBc + r * dw_dpt * ct * cosA;
       result(pt_i + 1) = r * dw_deta * ct * cosA;
       result(pt_i + 2) = a * cosP - r * cosA;
       result(pt_i + 3) = -sinP;
       result(time_i) = w * r * cosA;
       break;
-    case KFBase::VERTEX_Y:
+    case core::VERTEX_Y:
       result(pt_i) = (cosA - cosP) / qBc - r * dw_dpt * ct * sinA;
       result(pt_i + 1) = -r * dw_deta * ct * sinA;
       result(pt_i + 2) = a * sinP + r * sinA;
       result(pt_i + 3) = cosP;
       result(time_i) = -w * r * sinA;
       break;
-    case KFBase::VERTEX_Z:
+    case core::VERTEX_Z:
       result(pt_i) = eta * ct / energy - dz * de_dpt / energy;
       result(pt_i + 1) = pt * ct / energy - dz * de_deta / energy;
       result(pt_i + 4) = 1;
@@ -343,8 +345,8 @@ Eigen::VectorXd KFCmd::ChargedParticle::calcDVertexComponent(
   return result;
 }
 
-Eigen::MatrixXd KFCmd::ChargedParticle::calcD2VertexComponent(
-    const Eigen::VectorXd& x, KFBase::VERTEX_COMPONENT component) const {
+Eigen::MatrixXd kfcmd::ChargedParticle::calcD2VertexComponent(
+    const Eigen::VectorXd& x, core::VERTEX_COMPONENT component) const {
   // 0 --- pt
   // 1 --- ctg theta
   // 2 --- phi
@@ -389,7 +391,7 @@ Eigen::MatrixXd KFCmd::ChargedParticle::calcD2VertexComponent(
   double sinP = std::sin(phi);
   double dz = pt * eta * ct / energy;
   switch (component) {
-    case KFBase::VERTEX_X:
+    case core::VERTEX_X:
       result(pt_i, pt_i) = 2. * dw_dpt * ct * cosA / qBc + r * d2w_d2pt * ct * cosA -
 	r * dw_dpt * dw_dpt * ct2 * sinA;
       result(pt_i, eta_i) = dw_deta * ct * cosA / qBc +
@@ -414,7 +416,7 @@ Eigen::MatrixXd KFCmd::ChargedParticle::calcD2VertexComponent(
       result(time_i, phi_i) = result(phi_i, time_i);
       result(time_i, time_i) = -w * w * r * sinA;
       break;
-    case KFBase::VERTEX_Y:
+    case core::VERTEX_Y:
       result(pt_i, pt_i) = -2. * dw_dpt * ct * sinA / qBc - r * d2w_d2pt * ct * sinA -
 	r * dw_dpt * dw_dpt * ct2 * cosA;
       result(pt_i, eta_i) = -dw_deta * ct * sinA / qBc - r * d2w_dpt_deta * ct * sinA -
@@ -438,7 +440,7 @@ Eigen::MatrixXd KFCmd::ChargedParticle::calcD2VertexComponent(
       result(time_i, phi_i) = result(phi_i, time_i);
       result(time_i, time_i) = -w * w * r * cosA;
       break;
-    case KFBase::VERTEX_Z:
+    case core::VERTEX_Z:
       result(pt_i, pt_i) = -2. * eta * ct * de_dpt / energy / energy +
       	2. * dz * de_dpt * de_dpt / energy / energy - dz * d2e_d2pt / energy;
       result(pt_i, eta_i) = ct / energy - eta * ct * de_deta / energy / energy -
@@ -457,7 +459,7 @@ Eigen::MatrixXd KFCmd::ChargedParticle::calcD2VertexComponent(
   return result;
 }
 
-void KFCmd::ChargedParticle::setMagneticField(const std::string& name) {
+void kfcmd::ChargedParticle::setMagneticField(const std::string& name) {
   const auto it = getConstants()->find(name);
   if (it == getConstants()->end()) {
     // TO DO : exception
@@ -465,7 +467,7 @@ void KFCmd::ChargedParticle::setMagneticField(const std::string& name) {
   _magnetFieldIterator = it;
 }
 
-void KFCmd::ChargedParticle::setTimeParameter(const std::string& name) {
+void kfcmd::ChargedParticle::setTimeParameter(const std::string& name) {
   auto it = getCommonParameters()->find(name);
   if (it == getCommonParameters()->end()) {
     // TO DO : exception
@@ -473,6 +475,6 @@ void KFCmd::ChargedParticle::setTimeParameter(const std::string& name) {
   _timeParam = it->second;
 }
 
-double KFCmd::ChargedParticle::getMagneticField() const {
+double kfcmd::ChargedParticle::getMagneticField() const {
   return _magnetFieldIterator->second;
 }

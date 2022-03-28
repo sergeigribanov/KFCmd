@@ -30,12 +30,14 @@
  */
 
 #include <cmath>
-#include "ParticleMassLessThetaPhiE.hpp"
+#include "kfcmd/ParticleMassLessThetaPhiE.hpp"
 
-KFCmd::ParticleMassLessThetaPhiE::ParticleMassLessThetaPhiE(const std::string& name) :
-  KFBase::ParticleMassLessThetaPhiE(name) {
+namespace core = kfbase::core;
+
+kfcmd::ParticleMassLessThetaPhiE::ParticleMassLessThetaPhiE(const std::string& name) :
+  core::ParticleMassLessThetaPhiE(name) {
   setLowerLimit(0, 0);
   setUpperLimit(0, 1100);
 }
 
-KFCmd::ParticleMassLessThetaPhiE::~ParticleMassLessThetaPhiE() {}
+kfcmd::ParticleMassLessThetaPhiE::~ParticleMassLessThetaPhiE() {}
