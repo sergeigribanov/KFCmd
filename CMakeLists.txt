@@ -8,27 +8,33 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 find_package(Eigen3 REQUIRED NO_MODULE)
 find_package(kfbase REQUIRED)
 
-file(GLOB SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
-file(GLOB HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp)
+include(GNUInstallDirs)
+add_subdirectory(core)
+add_subdirectory(hypos)
 
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/env.sh.in env.sh)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/rootlogon.C.in rootlogon.C)
+# file(GLOB SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
+# file(GLOB HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp)
 
-add_library(kfcmd SHARED ${SOURCES})
+# configure_file(${CMAKE_CURRENT_SOURCE_DIR}/env.sh.in env.sh)
+# configure_file(${CMAKE_CURRENT_SOURCE_DIR}/rootlogon.C.in rootlogon.C)
 
-target_include_directories(kfcmd
-  PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>)
-target_link_libraries(kfcmd
-  PRIVATE
-  kfbase::kfbase_core)
+# add_library(kfcmd SHARED ${SOURCES})
 
-set(PUBLIC_HEADERS ${HEADERS})
+# target_include_directories(kfcmd
+#   PUBLIC
+#   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+#   $<INSTALL_INTERFACE:include>)
+# target_link_libraries(kfcmd
+#   PRIVATE
+#   kfbase::kfbase_core)
 
-set_target_properties(kfcmd
-  PROPERTIES
-  PUBLIC_HEADER "${PUBLIC_HEADERS}")
+# set(PUBLIC_HEADERS ${HEADERS})
+
+# set_target_properties(kfcmd
+#   PROPERTIES
+#   PUBLIC_HEADER "${PUBLIC_HEADERS}")
+
+
 
 # install(TARGETS kfcmd
 #   EXPORT kfcmdTargets
