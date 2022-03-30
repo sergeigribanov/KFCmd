@@ -14,5 +14,5 @@ set_target_properties(kfcmd_hypos
 
 install(TARGETS kfcmd_hypos
   EXPORT kfcmdTargets
-  LIBRARY DESTINATION lib/kfcmd
+  LIBRARY DESTINATION lib
   PUBLIC_HEADER DESTINATION include/kfcmd/hypos)

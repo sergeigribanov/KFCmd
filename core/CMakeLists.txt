@@ -14,5 +14,5 @@ set_target_properties(kfcmd_core
 
 install(TARGETS kfcmd_core
   EXPORT kfcmdTargets
-  LIBRARY DESTINATION lib/kfcmd
+  LIBRARY DESTINATION lib
   PUBLIC_HEADER DESTINATION include/kfcmd/core)
