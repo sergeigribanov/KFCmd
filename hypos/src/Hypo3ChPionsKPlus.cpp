@@ -42,17 +42,33 @@ kfcmd::hypos::Hypo3ChPionsKPlus::Hypo3ChPionsKPlus(double energy, double magnetF
     : kfcmd::core::Hypothesis(energy, magnetField, nIter, tolerance) {
   addVertex("vtx0");
   addVertex("vtx1");
-  addChargedParticle(new kfcmd::core::PiPlusMeson("pi+_0"));
-  addChargedParticle(new kfcmd::core::PiMinusMeson("pi-_0"));
-  addChargedParticle(new kfcmd::core::PiMinusMeson("pi-_1"));
-  addChargedParticle(new kfcmd::core::KPlusMeson("k+"));
+  auto pipl0 = new kfcmd::core::PiPlusMeson("pi+_0");
+  addChargedParticle(pipl0);
+  auto pimi0 = new kfcmd::core::PiMinusMeson("pi-_0");
+  addChargedParticle(pimi0);
+  auto pimi1 = new kfcmd::core::PiMinusMeson("pi-_1");
+  addChargedParticle(pimi1);
+  auto kpl = new kfcmd::core::KPlusMeson("k+");
+  addChargedParticle(kpl);
+  addIntermediateNeutralParticle("ks", TDatabasePDG::Instance()->GetParticle(310)->Mass() * 1000, "vtx0");
+  addConstantMomentumParticle("origin", energy, Eigen::Vector3d::Zero());
+  addEnergyMomentumConstraints("em-vtx0", {getParticle("origin")},
+                               {pimi1, kpl, getParticle("ks")});
+  addEnergyMomentumConstraints("em-vtx1", {getParticle("ks")},
+                               {pipl0, pimi0});
+
+  // addMomentumConstraints("momentum-vtx0", {getParticle("origin")},
+  //                        {pimi1, kpl, getParticle("ks")});
+  // addMomentumConstraints("momentum-vtx1", {getParticle("ks")},
+  //                        {pipl0, pimi0});
+  // addEnergyConstraint("energy-constraint", {getParticle("origin")},
+  //                     {pimi1, kpl, pipl0, pimi0});
+
   addVertexConstraintsXYZ("pi-_1", "vtx0");
   addVertexConstraintsXYZ("k+", "vtx0");
   addVertexConstraintsXYZ("pi+_0", "vtx1");
   addVertexConstraintsXYZ("pi-_0", "vtx1");
-  addFlowConstraintsXYZ("ks-flow", "vtx0", "vtx1");
-  addParticleToFlow("ks-flow", "pi+_0");
-  addParticleToFlow("ks-flow", "pi-_0");
+  addVertexConstraintsXYZ("ks", "vtx1");
 }
 
 kfcmd::hypos::Hypo3ChPionsKPlus::~Hypo3ChPionsKPlus() {}

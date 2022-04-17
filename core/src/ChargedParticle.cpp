@@ -33,7 +33,6 @@
 
 #include <TMath.h>
 #include <cmath>
-#include <iostream>
 
 const double kfcmd::core::ChargedParticle::_c = 2.99792458;
 
@@ -271,10 +270,10 @@ double kfcmd::core::ChargedParticle::calcVertexComponent(
   double a = r - x(pt_i + 3);
   switch (component) {
     case kfbase::core::VERTEX_X:
-      result = a * std::sin(phi) + r * std::sin(alpha);
+      result = _beamX->second + a * std::sin(phi) + r * std::sin(alpha);
       break;
     case kfbase::core::VERTEX_Y:
-      result = -a * std::cos(phi) + r * std::cos(alpha);
+      result = _beamY->second - a * std::cos(phi) + r * std::cos(alpha);
       break;
     case kfbase::core::VERTEX_Z:
       result = x(pt_i + 4) + pt * eta * ct / energy;
@@ -463,6 +462,22 @@ void kfcmd::core::ChargedParticle::setMagneticField(const std::string& name) {
     // TO DO : exception
   }
   _magnetFieldIterator = it;
+}
+
+void kfcmd::core::ChargedParticle::setBeamX(const std::string& name) {
+  const auto it = getConstants()->find(name);
+  if (it == getConstants()->end()) {
+    // TO DO : exception
+  }
+  _beamX = it;
+}
+
+void kfcmd::core::ChargedParticle::setBeamY(const std::string& name) {
+  const auto it = getConstants()->find(name);
+  if (it == getConstants()->end()) {
+    // TO DO : exception
+  }
+  _beamY = it;
 }
 
 void kfcmd::core::ChargedParticle::setTimeParameter(const std::string& name) {

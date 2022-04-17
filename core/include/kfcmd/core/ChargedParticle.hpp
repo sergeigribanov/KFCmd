@@ -61,6 +61,8 @@ namespace kfcmd {
        * @param name (name of a constant)
        */
       void setMagneticField(const std::string&);
+      void setBeamX(const std::string&);
+      void setBeamY(const std::string&);
       //! A track natural parameter setter
       /*!
        * This method is used to set track natural parameter. In order to
@@ -95,6 +97,8 @@ namespace kfcmd {
       static const double _c;
       //! An iterator that points to a magnet field constant
       std::unordered_map<std::string, double>::const_iterator _magnetFieldIterator;
+      std::unordered_map<std::string, double>::const_iterator _beamX;
+      std::unordered_map<std::string, double>::const_iterator _beamY;
     };
   }  // namespace core
 } // namespace kfcmd

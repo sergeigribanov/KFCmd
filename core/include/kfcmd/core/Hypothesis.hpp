@@ -34,6 +34,7 @@
 
 #include <kfbase/core/Hypothesis.hpp>
 #include <kfbase/core/VertexConstraint.hpp>
+#include <kfbase/core/ConstantMomentumParticle.hpp>
 #include <set>
 #include <string>
 
@@ -259,8 +260,19 @@ namespace kfcmd {
        */
       void enableVertexConstraintXYZ(const std::string&);
       void enableFlowConstraintXYZ(const std::string&);
-      void enableCommonMomentumConstraintPxPyPzE();
-      void disableCommonMomentumConstraintPxPyPzE();
+      void addEnergyConstraint(const std::string&,
+                               const std::set<kfbase::core::Particle*>&,
+                               const std::set<kfbase::core::Particle*>&);
+      void addMomentumConstraints(const std::string&,
+                                  const std::set<kfbase::core::Particle*>&,
+                                  const std::set<kfbase::core::Particle*>&);
+      void addEnergyMomentumConstraints(const std::string&,
+                                        const std::set<kfbase::core::Particle*>&,
+                                        const std::set<kfbase::core::Particle*>&);
+      void enableEnergyMomentumConstraints(const std::string&);
+      void disableEnergyMomentumConstraints(const std::string&);
+      // void enableCommonMomentumConstraintPxPyPzE();
+      // void disableCommonMomentumConstraintPxPyPzE();
       //! A method that used to enable X vertex constraint for a certain charged
       //! particle
       /*!
@@ -305,6 +317,9 @@ namespace kfcmd {
        * @param vertexName (photon vertex)
        */
       void addPhoton(kfcmd::core::Photon*, const std::string&);
+      void addConstantMomentumParticle(const std::string&, double,
+                                       const Eigen::Vector3d&);
+      void addIntermediateNeutralParticle(const std::string&, double, const std::string&);
       void addParticlePxPyPzE(const std::string&, double);
       void addParticleMassLessThetaPhiE(const std::string&);
       //! A method that used to add vertex constraint for a certain charged particle

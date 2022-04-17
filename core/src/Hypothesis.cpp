@@ -38,6 +38,7 @@
 #include <kfbase/core/FlowConstraint.hpp>
 #include <kfbase/core/DoubleParticleAngularConstraint.hpp>
 #include <kfbase/core/ParticleAngularConstraint.hpp>
+#include <kfbase/core/IntermediateNeutralParticle.hpp>
 #include <kfbase/newtonian_opt/CommonParams.hpp>
 #include <cmath>
 
@@ -47,35 +48,156 @@ kfcmd::core::Hypothesis::Hypothesis(double energy, double magneticField, long nI
                                     double tolerance)
   : kfbase::core::Hypothesis(nIter, tolerance), _energy(energy) {
   addConstant("#m-field", magneticField);
-  addConstraint(
-                new kfbase::core::MomentumConstraint("#constraint-px", kfbase::core::MOMENT_X, 0));
-  addConstraint(
-                new kfbase::core::MomentumConstraint("#constraint-py", kfbase::core::MOMENT_Y, 0));
-  addConstraint(
-                new kfbase::core::MomentumConstraint("#constraint-pz", kfbase::core::MOMENT_Z, 0));
-  addConstraint(new kfbase::core::MomentumConstraint("#constraint-pe",
-                                                     kfbase::core::MOMENT_E, energy));
-  enableConstraint("#constraint-px");
-  enableConstraint("#constraint-py");
-  enableConstraint("#constraint-pz");
-  enableConstraint("#constraint-pe");
+  addConstant("#beam-x", 0.);
+  addConstant("#beam-y", 0.);
+  // addConstraint(
+  //               new kfbase::core::MomentumConstraint("#constraint-px", kfbase::core::MOMENT_X, 0));
+  // addConstraint(
+  //               new kfbase::core::MomentumConstraint("#constraint-py", kfbase::core::MOMENT_Y, 0));
+  // addConstraint(
+  //               new kfbase::core::MomentumConstraint("#constraint-pz", kfbase::core::MOMENT_Z, 0));
+  // addConstraint(new kfbase::core::MomentumConstraint("#constraint-pe",
+  //                                                    kfbase::core::MOMENT_E, energy));
+  // enableConstraint("#constraint-px");
+  // enableConstraint("#constraint-py");
+  // enableConstraint("#constraint-pz");
+  // enableConstraint("#constraint-pe");
 }
 
 kfcmd::core::Hypothesis::~Hypothesis() {}
 
-void kfcmd::core::Hypothesis::enableCommonMomentumConstraintPxPyPzE() {
-  enableConstraint("#constraint-px");
-  enableConstraint("#constraint-py");
-  enableConstraint("#constraint-pz");
-  enableConstraint("#constraint-pe");
+void kfcmd::core::Hypothesis::addEnergyConstraint(const std::string& name,
+                                                     const std::set<kfbase::core::Particle*>& inputs,
+                                                     const std::set<kfbase::core::Particle*>& outputs) {
+  const std::string scpe = "#momentum-constraint-" + name + "-pe";
+  auto cpe = new kfbase::core::MomentumConstraint(scpe, kfbase::core::MOMENT_E);
+  addConstraint(cpe);
+  for (auto el : inputs) {
+    cpe->inAdd(el);
+  }
+  for (auto el : outputs) {
+    cpe->outAdd(el);
+  }
+  enableConstraint(scpe);
 }
 
-void kfcmd::core::Hypothesis::disableCommonMomentumConstraintPxPyPzE() {
-  disableConstraint("#constraint-px");
-  disableConstraint("#constraint-py");
-  disableConstraint("#constraint-pz");
-  disableConstraint("#constraint-pe");
+void kfcmd::core::Hypothesis::addMomentumConstraints(const std::string& name,
+                                                     const std::set<kfbase::core::Particle*>& inputs,
+                                                     const std::set<kfbase::core::Particle*>& outputs) {
+  const std::string scpx = "#momentum-constraint-" + name + "-px";
+  const std::string scpy = "#momentum-constraint-" + name + "-py";
+  const std::string scpz = "#momentum-constraint-" + name + "-pz";
+  auto cpx = new kfbase::core::MomentumConstraint(scpx, kfbase::core::MOMENT_X);
+  addConstraint(cpx);
+  auto cpy = new kfbase::core::MomentumConstraint(scpy, kfbase::core::MOMENT_Y);
+  addConstraint(cpy);
+  auto cpz = new kfbase::core::MomentumConstraint(scpz, kfbase::core::MOMENT_Z);
+  addConstraint(cpz);
+  for (auto el : inputs) {
+    cpx->inAdd(el);
+    cpy->inAdd(el);
+    cpz->inAdd(el);
+  }
+  for (auto el : outputs) {
+    cpx->outAdd(el);
+    cpy->outAdd(el);
+    cpz->outAdd(el);
+  }
+
+  enableConstraint(scpx);
+  enableConstraint(scpy);
+  enableConstraint(scpz);
 }
+
+void kfcmd::core::Hypothesis::addEnergyMomentumConstraints(const std::string& name,
+                                                           const std::set<kfbase::core::Particle*>& inputs,
+                                                           const std::set<kfbase::core::Particle*>& outputs) {
+  const std::string scpx = "#momentum-constraint-" + name + "-px";
+  const std::string scpy = "#momentum-constraint-" + name + "-py";
+  const std::string scpz = "#momentum-constraint-" + name + "-pz";
+  const std::string scpe = "#momentum-constraint-" + name + "-pe";
+  auto cpx = new kfbase::core::MomentumConstraint(scpx, kfbase::core::MOMENT_X);
+  addConstraint(cpx);
+  auto cpy = new kfbase::core::MomentumConstraint(scpy, kfbase::core::MOMENT_Y);
+  addConstraint(cpy);
+  auto cpz = new kfbase::core::MomentumConstraint(scpz, kfbase::core::MOMENT_Z);
+  addConstraint(cpz);
+  auto cpe = new kfbase::core::MomentumConstraint(scpe, kfbase::core::MOMENT_E);
+  addConstraint(cpe);
+  // // ~> !!!
+  // const std::string vertexName = "vtx0";
+  // const std::string vertexXname = "#" + vertexName + "-x";
+  // const std::string vertexYname = "#" + vertexName + "-y";
+  // const std::string vertexZname = "#" + vertexName + "-z";
+  // cpx->includeUsedCommonParameter(vertexXname);
+  // cpx->includeUsedCommonParameter(vertexYname);
+  // cpx->includeUsedCommonParameter(vertexZname);
+  // cpy->includeUsedCommonParameter(vertexXname);
+  // cpy->includeUsedCommonParameter(vertexYname);
+  // cpy->includeUsedCommonParameter(vertexZname);
+  // cpz->includeUsedCommonParameter(vertexXname);
+  // cpz->includeUsedCommonParameter(vertexYname);
+  // cpz->includeUsedCommonParameter(vertexZname);
+  // cpe->includeUsedCommonParameter(vertexXname);
+  // cpe->includeUsedCommonParameter(vertexYname);
+  // cpe->includeUsedCommonParameter(vertexZname);
+  // // <~ !!!
+
+  for (auto el : inputs) {
+    cpx->inAdd(el);
+    cpy->inAdd(el);
+    cpz->inAdd(el);
+    cpe->inAdd(el);
+  }
+  for (auto el : outputs) {
+    cpx->outAdd(el);
+    cpy->outAdd(el);
+    cpz->outAdd(el);
+    cpe->outAdd(el);
+  }
+
+
+  enableConstraint(scpx);
+  enableConstraint(scpy);
+  enableConstraint(scpz);
+  enableConstraint(scpe);
+}
+
+void kfcmd::core::Hypothesis::enableEnergyMomentumConstraints(const std::string& name) {
+  const std::string scpx = "#momentum-constraint-" + name + "-px";
+  const std::string scpy = "#momentum-constraint-" + name + "-py";
+  const std::string scpz = "#momentum-constraint-" + name + "-pz";
+  const std::string scpe = "#momentum-constraint-" + name + "-pe";
+  enableConstraint(scpx);
+  enableConstraint(scpy);
+  enableConstraint(scpz);
+  enableConstraint(scpe);
+}
+
+void kfcmd::core::Hypothesis::disableEnergyMomentumConstraints(const std::string& name) {
+  const std::string scpx = "#momentum-constraint-" + name + "-px";
+  const std::string scpy = "#momentum-constraint-" + name + "-py";
+  const std::string scpz = "#momentum-constraint-" + name + "-pz";
+  const std::string scpe = "#momentum-constraint-" + name + "-pe";
+  disableConstraint(scpx);
+  disableConstraint(scpy);
+  disableConstraint(scpz);
+  disableConstraint(scpe);
+}
+
+// void kfcmd::core::Hypothesis::enableCommonMomentumConstraintPxPyPzE() {
+//   enableConstraint("#constraint-px");
+//   enableConstraint("#constraint-py");
+//   enableConstraint("#constraint-pz");
+//   enableConstraint("#constraint-pe");
+// }
+
+// void kfcmd::core::Hypothesis::disableCommonMomentumConstraintPxPyPzE() {
+//   disableConstraint("#constraint-px");
+//   disableConstraint("#constraint-py");
+//   disableConstraint("#constraint-pz");
+//   disableConstraint("#constraint-pe");
+// }
 
 void kfcmd::core::Hypothesis::setInitialVertex(const std::string& vertexName,
                                                const Eigen::Vector3d& vertex) {
@@ -223,6 +345,8 @@ void kfcmd::core::Hypothesis::releaseTrackNaturalParameter(const std::string& ch
 void kfcmd::core::Hypothesis::addChargedParticle(kfcmd::core::ChargedParticle* particle) {
   addParticle(particle);
   particle->setMagneticField("#m-field");
+  particle->setBeamX("#beam-x");
+  particle->setBeamY("#beam-y");
   const std::string timeParameter = "#time-" + particle->getName();
   auto timep = new nopt::CommonParams(timeParameter, 1);
   timep->setLowerLimit(0, -100);
@@ -231,10 +355,10 @@ void kfcmd::core::Hypothesis::addChargedParticle(kfcmd::core::ChargedParticle* p
   particle->setTimeParameter(timeParameter);
   enableParticle(particle->getName());
   enableCommonParams(timeParameter);
-  addParticleToConstraint(particle->getName(), "#constraint-px");
-  addParticleToConstraint(particle->getName(), "#constraint-py");
-  addParticleToConstraint(particle->getName(), "#constraint-pz");
-  addParticleToConstraint(particle->getName(), "#constraint-pe");
+  // addParticleToConstraint(particle->getName(), "#constraint-px");
+  // addParticleToConstraint(particle->getName(), "#constraint-py");
+  // addParticleToConstraint(particle->getName(), "#constraint-pz");
+  // addParticleToConstraint(particle->getName(), "#constraint-pe");
 }
 
 void kfcmd::core::Hypothesis::disableChargedParticle(
@@ -259,39 +383,67 @@ void kfcmd::core::Hypothesis::addPhoton(kfcmd::core::Photon* photon,
   const std::string vertexZname = "#" + vertexName + "-z";
   photon->setVertexZ(vertexZname);
   enableParticle(photon->getName());
-  addParticleToConstraint(photon->getName(), "#constraint-px");
-  addParticleToConstraint(photon->getName(), "#constraint-py");
-  addParticleToConstraint(photon->getName(), "#constraint-pz");
-  addParticleToConstraint(photon->getName(), "#constraint-pe");
-  _constraints.at("#constraint-px")->includeUsedCommonParameter(vertexXname);
-  _constraints.at("#constraint-px")->includeUsedCommonParameter(vertexYname);
-  _constraints.at("#constraint-px")->includeUsedCommonParameter(vertexZname);
-  _constraints.at("#constraint-py")->includeUsedCommonParameter(vertexXname);
-  _constraints.at("#constraint-py")->includeUsedCommonParameter(vertexYname);
-  _constraints.at("#constraint-py")->includeUsedCommonParameter(vertexZname);
-  _constraints.at("#constraint-pz")->includeUsedCommonParameter(vertexXname);
-  _constraints.at("#constraint-pz")->includeUsedCommonParameter(vertexYname);
-  _constraints.at("#constraint-pz")->includeUsedCommonParameter(vertexZname);
+  // addParticleToConstraint(photon->getName(), "#constraint-px");
+  // addParticleToConstraint(photon->getName(), "#constraint-py");
+  // addParticleToConstraint(photon->getName(), "#constraint-pz");
+  // addParticleToConstraint(photon->getName(), "#constraint-pe");
+
+  // !!!
+  // _constraints.at("#constraint-px")->includeUsedCommonParameter(vertexXname);
+  // _constraints.at("#constraint-px")->includeUsedCommonParameter(vertexYname);
+  // _constraints.at("#constraint-px")->includeUsedCommonParameter(vertexZname);
+  // _constraints.at("#constraint-py")->includeUsedCommonParameter(vertexXname);
+  // _constraints.at("#constraint-py")->includeUsedCommonParameter(vertexYname);
+  // _constraints.at("#constraint-py")->includeUsedCommonParameter(vertexZname);
+  // _constraints.at("#constraint-pz")->includeUsedCommonParameter(vertexXname);
+  // _constraints.at("#constraint-pz")->includeUsedCommonParameter(vertexYname);
+  // _constraints.at("#constraint-pz")->includeUsedCommonParameter(vertexZname);
+}
+
+void kfcmd::core::Hypothesis::addConstantMomentumParticle(const std::string& name,
+                                                          double energy,
+                                                          const Eigen::Vector3d& p) {
+  auto particle = new kfbase::core::ConstantMomentumParticle(name, energy, p);
+  addParticle(particle);
+  enableParticle(particle->getName());
+}
+
+void kfcmd::core::Hypothesis::addIntermediateNeutralParticle(const std::string& name,
+                                                             double mass,
+                                                             const std::string& vertexName) {
+  auto particle = new kfbase::core::IntermediateNeutralParticle(name, mass);
+  addParticle(particle);
+  const std::string vertexXname = "#" + vertexName + "-x";
+  particle->setVertexX(vertexXname);
+  const std::string vertexYname = "#" + vertexName + "-y";
+  particle->setVertexY(vertexYname);
+  const std::string vertexZname = "#" + vertexName + "-z";
+  particle->setVertexZ(vertexZname);
+  enableParticle(particle->getName());
 }
 
 void kfcmd::core::Hypothesis::addParticlePxPyPzE(const std::string& name, double mass) {
   auto particle = new kfcmd::core::ParticlePxPyPzE(name, mass);
   addParticle(particle);
   enableParticle(particle->getName());
-  addParticleToConstraint(particle->getName(), "#constraint-px");
-  addParticleToConstraint(particle->getName(), "#constraint-py");
-  addParticleToConstraint(particle->getName(), "#constraint-pz");
-  addParticleToConstraint(particle->getName(), "#constraint-pe");
+
+  // !!!
+  // addParticleToConstraint(particle->getName(), "#constraint-px");
+  // addParticleToConstraint(particle->getName(), "#constraint-py");
+  // addParticleToConstraint(particle->getName(), "#constraint-pz");
+  // addParticleToConstraint(particle->getName(), "#constraint-pe");
 }
 
 void kfcmd::core::Hypothesis::addParticleMassLessThetaPhiE(const std::string& name) {
   auto particle = new kfcmd::core::ParticleMassLessThetaPhiE(name);
   addParticle(particle);
   enableParticle(particle->getName());
-  addParticleToConstraint(particle->getName(), "#constraint-px");
-  addParticleToConstraint(particle->getName(), "#constraint-py");
-  addParticleToConstraint(particle->getName(), "#constraint-pz");
-  addParticleToConstraint(particle->getName(), "#constraint-pe");
+
+  // !!!
+  // addParticleToConstraint(particle->getName(), "#constraint-px");
+  // addParticleToConstraint(particle->getName(), "#constraint-py");
+  // addParticleToConstraint(particle->getName(), "#constraint-pz");
+  // addParticleToConstraint(particle->getName(), "#constraint-pe");
 }
 
 void kfcmd::core::Hypothesis::disablePhoton(const std::string& photonName) {
@@ -322,13 +474,17 @@ void kfcmd::core::Hypothesis::addVertexConstraintsXYZ(
   addParticleToConstraint(chargedParticleName, vtxX->getName());
   addParticleToConstraint(chargedParticleName, vtxY->getName());
   addParticleToConstraint(chargedParticleName, vtxZ->getName());
-  const std::string timeParameter = "#time-" + chargedParticleName;
-  _constraints.at(vtxX->getName())->includeUsedCommonParameter(timeParameter);
-  _constraints.at(vtxY->getName())->includeUsedCommonParameter(timeParameter);
-  _constraints.at(vtxZ->getName())->includeUsedCommonParameter(timeParameter);
+  // const std::string timeParameter = "#time-" + chargedParticleName;
+
+  // !!!
+  // _constraints.at(vtxX->getName())->includeUsedCommonParameter(timeParameter);
+  // _constraints.at(vtxY->getName())->includeUsedCommonParameter(timeParameter);
+  // _constraints.at(vtxZ->getName())->includeUsedCommonParameter(timeParameter);
+
   _constraints.at(vtxX->getName())->includeUsedCommonParameter(vertexXname);
   _constraints.at(vtxY->getName())->includeUsedCommonParameter(vertexYname);
   _constraints.at(vtxZ->getName())->includeUsedCommonParameter(vertexZname);
+
   enableConstraint(vtxX->getName());
   enableConstraint(vtxY->getName());
   enableConstraint(vtxZ->getName());
@@ -684,19 +840,23 @@ bool kfcmd::core::Hypothesis::fillPhoton(const std::string& name, std::size_t in
 }
 
 void kfcmd::core::Hypothesis::setBeamXY(double xbeam, double ybeam) {
-  for (auto& el : _constraints) {
-    auto cnt = dynamic_cast<kfbase::core::VertexConstraint*>(el.second);
-    if (cnt) {
-      switch (cnt->getComponent()) {
-      case kfbase::core::VERTEX_X:
-        cnt->setConstraintValue(-xbeam);
-        break;
-      case kfbase::core::VERTEX_Y:
-        cnt->setConstraintValue(-ybeam);
-        break;
-      case kfbase::core::VERTEX_Z:
-        break;
-      }
-    }
-  }
+  addConstant("#beam-x", xbeam);
+  addConstant("#beam-y", ybeam);
+
+  // !!!
+  // for (auto& el : _constraints) {
+  //   auto cnt = dynamic_cast<kfbase::core::VertexConstraint*>(el.second);
+  //   if (cnt) {
+  //     switch (cnt->getComponent()) {
+  //     case kfbase::core::VERTEX_X:
+  //       cnt->setConstraintValue(-xbeam);
+  //       break;
+  //     case kfbase::core::VERTEX_Y:
+  //       cnt->setConstraintValue(-ybeam);
+  //       break;
+  //     case kfbase::core::VERTEX_Z:
+  //       break;
+  //     }
+  //   }
+  // }
 }
