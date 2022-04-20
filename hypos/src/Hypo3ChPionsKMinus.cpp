@@ -52,17 +52,17 @@ kfcmd::hypos::Hypo3ChPionsKMinus::Hypo3ChPionsKMinus(double energy, double magne
   addChargedParticle(kmi);
   addIntermediateNeutralParticle("ks", TDatabasePDG::Instance()->GetParticle(310)->Mass() * 1000, "vtx0");
   addConstantMomentumParticle("origin", energy, Eigen::Vector3d::Zero());
-  addEnergyMomentumConstraints("em-vtx0", {getParticle("origin")},
-                               {pipl1, kmi, getParticle("ks")});
-  addEnergyMomentumConstraints("em-vtx1", {getParticle("ks")},
-                               {pipl0, pimi0});
+  // addEnergyMomentumConstraints("em-vtx0", {getParticle("origin")},
+  //                              {pipl1, kmi, getParticle("ks")});
+  // addEnergyMomentumConstraints("em-vtx1", {getParticle("ks")},
+  //                              {pipl0, pimi0});
 
-  // addMomentumConstraints("momentum-vtx0", {getParticle("origin")},
-  //                        {pipl1, kmi, getParticle("ks")});
-  // addMomentumConstraints("momentum-vtx1", {getParticle("ks")},
-  //                        {pipl0, pimi0});
-  // addEnergyConstraint("energy-constraint", {getParticle("origin")},
-  //                     {pipl1, kmi, pipl0, pimi0});
+  addMomentumConstraints("momentum-vtx0", {getParticle("origin")},
+                         {pipl1, kmi, getParticle("ks")});
+  addMomentumConstraints("momentum-vtx1", {getParticle("ks")},
+                         {pipl0, pimi0});
+  addEnergyConstraint("energy-constraint", {getParticle("origin")},
+                      {pipl1, kmi, pipl0, pimi0});
 
   addVertexConstraintsXYZ("pi+_1", "vtx0");
   addVertexConstraintsXYZ("k-", "vtx0");
