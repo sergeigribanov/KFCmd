@@ -29,6 +29,7 @@
  *
  */
 
+#include <algorithm>
 #include "kfcmd/core/Hypothesis.hpp"
 #include "kfcmd/core/ParticlePxPyPzE.hpp"
 #include "kfcmd/core/ParticleMassLessThetaPhiE.hpp"
@@ -573,47 +574,35 @@ Eigen::MatrixXd kfcmd::core::Hypothesis::inverseMatrix(
 bool kfcmd::core::Hypothesis::fillTrack(const std::string& name, std::size_t index,
                                         const kfcmd::core::TrPh& data) {
   Eigen::VectorXd par = Eigen::VectorXd::Zero(6);
-  // parameter 6 --- ct
-  Eigen::MatrixXd cov = Eigen::MatrixXd::Zero(5, 5);
-  cov(0, 0) = (data.terr0)[index][0][0];  // p, p
-  cov(0, 1) = (data.terr0)[index][0][3];  // p, ctg
-  cov(0, 2) = (data.terr0)[index][0][1];  // p, phi
-  cov(0, 3) = (data.terr0)[index][0][2];  // p, rho
-  cov(0, 4) = (data.terr0)[index][0][4];  // p, z
-
-  cov(1, 0) = (data.terr0)[index][3][0];  // ctg, p
-  cov(1, 1) = (data.terr0)[index][3][3];  // ctg, ctg
-  cov(1, 2) = (data.terr0)[index][3][1];  // ctg, phi
-  cov(1, 3) = (data.terr0)[index][3][2];  // ctg, rho
-  cov(1, 4) = (data.terr0)[index][3][4];  // ctg, z
-
-  cov(2, 0) = (data.terr0)[index][1][0];  // phi, p
-  cov(2, 1) = (data.terr0)[index][1][3];  // phi, ctg
-  cov(2, 2) = (data.terr0)[index][1][1];  // phi, phi
-  cov(2, 3) = (data.terr0)[index][1][2];  // phi, rho
-  cov(2, 4) = (data.terr0)[index][1][4];  // phi, z
-
-  cov(3, 0) = (data.terr0)[index][2][0];  // rho, p
-  cov(3, 1) = (data.terr0)[index][2][3];  // rho, ctg
-  cov(3, 2) = (data.terr0)[index][2][1];  // rho, phi
-  cov(3, 3) = (data.terr0)[index][2][2];  // rho, rho
-  cov(3, 4) = (data.terr0)[index][2][4];  // rho, z
-
-  cov(4, 0) = (data.terr0)[index][4][0];  // z, p
-  cov(4, 1) = (data.terr0)[index][4][3];  // z, ctg
-  cov(4, 2) = (data.terr0)[index][4][1];  // z, phi
-  cov(4, 3) = (data.terr0)[index][4][2];  // z, rho
-  cov(4, 4) = (data.terr0)[index][4][4];  // z, z
-
+  const Float_t* fst_terr0 = &((data.terr0)[index][0][0]);
+  const int s = 5;
+  const int sxs = s * s;
+  double tmp_terr0[sxs];
+  std::copy(fst_terr0, fst_terr0 + sxs, tmp_terr0);
+  Eigen::Map<Eigen::Matrix<double, s, s, Eigen::RowMajor>> terr0(tmp_terr0);
+  // indices in terr0:
+  // 0 --- p
+  // 1 --- phi
+  // 2 --- rho
+  // 3 --- ctg theta
+  // 4 --- z
+  Eigen::PermutationMatrix<s, s> perm;
+  perm.indices() = {0, 2, 3, 1, 4};
+  // Indices in kinfit are permutated. Indices in kinfit:
+  // 0 --- p
+  // 1 --- ctg
+  // 2 --- phi
+  // 3 --- rho
+  // 4 --- z
+  Eigen::MatrixXd cov = perm * terr0 * perm.inverse();
   if (0 == cov.determinant()) return false;
-
   par(0) = (data.tptot)[index] * std::sin((data.tth)[index]);
   par(1) = 1. / std::tan((data.tth)[index]);
   par(2) = (data.tphi)[index];
   par(3) = (data.trho)[index];
   par(4) = (data.tz)[index];
-
   this->setInitialParticleParams(name, par);
+  // index 6 --- ct
   Eigen::MatrixXd inv = Eigen::MatrixXd::Zero(6, 6);
   inv.block(0, 0, 5, 5) =  cov.inverse();
   this->setParticleInverseErrorMatrix(name, inv);
