@@ -63,16 +63,6 @@ namespace kfcmd {
       void setMagneticField(const std::string&);
       void setBeamX(const std::string&);
       void setBeamY(const std::string&);
-      //! A track natural parameter setter
-      /*!
-       * This method is used to set track natural parameter. In order to
-       * exclude this parameter from a particle error matrix, this parammeter
-       * is stored in a separate common parameter container.
-       *
-       * @param name (name of a common parameter container for a track natural
-       * parmeter)
-       */
-      void setTimeParameter(const std::string&);
       virtual double calcMomentumComponent(
                                            const Eigen::VectorXd&, kfbase::core::MOMENT_COMPONENT) const override final;
       virtual Eigen::VectorXd calcDMomentumComponent(
@@ -89,9 +79,7 @@ namespace kfcmd {
     protected:
       //! A magnetic field getter
       double getMagneticField() const;
-      //! A track natural parameter [cm]
-      kfbase::newtonian_opt::CommonParams* _timeParam;
-
+      
     private:
       //! A constant that proportional to the light velocity
       static const double _c;

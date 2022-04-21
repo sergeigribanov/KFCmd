@@ -38,7 +38,7 @@ const double kfcmd::core::ChargedParticle::_c = 2.99792458;
 
 kfcmd::core::ChargedParticle::ChargedParticle(const std::string& name, double mass,
                                         double charge)
-    : kfbase::core::VertexParticle(name, 5, mass, charge) {
+    : kfbase::core::VertexParticle(name, 6, mass, charge) {
   setPeriod(2, 0, 2 * TMath::Pi());
   setLowerLimit(0, 0);
   setUpperLimit(0, 1100);
@@ -50,6 +50,8 @@ kfcmd::core::ChargedParticle::ChargedParticle(const std::string& name, double ma
   setUpperLimit(3, 30);
   setLowerLimit(4, -20);
   setUpperLimit(4, 20);
+  setLowerLimit(5, -100.); // !!!
+  setUpperLimit(5, 100.); // !!!
 }
 
 kfcmd::core::ChargedParticle::~ChargedParticle() {}
@@ -61,9 +63,10 @@ double kfcmd::core::ChargedParticle::calcMomentumComponent(
   // 2 --- phi
   // 3 --- rho
   // 4 --- tz
+  // 5 --- ct
   const long pt_i = getBeginIndex();
   double result = 0;
-  double ct = x(_timeParam->getBeginIndex());
+  double ct = x(pt_i + 5);
   double pt = x(pt_i);
   double eta = x(pt_i + 1);
   double m = getMass();
@@ -95,10 +98,10 @@ Eigen::VectorXd kfcmd::core::ChargedParticle::calcDMomentumComponent(
   // 2 --- phi
   // 3 --- rho
   // 4 --- tz
+  // 5 --- ct
   const long pt_i = getBeginIndex();
-  const long time_i = _timeParam->getBeginIndex();
   Eigen::VectorXd result = Eigen::VectorXd::Zero(x.size());
-  double ct = x(time_i);
+  double ct = x(pt_i + 5);
   double m = getMass();
   double m2 = m * m;
   double eta = x(pt_i + 1);
@@ -123,13 +126,13 @@ Eigen::VectorXd kfcmd::core::ChargedParticle::calcDMomentumComponent(
       result(pt_i + 2) = -py;
       result(pt_i) = cosA + dw_dpt * py * ct;
       result(pt_i + 1) = dw_deta * py * ct;
-      result(time_i) = w * py;
+      result(pt_i + 5) = w * py;
       break;
     case kfbase::core::MOMENT_Y:
       result(pt_i + 2) = px;
       result(pt_i) = -sinA - dw_dpt * px * ct;
       result(pt_i + 1) = -dw_deta * px * ct;
-      result(time_i) = -w * px;
+      result(pt_i + 5) = -w * px;
       break;
     case kfbase::core::MOMENT_Z:
       result(pt_i) = eta;
@@ -150,10 +153,11 @@ Eigen::MatrixXd kfcmd::core::ChargedParticle::calcD2MomentumComponent(
   // 2 --- phi
   // 3 --- rho
   // 4 --- tz
+  // 5 --- ct
   const long pt_i = getBeginIndex();
   const long eta_i = pt_i + 1;
   const long phi_i = pt_i + 2;
-  const long time_i = _timeParam->getBeginIndex();
+  const long time_i = pt_i + 5;
   Eigen::MatrixXd result = Eigen::MatrixXd::Zero(x.size(), x.size());
   double ct = x(time_i);
   double m = getMass();
@@ -255,9 +259,10 @@ double kfcmd::core::ChargedParticle::calcVertexComponent(
   // 2 --- phi
   // 3 --- rho
   // 4 --- tz
+  // 5 --- ct
   long pt_i = getBeginIndex();
   double result = 0;
-  double ct = x(_timeParam->getBeginIndex());
+  double ct = x(pt_i + 5);
   double m = getMass();
   double eta = x(pt_i + 1);
   double pt = x(pt_i);
@@ -290,10 +295,11 @@ Eigen::VectorXd kfcmd::core::ChargedParticle::calcDVertexComponent(
   // 2 --- phi
   // 3 --- rho
   // 4 --- tz
+  // 5 --- ct
   long pt_i = getBeginIndex();
-  const long time_i = _timeParam->getBeginIndex();
+  const long time_i = pt_i + 5;
   Eigen::VectorXd result = Eigen::VectorXd::Zero(x.size());
-  double ct = x(_timeParam->getBeginIndex());
+  double ct = x(time_i);
   double m = getMass();
   double eta = x(pt_i + 1);
   double eta2 = eta * eta;
@@ -349,13 +355,14 @@ Eigen::MatrixXd kfcmd::core::ChargedParticle::calcD2VertexComponent(
   // 2 --- phi
   // 3 --- rho
   // 4 --- tz
+  // 5 --- ct
   long pt_i = getBeginIndex();
   const long eta_i = pt_i + 1;
   const long phi_i = pt_i + 2;
   const long rho_i = pt_i + 3;
-  const long time_i = _timeParam->getBeginIndex();
+  const long time_i = pt_i + 5;
   Eigen::MatrixXd result = Eigen::MatrixXd::Zero(x.size(), x.size());
-  double ct = x(_timeParam->getBeginIndex());
+  double ct = x(time_i);
   double ct2 = ct * ct;
   double m = getMass();
   double eta = x(pt_i + 1);
@@ -478,14 +485,6 @@ void kfcmd::core::ChargedParticle::setBeamY(const std::string& name) {
     // TO DO : exception
   }
   _beamY = it;
-}
-
-void kfcmd::core::ChargedParticle::setTimeParameter(const std::string& name) {
-  auto it = getCommonParameters()->find(name);
-  if (it == getCommonParameters()->end()) {
-    // TO DO : exception
-  }
-  _timeParam = it->second;
 }
 
 double kfcmd::core::ChargedParticle::getMagneticField() const {

@@ -205,8 +205,8 @@ namespace kfcmd {
        * @param component (vertex component)
        */
       void releaseVertexComponent(const std::string&, kfbase::core::VERTEX_COMPONENT);
-      void fixTrackNaturalParameter(const std::string&, double);
-      void releaseTrackNaturalParameter(const std::string&);
+      // void fixTrackNaturalParameter(const std::string&, double);
+      // void releaseTrackNaturalParameter(const std::string&);
 
       //! A method that used to disable a charged particle
       /*!
@@ -271,8 +271,6 @@ namespace kfcmd {
                                         const std::set<kfbase::core::Particle*>&);
       void enableEnergyMomentumConstraints(const std::string&);
       void disableEnergyMomentumConstraints(const std::string&);
-      // void enableCommonMomentumConstraintPxPyPzE();
-      // void disableCommonMomentumConstraintPxPyPzE();
       //! A method that used to enable X vertex constraint for a certain charged
       //! particle
       /*!
@@ -340,10 +338,6 @@ namespace kfcmd {
       void addParticleAngularConstraint(const std::string&,
                                         const std::string&,
                                         double);
-      void addFlowConstraintsXYZ(const std::string&,
-                                 const std::string&,
-                                 const std::string&);
-      void addParticleToFlow(const std::string&, const std::string&);
       //! A method that used to add mass constraint to a hypothesis
       /*!
        * @param constraintName (constraint name)
