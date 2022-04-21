@@ -35,7 +35,6 @@
 
 #include <kfbase/core/MassConstraint.hpp>
 #include <kfbase/core/MomentumConstraint.hpp>
-#include <kfbase/core/FlowConstraint.hpp>
 #include <kfbase/core/DoubleParticleAngularConstraint.hpp>
 #include <kfbase/core/ParticleAngularConstraint.hpp>
 #include <kfbase/core/IntermediateNeutralParticle.hpp>
@@ -435,18 +434,6 @@ void kfcmd::core::Hypothesis::setAngularConstraintSigma(const std::string& const
   auto cnt = dynamic_cast<nopt::NonLagrangeConstraint*>(_constraints.at(constraintName));
   // TODO: wrong class exception
   cnt->setLambda(1. / sigma / sigma);
-}
-
-void kfcmd::core::Hypothesis::disableFlowConstraintXYZ(const std::string& flowName) {
-  disableConstraint("#" + flowName + "-x");
-  disableConstraint("#" + flowName + "-y");
-  disableConstraint("#" + flowName + "-z");
-}
-
-void kfcmd::core::Hypothesis::enableFlowConstraintXYZ(const std::string& flowName) {
-  enableConstraint("#" + flowName + "-x");
-  enableConstraint("#" + flowName + "-y");
-  enableConstraint("#" + flowName + "-z");
 }
 
 void kfcmd::core::Hypothesis::disableVertexConstraintXYZ(

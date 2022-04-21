@@ -234,7 +234,6 @@ namespace kfcmd {
        * @param chargedParticleName (charged particle name)
        */
       void disableVertexConstraintXYZ(const std::string&);
-      void disableFlowConstraintXYZ(const std::string&);
       //! A method that used to disable X vertex constraint for a certain charged
       //! particle
       /*!
@@ -259,7 +258,6 @@ namespace kfcmd {
        * @param chargedParticleName (charged particle name)
        */
       void enableVertexConstraintXYZ(const std::string&);
-      void enableFlowConstraintXYZ(const std::string&);
       void addEnergyConstraint(const std::string&,
                                const std::set<kfbase::core::Particle*>&,
                                const std::set<kfbase::core::Particle*>&);
