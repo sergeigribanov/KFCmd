@@ -199,20 +199,35 @@ void kfcmd::core::Hypothesis::disableEnergyMomentumConstraints(const std::string
 //   disableConstraint("#constraint-pe");
 // }
 
+void kfcmd::core::Hypothesis::setInitialVertexX(const std::string& vertexName,
+                                               double x) {
+  const std::string vx = "#" + vertexName + "-x";
+  Eigen::VectorXd v(1);
+  v(0) = x;
+  setInitialCommonParams(vx, v);
+}
+
+void kfcmd::core::Hypothesis::setInitialVertexY(const std::string& vertexName,
+                                                double y) {
+  const std::string vy = "#" + vertexName + "-y";
+  Eigen::VectorXd v(1);
+  v(0) = y;
+  setInitialCommonParams(vy, v);
+}
+
+void kfcmd::core::Hypothesis::setInitialVertexZ(const std::string& vertexName,
+                                                double z) {
+  const std::string vz = "#" + vertexName + "-z";
+  Eigen::VectorXd v(1);
+  v(0) = z;
+  setInitialCommonParams(vz, v);
+}
+
 void kfcmd::core::Hypothesis::setInitialVertex(const std::string& vertexName,
                                                const Eigen::Vector3d& vertex) {
-  const std::string vx = "#" + vertexName + "-x";
-  const std::string vy = "#" + vertexName + "-y";
-  const std::string vz = "#" + vertexName + "-z";
-  Eigen::VectorXd xvect(1);
-  xvect(0) = vertex(0);
-  Eigen::VectorXd yvect(1);
-  yvect(0) = vertex(1);
-  Eigen::VectorXd zvect(1);
-  zvect(0) = vertex(2);
-  setInitialCommonParams(vx, xvect);
-  setInitialCommonParams(vy, yvect);
-  setInitialCommonParams(vz, zvect);
+  setInitialVertexX(vertexName, vertex(0));
+  setInitialVertexY(vertexName, vertex(1));
+  setInitialVertexZ(vertexName, vertex(2));
 }
 
 void kfcmd::core::Hypothesis::setInitialVertexRandomly(const std::string& vertexName, double distance) {
@@ -604,40 +619,40 @@ void kfcmd::core::Hypothesis::disableVertexConstraintXYZ(
   disableConstraint("#" + chargedParticleName + "-constraint-x");
   disableConstraint("#" + chargedParticleName + "-constraint-y");
   disableConstraint("#" + chargedParticleName + "-constraint-z");
-  disableCommonParams("#time-" + chargedParticleName);
+  // !!! disableCommonParams("#time-" + chargedParticleName);
 }
 
 void kfcmd::core::Hypothesis::disableVertexConstraintX(
                                                        const std::string& chargedParticleName) {
   disableConstraint("#" + chargedParticleName + "-constraint-x");
-  bool flag =
-    isConstraintEnabled("#" + chargedParticleName + "-constraint-y") ||
-    isConstraintEnabled("#" + chargedParticleName + "-constraint-z");
-  if (!flag) {
-    disableCommonParams("#time-" + chargedParticleName);
-  }
+  //!!! bool flag =
+  //   isConstraintEnabled("#" + chargedParticleName + "-constraint-y") ||
+  //   isConstraintEnabled("#" + chargedParticleName + "-constraint-z");
+  //!!! if (!flag) {
+  //   disableCommonParams("#time-" + chargedParticleName);
+  // }
 }
 
 void kfcmd::core::Hypothesis::disableVertexConstraintY(
                                                        const std::string& chargedParticleName) {
   disableConstraint("#" + chargedParticleName + "-constraint-y");
-  bool flag =
-    isConstraintEnabled("#" + chargedParticleName + "-constraint-x") ||
-    isConstraintEnabled("#" + chargedParticleName + "-constraint-z");
-  if (!flag) {
-    disableCommonParams("#time-" + chargedParticleName);
-  }
+  //!!! bool flag =
+  //   isConstraintEnabled("#" + chargedParticleName + "-constraint-x") ||
+  //   isConstraintEnabled("#" + chargedParticleName + "-constraint-z");
+  // if (!flag) {
+  //   disableCommonParams("#time-" + chargedParticleName);
+  // }
 }
 
 void kfcmd::core::Hypothesis::disableVertexConstraintZ(
                                                        const std::string& chargedParticleName) {
   disableConstraint("#" + chargedParticleName + "-constraint-z");
-  bool flag =
-    isConstraintEnabled("#" + chargedParticleName + "-constraint-x") ||
-    isConstraintEnabled("#" + chargedParticleName + "-constraint-y");
-  if (!flag) {
-    disableCommonParams("#time-" + chargedParticleName);
-  }
+  // !!! bool flag =
+  //   isConstraintEnabled("#" + chargedParticleName + "-constraint-x") ||
+  //   isConstraintEnabled("#" + chargedParticleName + "-constraint-y");
+  // if (!flag) {
+  //   disableCommonParams("#time-" + chargedParticleName);
+  // }
 }
 
 void kfcmd::core::Hypothesis::enableVertexConstraintXYZ(

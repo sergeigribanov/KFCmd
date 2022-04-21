@@ -296,6 +296,10 @@ namespace kfcmd {
 
       void setParticleAngularConstraintAxis(const std::string&, const TVector3&);
       void setAngularConstraintSigma(const std::string&,  double);
+      void setInitialVertex(const std::string&, const Eigen::Vector3d&);
+      void setInitialVertexX(const std::string&, double);
+      void setInitialVertexY(const std::string&, double);
+      void setInitialVertexZ(const std::string&, double);
 
     protected:
       //! A method that used to add vertex to a hypothesis
@@ -303,7 +307,6 @@ namespace kfcmd {
        * @param vertexName (vertex name)
        */
       void addVertex(const std::string&);
-      void setInitialVertex(const std::string&, const Eigen::Vector3d&);
       void setInitialVertexRandomly(const std::string&, double = 1.e-2);
       //! A method that used to add charged particle to a hypothesis
       /*!
