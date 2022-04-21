@@ -34,8 +34,8 @@
 
 kfcmd::core::ParticleMassLessThetaPhiE::ParticleMassLessThetaPhiE(const std::string& name) :
   kfbase::core::ParticleMassLessThetaPhiE(name) {
-  setLowerLimit(0, 0);
-  setUpperLimit(0, 1100);
+  setLowerLimit(0, 0.);
+  setUpperLimit(0, 1.1);
 }
 
 kfcmd::core::ParticleMassLessThetaPhiE::~ParticleMassLessThetaPhiE() {}

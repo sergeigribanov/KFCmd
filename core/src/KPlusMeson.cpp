@@ -35,6 +35,6 @@
 
 kfcmd::core::KPlusMeson::KPlusMeson(const std::string& name)
     : ChargedParticle(
-          name, TDatabasePDG::Instance()->GetParticle(321)->Mass() * 1000, 1) {}
+          name, TDatabasePDG::Instance()->GetParticle(321)->Mass(), 1) {}
 
 kfcmd::core::KPlusMeson::~KPlusMeson() {}

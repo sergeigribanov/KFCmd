@@ -35,6 +35,6 @@
 
 kfcmd::core::Muon::Muon(const std::string& name)
     : ChargedParticle(
-          name, TDatabasePDG::Instance()->GetParticle(13)->Mass() * 1000, -1) {}
+          name, TDatabasePDG::Instance()->GetParticle(13)->Mass(), -1) {}
 
 kfcmd::core::Muon::~Muon() {}

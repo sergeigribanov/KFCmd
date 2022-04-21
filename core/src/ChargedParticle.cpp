@@ -34,14 +34,14 @@
 #include <TMath.h>
 #include <cmath>
 
-const double kfcmd::core::ChargedParticle::_c = 2.99792458;
+const double kfcmd::core::ChargedParticle::_c = 2.99792458e-3;
 
 kfcmd::core::ChargedParticle::ChargedParticle(const std::string& name, double mass,
                                         double charge)
     : kfbase::core::VertexParticle(name, 6, mass, charge) {
   setPeriod(2, 0, 2 * TMath::Pi());
   setLowerLimit(0, 0);
-  setUpperLimit(0, 1100);
+  setUpperLimit(0, 1.1);
   setLowerLimit(1, -20);
   setUpperLimit(1, 20);
   setLowerLimit(2, -1000 * TMath::Pi());

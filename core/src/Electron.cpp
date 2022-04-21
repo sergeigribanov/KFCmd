@@ -35,6 +35,6 @@
 
 kfcmd::core::Electron::Electron(const std::string& name)
     : ChargedParticle(
-          name, TDatabasePDG::Instance()->GetParticle(11)->Mass() * 1000, -1) {}
+          name, TDatabasePDG::Instance()->GetParticle(11)->Mass(), -1) {}
 
 kfcmd::core::Electron::~Electron() {}

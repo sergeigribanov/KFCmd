@@ -34,12 +34,12 @@
 
 kfcmd::core::ParticlePxPyPzE::ParticlePxPyPzE(const std::string& name, double mass) :
   kfbase::core::ParticlePxPyPzE(name, mass) {
-  setLowerLimit(0, -1100);
-  setUpperLimit(0, 1100);
-  setLowerLimit(1, -1100);
-  setUpperLimit(1, 1100);
-  setLowerLimit(2, -1100);
-  setUpperLimit(2, 1100);
+  setLowerLimit(0, -1.1);
+  setUpperLimit(0, 1.1);
+  setLowerLimit(1, -1.1);
+  setUpperLimit(1, 1.1);
+  setLowerLimit(2, -1.1);
+  setUpperLimit(2, 1.1);
 }
 
 kfcmd::core::ParticlePxPyPzE::~ParticlePxPyPzE() {}

@@ -595,8 +595,11 @@ bool kfcmd::core::Hypothesis::fillTrack(const std::string& name, std::size_t ind
   // 3 --- rho
   // 4 --- z
   Eigen::MatrixXd cov = perm * terr0 * perm.inverse();
+  cov.row(0) *= 1.e-3;
+  cov.col(0) *= 1.e-3;
   if (0 == cov.determinant()) return false;
   par(0) = (data.tptot)[index] * std::sin((data.tth)[index]);
+  par(0) *= 1.e-3;
   par(1) = 1. / std::tan((data.tth)[index]);
   par(2) = (data.tphi)[index];
   par(3) = (data.trho)[index];
@@ -611,6 +614,10 @@ bool kfcmd::core::Hypothesis::fillTrack(const std::string& name, std::size_t ind
 
 bool kfcmd::core::Hypothesis::fillPhoton(const std::string& name, std::size_t index,
                                          const kfcmd::core::TrPh& data) {
+  // 0 --- energy
+  // 1 --- R
+  // 2 --- phi
+  // 3 --- z0
   Eigen::VectorXd par = Eigen::VectorXd::Zero(4);
   Eigen::MatrixXd cov = Eigen::MatrixXd::Zero(4, 4);
   double sigma2_z = 0.30;
@@ -629,9 +636,11 @@ bool kfcmd::core::Hypothesis::fillPhoton(const std::string& name, std::size_t in
   cov(1, 1) = sigma2_rho;
   cov(2, 2) = pow((data.pherr)[index][2], 2);
   cov(3, 3) = sigma2_z;
+  cov.row(0) *= 1.e-3;
+  cov.col(0) *= 1.e-3;
   if (0 == cov.determinant()) return false;
-
   par(0) = (data.phen)[index];
+  par(0) *= 1.e-3;
   par(1) = (data.phrho)[index];
   par(2) = (data.phphi0)[index];
   par(3) = z;
