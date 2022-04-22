@@ -305,15 +305,6 @@ void kfcmd::core::Hypothesis::addChargedParticle(kfcmd::core::ChargedParticle* p
   particle->setMagneticField("#m-field");
   particle->setBeamX("#beam-x");
   particle->setBeamY("#beam-y");
-  enableParticle(particle->getName());
-}
-
-void kfcmd::core::Hypothesis::disableChargedParticle(const std::string& chargedParticleName) {
-  disableParticle(chargedParticleName);
-}
-
-void kfcmd::core::Hypothesis::enableChargedParticle(const std::string& chargedParticleName) {
-  enableParticle(chargedParticleName);
 }
 
 void kfcmd::core::Hypothesis::addPhoton(kfcmd::core::Photon* photon,
@@ -325,7 +316,6 @@ void kfcmd::core::Hypothesis::addPhoton(kfcmd::core::Photon* photon,
   photon->setVertexY(vertexYname);
   const std::string vertexZname = "#" + vertexName + "-z";
   photon->setVertexZ(vertexZname);
-  enableParticle(photon->getName());
 }
 
 void kfcmd::core::Hypothesis::addConstantMomentumParticle(const std::string& name,
@@ -333,7 +323,6 @@ void kfcmd::core::Hypothesis::addConstantMomentumParticle(const std::string& nam
                                                           const Eigen::Vector3d& p) {
   auto particle = new kfbase::core::ConstantMomentumParticle(name, energy, p);
   addParticle(particle);
-  enableParticle(particle->getName());
 }
 
 void kfcmd::core::Hypothesis::addIntermediateNeutralParticle(const std::string& name,
@@ -347,27 +336,16 @@ void kfcmd::core::Hypothesis::addIntermediateNeutralParticle(const std::string& 
   particle->setVertexY(vertexYname);
   const std::string vertexZname = "#" + vertexName + "-z";
   particle->setVertexZ(vertexZname);
-  enableParticle(particle->getName());
 }
 
 void kfcmd::core::Hypothesis::addParticlePxPyPzE(const std::string& name, double mass) {
   auto particle = new kfcmd::core::ParticlePxPyPzE(name, mass);
   addParticle(particle);
-  enableParticle(particle->getName());
 }
 
 void kfcmd::core::Hypothesis::addParticleMassLessThetaPhiE(const std::string& name) {
   auto particle = new kfcmd::core::ParticleMassLessThetaPhiE(name);
   addParticle(particle);
-  enableParticle(particle->getName());
-}
-
-void kfcmd::core::Hypothesis::disablePhoton(const std::string& photonName) {
-  disableParticle(photonName);
-}
-
-void kfcmd::core::Hypothesis::enablePhoton(const std::string& photonName) {
-  enableParticle(photonName);
 }
 
 void kfcmd::core::Hypothesis::addVertexConstraintsXYZ(

@@ -205,29 +205,6 @@ namespace kfcmd {
        * @param component (vertex component)
        */
       void releaseVertexComponent(const std::string&, kfbase::core::VERTEX_COMPONENT);
-      // void fixTrackNaturalParameter(const std::string&, double);
-      // void releaseTrackNaturalParameter(const std::string&);
-
-      //! A method that used to disable a charged particle
-      /*!
-       * @param chargedParticleName (charged particle name)
-       */
-      void disableChargedParticle(const std::string&);
-      //! A method that used to enable a charged particle by name
-      /*!
-       * @param chargedParticleName (charged particle name)
-       */
-      void enableChargedParticle(const std::string&);
-      //! A method that used to disable photon by name
-      /*!
-       * @param photonName (photon name)
-       */
-      void disablePhoton(const std::string&);
-      //! A method that used to enable photon by name
-      /*!
-       * @param photonName (photon name)
-       */
-      void enablePhoton(const std::string&);
       //! A method that used to disable X, Y and Z vertex constraint for a certain
       //! charged particle
       /*!
