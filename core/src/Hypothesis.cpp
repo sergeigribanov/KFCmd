@@ -586,7 +586,7 @@ bool kfcmd::core::Hypothesis::fillTrack(const std::string& name, std::size_t ind
   // index 6 --- ct
   Eigen::MatrixXd inv = Eigen::MatrixXd::Zero(6, 6);
   inv.block(0, 0, 5, 5) =  cov.inverse();
-  this->setParticleInverseErrorMatrix(name, inv);
+  this->setParticleInverseCovarianceMatrix(name, inv);
   return true;
 }
 
@@ -625,7 +625,7 @@ bool kfcmd::core::Hypothesis::fillPhoton(const std::string& name, std::size_t in
 
   this->setInitialParticleParams(name, par);
   Eigen::MatrixXd inv = cov.inverse();
-  this->setParticleInverseErrorMatrix(name, inv);
+  this->setParticleInverseCovarianceMatrix(name, inv);
   return true;
 }
 
