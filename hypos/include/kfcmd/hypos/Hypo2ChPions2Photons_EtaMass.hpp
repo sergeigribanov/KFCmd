@@ -18,9 +18,9 @@
  */
 
 /**
- * @file Hypo3ChPionsKPlus.hpp
+ * @file Hypo2ChPions2Photons_EtaMass.hpp
  *
- * @brief Hypo3ChPionsKPlus class definition
+ * @brief Hypo2ChPions2Photons_EtaMass class definition
  *
  * @ingroup KFCmd
  *
@@ -29,16 +29,16 @@
  *
  */
 
-#ifndef __KFCMD_HYPO3CHPIONSKPLUS_HPP__
-#define __KFCMD_HYPO3CHPIONSKPLUS_HPP__
+#ifndef _KFCmd_Hypo2ChPions2Photons_EtaMass_HPP_
+#define _KFCmd_Hypo2ChPions2Photons_EtaMass_HPP_
 #include "kfcmd/core/Hypothesis.hpp"
 
 namespace kfcmd {
   namespace hypos {
     /**
-     * Implementation of K+pi-pi+pi- hypothesis
+     * Implementation of (pi+, pi-, gamma, gamma) hypothesis
      */
-    class Hypo3ChPionsKPlus : public kfcmd::core::Hypothesis {
+    class Hypo2ChPions2Photons_EtaMass : public kfcmd::core::Hypothesis {
     public:
       //! A constructor
       /*!
@@ -50,11 +50,11 @@ namespace kfcmd {
        *
        * @param tolerance (optimization tolerance)
        */
-      Hypo3ChPionsKPlus(double, double, long = 20, double = 1.e-3);
+      Hypo2ChPions2Photons_EtaMass(double, double, long = 20, double = 1.e-4);
       //! A destructor
-      virtual ~Hypo3ChPionsKPlus();
+      virtual ~Hypo2ChPions2Photons_EtaMass();
     };
-  } // namespace hypos
+  } // namespace core
 }  // namespace kfcmd
 
 #endif

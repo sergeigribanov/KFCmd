@@ -18,9 +18,9 @@
  */
 
 /**
- * @file Hypo3ChPionsKMinus.cpp
+ * @file Hypo3ChPionsKPlus.cpp
  *
- * @brief Implementation of Hypo3ChPionsKMinus methods
+ * @brief Implementation of Hypo3ChPionsKPlus methods
  *
  * @ingroup KFCmd
  *
@@ -29,46 +29,42 @@
  *
  */
 
-#include "kfcmd/hypos/Hypo3ChPionsKMinus.hpp"
+#include "kfcmd/hypos/HypoKsKPlusPiMinus_NoKsMass.hpp"
 
 #include <TDatabasePDG.h>
 
-#include "kfcmd/core/KMinusMeson.hpp"
+#include "kfcmd/core/KPlusMeson.hpp"
 #include "kfcmd/core/PiMinusMeson.hpp"
 #include "kfcmd/core/PiPlusMeson.hpp"
 
-kfcmd::hypos::Hypo3ChPionsKMinus::Hypo3ChPionsKMinus(double energy, double magnetField,
-                                                     long nIter, double tolerance)
+using namespace kfcmd::hypos;
+
+HypoKsKPlusPiMinus_NoKsMass::HypoKsKPlusPiMinus_NoKsMass(double energy, double magnetField,
+                                            long nIter, double tolerance)
     : kfcmd::core::Hypothesis(energy, magnetField, nIter, tolerance) {
   addVertex("vtx0");
   addVertex("vtx1");
-  auto pipl0 = new kfcmd::core::PiPlusMeson("pi+_0");
-  addChargedParticle(pipl0);
+  auto pipl1 = new kfcmd::core::PiPlusMeson("pi+_1");
+  addChargedParticle(pipl1);
+  auto pimi1 = new kfcmd::core::PiMinusMeson("pi-_1");
+  addChargedParticle(pimi1);
   auto pimi0 = new kfcmd::core::PiMinusMeson("pi-_0");
   addChargedParticle(pimi0);
-  auto pipl1 = new kfcmd::core::PiMinusMeson("pi+_1");
-  addChargedParticle(pipl1);
-  auto kmi = new kfcmd::core::KMinusMeson("k-");
-  addChargedParticle(kmi);
-  addIntermediateNeutralParticle("ks", TDatabasePDG::Instance()->GetParticle(310)->Mass() * 1000, "vtx0");
+  auto kpl = new kfcmd::core::KPlusMeson("k+");
+  addChargedParticle(kpl);
+  addIntermediateNeutralParticle("ks", TDatabasePDG::Instance()->GetParticle(310)->Mass(), "vtx0");
   addConstantMomentumParticle("origin", energy, Eigen::Vector3d::Zero());
-  // addEnergyMomentumConstraints("em-vtx0", {getParticle("origin")},
-  //                              {pipl1, kmi, getParticle("ks")});
-  // addEnergyMomentumConstraints("em-vtx1", {getParticle("ks")},
-  //                              {pipl0, pimi0});
-
   addMomentumConstraints("momentum-vtx0", {getParticle("origin")},
-                         {pipl1, kmi, getParticle("ks")});
+                         {pimi0, kpl, getParticle("ks")});
   addMomentumConstraints("momentum-vtx1", {getParticle("ks")},
-                         {pipl0, pimi0});
+                         {pipl1, pimi1});
   addEnergyConstraint("energy-constraint", {getParticle("origin")},
-                      {pipl1, kmi, pipl0, pimi0});
-
-  addVertexConstraintsXYZ("pi+_1", "vtx0");
-  addVertexConstraintsXYZ("k-", "vtx0");
-  addVertexConstraintsXYZ("pi+_0", "vtx1");
-  addVertexConstraintsXYZ("pi-_0", "vtx1");
+                      {pimi0, kpl, pipl1, pimi1});
+  addVertexConstraintsXYZ("pi-_0", "vtx0");
+  addVertexConstraintsXYZ("k+", "vtx0");
+  addVertexConstraintsXYZ("pi+_1", "vtx1");
+  addVertexConstraintsXYZ("pi-_1", "vtx1");
   addVertexConstraintsXYZ("ks", "vtx1");
 }
 
-kfcmd::hypos::Hypo3ChPionsKMinus::~Hypo3ChPionsKMinus() {}
+HypoKsKPlusPiMinus_NoKsMass::~HypoKsKPlusPiMinus_NoKsMass() {}

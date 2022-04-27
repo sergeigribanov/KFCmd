@@ -18,9 +18,9 @@
  */
 
 /**
- * @file Hypo2ChPions2Photons.cpp
+ * @file Hypo2ChPions2Photons_EtaMass.cpp
  *
- * @brief Implementation of Hypo2ChPions2Photons methods
+ * @brief Implementation of Hypo2ChPions2Photons_EtaMass methods
  *
  * @ingroup KFCmd
  *
@@ -29,14 +29,14 @@
  *
  */
 
-#include "kfcmd/hypos/Hypo2ChPions2Photons.hpp"
-
+#include <TDatabasePDG.h>
+#include "kfcmd/hypos/Hypo2ChPions2Photons_EtaMass.hpp"
 #include "kfcmd/core/PiMinusMeson.hpp"
 #include "kfcmd/core/PiPlusMeson.hpp"
 
 using namespace kfcmd::hypos;
 
-Hypo2ChPions2Photons::Hypo2ChPions2Photons(double energy,
+Hypo2ChPions2Photons_EtaMass::Hypo2ChPions2Photons_EtaMass(double energy,
                                                   double magneticField,
                                                   long nIter, double tolerance)
     : kfcmd::core::Hypothesis(energy, magneticField, nIter, tolerance) {
@@ -53,6 +53,9 @@ Hypo2ChPions2Photons::Hypo2ChPions2Photons(double energy,
   addEnergyMomentumConstraints("em-vtx0", {getParticle("origin")}, {pip, pim, ph0, ph1});
   addVertexConstraintsXYZ("pi+", "vtx0");
   addVertexConstraintsXYZ("pi-", "vtx0");
+  addMassConstraint("m-eta-constraint",
+                    TDatabasePDG::Instance()->GetParticle(221)->Mass(),
+                    {"g0", "g1"});
 }
 
-Hypo2ChPions2Photons::~Hypo2ChPions2Photons() {}
+Hypo2ChPions2Photons_EtaMass::~Hypo2ChPions2Photons_EtaMass() {}

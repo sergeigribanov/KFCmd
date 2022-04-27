@@ -18,9 +18,9 @@
  */
 
 /**
- * @file Hypo3ChPionsKMinus.hpp
+ * @file HypoKsKMinusPiPlus_NoKsMass.hpp
  *
- * @brief Hypo3ChPionsKMinus class definition
+ * @brief HypoKsKMinusPiPlus_NoKsMass class definition
  *
  * @ingroup KFCmd
  *
@@ -29,8 +29,8 @@
  *
  */
 
-#ifndef __KFCMD_HYPO3CHPIONSKMINUS_HPP__
-#define __KFCMD_HYPO3CHPIONSKMINUS_HPP__
+#ifndef _KFCmd_HypoKsKMinusPiPlus_NoKsMass_HPP_
+#define _KFCmd_HypoKsKMinusPiPlus_NoKsMass_HPP_
 #include "kfcmd/core/Hypothesis.hpp"
 
 namespace kfcmd {
@@ -38,7 +38,7 @@ namespace kfcmd {
     /**
      * Implementation of K-pi+pi-pi+ hypothesis
      */
-    class Hypo3ChPionsKMinus : public kfcmd::core::Hypothesis {
+    class HypoKsKMinusPiPlus_NoKsMass : public kfcmd::core::Hypothesis {
     public:
       //! A constructor
       /*!
@@ -50,9 +50,9 @@ namespace kfcmd {
        *
        * @param tolerance (optimization tolerance)
        */
-      Hypo3ChPionsKMinus(double, double, long = 20, double = 1.e-3);
+      HypoKsKMinusPiPlus_NoKsMass(double, double, long = 20, double = 1.e-4);
       //! A destructor
-      virtual ~Hypo3ChPionsKMinus();
+      virtual ~HypoKsKMinusPiPlus_NoKsMass();
     };
   } // namespace hypos
 }  // namespace kfcmd

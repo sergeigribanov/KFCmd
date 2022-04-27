@@ -18,9 +18,9 @@
  */
 
 /**
- * @file Hypo2ChPions2Photons.cpp
+ * @file Hypo4ChPions.cpp
  *
- * @brief Implementation of Hypo2ChPions2Photons methods
+ * @brief Implementation of Hypo4ChPions methods
  *
  * @ingroup KFCmd
  *
@@ -29,30 +29,30 @@
  *
  */
 
-#include "kfcmd/hypos/Hypo2ChPions2Photons.hpp"
-
+#include "kfcmd/hypos/Hypo4ChPions.hpp"
 #include "kfcmd/core/PiMinusMeson.hpp"
 #include "kfcmd/core/PiPlusMeson.hpp"
 
 using namespace kfcmd::hypos;
 
-Hypo2ChPions2Photons::Hypo2ChPions2Photons(double energy,
-                                                  double magneticField,
-                                                  long nIter, double tolerance)
-    : kfcmd::core::Hypothesis(energy, magneticField, nIter, tolerance) {
+Hypo4ChPions::Hypo4ChPions(double energy, double magnetField, long nIter,
+                                  double tolerance)
+    : kfcmd::core::Hypothesis(energy, magnetField, nIter, tolerance) {
   addVertex("vtx0");
-  auto pip = new kfcmd::core::PiPlusMeson("pi+");
-  addChargedParticle(pip);
-  auto pim = new kfcmd::core::PiMinusMeson("pi-");
-  addChargedParticle(pim);
-  auto ph0 = new kfcmd::core::Photon("g0");
-  addPhoton(ph0, "vtx0");
-  auto ph1 = new kfcmd::core::Photon("g1");
-  addPhoton(ph1, "vtx0");
+  auto pipl0 = new kfcmd::core::PiPlusMeson("pi+_0");
+  addChargedParticle(pipl0);
+  auto pipl1 = new kfcmd::core::PiPlusMeson("pi+_1");
+  addChargedParticle(pipl1);
+  auto pimi0 = new kfcmd::core::PiMinusMeson("pi-_0");
+  addChargedParticle(pimi0);
+  auto pimi1 = new kfcmd::core::PiMinusMeson("pi-_1");
+  addChargedParticle(pimi1);
   addConstantMomentumParticle("origin", energy, Eigen::Vector3d::Zero());
-  addEnergyMomentumConstraints("em-vtx0", {getParticle("origin")}, {pip, pim, ph0, ph1});
-  addVertexConstraintsXYZ("pi+", "vtx0");
-  addVertexConstraintsXYZ("pi-", "vtx0");
+  addEnergyMomentumConstraints("em-vtx0", {getParticle("origin")}, {pipl0, pipl1, pimi0, pimi1});
+  addVertexConstraintsXYZ("pi+_0", "vtx0");
+  addVertexConstraintsXYZ("pi+_1", "vtx0");
+  addVertexConstraintsXYZ("pi-_0", "vtx0");
+  addVertexConstraintsXYZ("pi-_1", "vtx0");
 }
 
-Hypo2ChPions2Photons::~Hypo2ChPions2Photons() {}
+Hypo4ChPions::~Hypo4ChPions() {}

@@ -18,9 +18,9 @@
  */
 
 /**
- * @file Hypo2ChPions2Photons.hpp
+ * @file Hypo4ChPions2Photons.hpp
  *
- * @brief Hypo2ChPions2Photons class definition
+ * @brief Hypo4ChPions2Photons class definition
  *
  * @ingroup KFCmd
  *
@@ -29,16 +29,16 @@
  *
  */
 
-#ifndef _KFCmd_Hypo2ChPions2Photons_HPP_
-#define _KFCmd_Hypo2ChPions2Photons_HPP_
+#ifndef _KFCmd_Hypo4ChPions2Photons_HPP_
+#define _KFCmd_Hypo4ChPions2Photons_HPP_
 #include "kfcmd/core/Hypothesis.hpp"
 
 namespace kfcmd {
   namespace hypos {
     /**
-     * Implementation of (pi+, pi-, gamma, gamma) hypothesis
+     * Implementation of (pi+, pi-, pi+, pi-, gamma, gamma) hypothesis
      */
-    class Hypo2ChPions2Photons : public kfcmd::core::Hypothesis {
+    class Hypo4ChPions2Photons : public kfcmd::core::Hypothesis {
     public:
       //! A constructor
       /*!
@@ -50,11 +50,11 @@ namespace kfcmd {
        *
        * @param tolerance (optimization tolerance)
        */
-      Hypo2ChPions2Photons(double, double, long = 20, double = 1.e-4);
+      Hypo4ChPions2Photons(double, double, long = 20, double = 1.e-4);
       //! A destructor
-      virtual ~Hypo2ChPions2Photons();
+      virtual ~Hypo4ChPions2Photons();
     };
-  } // namespace core
+  } // namespace hypos
 }  // namespace kfcmd
 
 #endif
