@@ -37,8 +37,9 @@
 using namespace kfcmd::hypos;
 
 Hypo2ChPions2Photons::Hypo2ChPions2Photons(double energy,
-                                                  double magneticField,
-                                                  long nIter, double tolerance)
+                                           double magneticField,
+                                           long nIter,
+                                           double tolerance)
     : kfcmd::core::Hypothesis(energy, magneticField, nIter, tolerance) {
   addVertex("vtx0");
   auto pip = new kfcmd::core::PiPlusMeson("pi+");
