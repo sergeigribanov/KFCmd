@@ -57,10 +57,10 @@ Hypo4ChPions2Photons::Hypo4ChPions2Photons(double energy,
   addPhoton(g1, "vtx0");
   addConstantMomentumParticle("origin", energy, Eigen::Vector3d::Zero());
   addEnergyMomentumConstraints("em-vtx0", {getParticle("origin")}, {pipl0, pipl1, pimi0, pimi1, g0, g1});
-  addVertexConstraintsXYZ("pi+_0", "vtx0");
-  addVertexConstraintsXYZ("pi+_1", "vtx0");
-  addVertexConstraintsXYZ("pi-_0", "vtx0");
-  addVertexConstraintsXYZ("pi-_1", "vtx0");
+  addOutputVertexConstraintsXYZ("pi+_0", "vtx0");
+  addOutputVertexConstraintsXYZ("pi+_1", "vtx0");
+  addOutputVertexConstraintsXYZ("pi-_0", "vtx0");
+  addOutputVertexConstraintsXYZ("pi-_1", "vtx0");
   addMassConstraint("m-pi0-constraint",
                     TDatabasePDG::Instance()->GetParticle(111)->Mass(),
                     {"g0", "g1"});

@@ -47,7 +47,7 @@ HypoKsKl::HypoKsKl(double energy, double magnetField,
   auto pimi1 = new kfcmd::core::PiMinusMeson("pi-_1");
   addChargedParticle(pimi1);
   addIntermediateNeutralParticle("ks", TDatabasePDG::Instance()->GetParticle(310)->Mass(), "vtx0");
-  addParticlePxPyPzE("kl", TDatabasePDG::Instance()->GetParticle(130)->Mass());
+  addParticlePxPyPz("kl", TDatabasePDG::Instance()->GetParticle(130)->Mass());
   addConstantMomentumParticle("origin", energy, Eigen::Vector3d::Zero());
   addMomentumConstraints("em-vtx0", {getParticle("origin")},
                          {getParticle("kl"), getParticle("ks")});
@@ -55,9 +55,9 @@ HypoKsKl::HypoKsKl(double energy, double magnetField,
                          {pipl1, pimi1});
   addEnergyConstraint("energy-constraint", {getParticle("origin")},
                       {pipl1, pimi1, getParticle("kl")});
-  addVertexConstraintsXYZ("pi+_1", "vtx1");
-  addVertexConstraintsXYZ("pi-_1", "vtx1");
-  addVertexConstraintsXYZ("ks", "vtx1");
+  addOutputVertexConstraintsXYZ("pi+_1", "vtx1");
+  addOutputVertexConstraintsXYZ("pi-_1", "vtx1");
+  addOutputVertexConstraintsXYZ("ks", "vtx1");
 }
 
 HypoKsKl::~HypoKsKl() {}

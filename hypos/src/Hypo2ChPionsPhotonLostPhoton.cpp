@@ -20,8 +20,8 @@ Hypo2ChPionsPhotonLostPhoton::Hypo2ChPionsPhotonLostPhoton(double energy,
   addConstantMomentumParticle("origin", energy, Eigen::Vector3d::Zero());
   addEnergyMomentumConstraints("em-vtx0", {getParticle("origin")},
                                {pip, pim, ph0, getParticle("g1")});
-  addVertexConstraintsXYZ("pi+", "vtx0");
-  addVertexConstraintsXYZ("pi-", "vtx0");
+  addOutputVertexConstraintsXYZ("pi+", "vtx0");
+  addOutputVertexConstraintsXYZ("pi-", "vtx0");
 }
 
 Hypo2ChPionsPhotonLostPhoton::~Hypo2ChPionsPhotonLostPhoton() {}

@@ -64,17 +64,17 @@ kfcmd::hypos::Hypo2Ks2ChPions::Hypo2Ks2ChPions(double energy, double magnetField
   addEnergyMomentumConstraints("momentum-vtx2", {getParticle("ks2")},
                                {pipl2, pimi2});
 
-  addVertexConstraintsXYZ("pi-_0", "vtx0");
-  addVertexConstraintsXYZ("pi+_0", "vtx0");
+  addOutputVertexConstraintsXYZ("pi-_0", "vtx0");
+  addOutputVertexConstraintsXYZ("pi+_0", "vtx0");
 
-  addVertexConstraintsXYZ("pi+_1", "vtx1");
-  addVertexConstraintsXYZ("pi-_1", "vtx1");
+  addOutputVertexConstraintsXYZ("pi+_1", "vtx1");
+  addOutputVertexConstraintsXYZ("pi-_1", "vtx1");
 
-  addVertexConstraintsXYZ("pi+_2", "vtx2");
-  addVertexConstraintsXYZ("pi-_2", "vtx2");
+  addOutputVertexConstraintsXYZ("pi+_2", "vtx2");
+  addOutputVertexConstraintsXYZ("pi-_2", "vtx2");
 
-  addVertexConstraintsXYZ("ks1", "vtx1");
-  addVertexConstraintsXYZ("ks2", "vtx2");
+  addOutputVertexConstraintsXYZ("ks1", "vtx1");
+  addOutputVertexConstraintsXYZ("ks2", "vtx2");
 }
 
 kfcmd::hypos::Hypo2Ks2ChPions::~Hypo2Ks2ChPions() {}

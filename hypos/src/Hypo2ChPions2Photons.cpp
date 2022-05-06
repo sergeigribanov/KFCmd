@@ -52,8 +52,8 @@ Hypo2ChPions2Photons::Hypo2ChPions2Photons(double energy,
   addPhoton(ph1, "vtx0");
   addConstantMomentumParticle("origin", energy, Eigen::Vector3d::Zero());
   addEnergyMomentumConstraints("em-vtx0", {getParticle("origin")}, {pip, pim, ph0, ph1});
-  addVertexConstraintsXYZ("pi+", "vtx0");
-  addVertexConstraintsXYZ("pi-", "vtx0");
+  addOutputVertexConstraintsXYZ("pi+", "vtx0");
+  addOutputVertexConstraintsXYZ("pi-", "vtx0");
 }
 
 Hypo2ChPions2Photons::~Hypo2ChPions2Photons() {}

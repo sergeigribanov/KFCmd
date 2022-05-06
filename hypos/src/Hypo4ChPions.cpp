@@ -49,10 +49,10 @@ Hypo4ChPions::Hypo4ChPions(double energy, double magnetField, long nIter,
   addChargedParticle(pimi1);
   addConstantMomentumParticle("origin", energy, Eigen::Vector3d::Zero());
   addEnergyMomentumConstraints("em-vtx0", {getParticle("origin")}, {pipl0, pipl1, pimi0, pimi1});
-  addVertexConstraintsXYZ("pi+_0", "vtx0");
-  addVertexConstraintsXYZ("pi+_1", "vtx0");
-  addVertexConstraintsXYZ("pi-_0", "vtx0");
-  addVertexConstraintsXYZ("pi-_1", "vtx0");
+  addOutputVertexConstraintsXYZ("pi+_0", "vtx0");
+  addOutputVertexConstraintsXYZ("pi+_1", "vtx0");
+  addOutputVertexConstraintsXYZ("pi-_0", "vtx0");
+  addOutputVertexConstraintsXYZ("pi-_1", "vtx0");
 }
 
 Hypo4ChPions::~Hypo4ChPions() {}

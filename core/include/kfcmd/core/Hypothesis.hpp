@@ -33,7 +33,8 @@
 #define __KFCMD_HYPOTHESIS_HPP__
 
 #include <kfbase/core/Hypothesis.hpp>
-#include <kfbase/core/VertexConstraint.hpp>
+#include <kfbase/core/OutputVertexConstraint.hpp>
+#include <kfbase/core/InputVertexConstraint.hpp>
 #include <kfbase/core/ConstantMomentumParticle.hpp>
 #include <set>
 #include <string>
@@ -64,7 +65,6 @@ namespace kfcmd {
       Hypothesis(double, double, long = 20, double = 1.e-3);
       //! A destructor
       virtual ~Hypothesis();
-      TVector3 calcVertexComponent(const std::string&);
       //! A getter for an initial vertex
       /*!
        * @param vertexName (vertex name)
@@ -210,31 +210,36 @@ namespace kfcmd {
       /*!
        * @param chargedParticleName (charged particle name)
        */
-      void disableVertexConstraintXYZ(const std::string&);
+      void disableOutputVertexConstraintXYZ(const std::string&);
+      void disableInputVertexConstraintXYZ(const std::string&);
       //! A method that used to disable X vertex constraint for a certain charged
       //! particle
       /*!
        * @param chargedParticleName (charged particle name)
        */
-      void disableVertexConstraintX(const std::string&);
+      void disableOutputVertexConstraintX(const std::string&);
+      void disableInputVertexConstraintX(const std::string&);
       //! A method that used to disable Y vertex constraint for a certain charged
       //! particle
       /*!
        * @param chargedParticleName (charged particle name)
        */
-      void disableVertexConstraintY(const std::string&);
+      void disableOutputVertexConstraintY(const std::string&);
+      void disableInputVertexConstraintY(const std::string&);
       //! A method that used to disable Z vertex constraint for a certain charged
       //! particle
       /*!
        * @param chargedParticleName (charged particle name)
        */
-      void disableVertexConstraintZ(const std::string&);
+      void disableOutputVertexConstraintZ(const std::string&);
+      void disableInputVertexConstraintZ(const std::string&);
       //! A method that used to enable X, Y and Z vertex constraint for a certain
       //! charged particle
       /*!
        * @param chargedParticleName (charged particle name)
        */
-      void enableVertexConstraintXYZ(const std::string&);
+      void enableOutputVertexConstraintXYZ(const std::string&);
+      void enableInputVertexConstraintXYZ(const std::string&);
       void addEnergyConstraint(const std::string&,
                                const std::set<kfbase::core::Particle*>&,
                                const std::set<kfbase::core::Particle*>&);
@@ -251,19 +256,22 @@ namespace kfcmd {
       /*!
        * @param chargedParticleName (charged particle name)
        */
-      void enableVertexConstraintX(const std::string&);
+      void enableOutputVertexConstraintX(const std::string&);
+      void enableInputVertexConstraintX(const std::string&);
       //! A method that used to enable Y vertex constraint for a certain charged
       //! particle
       /*!
        * @param chargedParticleName (charged particle name)
        */
-      void enableVertexConstraintY(const std::string&);
+      void enableOutputVertexConstraintY(const std::string&);
+      void enableInputVertexConstraintY(const std::string&);
       //! A method that used to enable Z vertex constraint for a certain charged
       //! particle
       /*!
        * @param chargedParticleName (charged particle name)
        */
-      void enableVertexConstraintZ(const std::string&);
+      void enableOutputVertexConstraintZ(const std::string&);
+      void enableInputVertexConstraintZ(const std::string&);
 
       void setBeamXY(double, double);
 
@@ -296,7 +304,7 @@ namespace kfcmd {
       void addConstantMomentumParticle(const std::string&, double,
                                        const Eigen::Vector3d&);
       void addIntermediateNeutralParticle(const std::string&, double, const std::string&);
-      void addParticlePxPyPzE(const std::string&, double);
+      void addParticlePxPyPz(const std::string&, double);
       void addParticleMassLessThetaPhiE(const std::string&);
       //! A method that used to add vertex constraint for a certain charged particle
       //! to a hypothesis
@@ -305,7 +313,8 @@ namespace kfcmd {
        *
        * @param vertexName (vertex name)
        */
-      void addVertexConstraintsXYZ(const std::string&, const std::string&);
+      void addOutputVertexConstraintsXYZ(const std::string&, const std::string&);
+      void addInputVertexConstraintsXYZ(const std::string&, const std::string&);
       void addDoubleParticleAngularConstraint(const std::string&,
                                               const std::string&,
                                               const std::string&,

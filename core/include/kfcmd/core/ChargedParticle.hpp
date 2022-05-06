@@ -63,23 +63,21 @@ namespace kfcmd {
       void setMagneticField(const std::string&);
       void setBeamX(const std::string&);
       void setBeamY(const std::string&);
-      virtual double calcMomentumComponent(
-                                           const Eigen::VectorXd&, kfbase::core::MOMENT_COMPONENT) const override final;
-      virtual Eigen::VectorXd calcDMomentumComponent(
-                                                     const Eigen::VectorXd&, kfbase::core::MOMENT_COMPONENT) const override final;
-      virtual Eigen::MatrixXd calcD2MomentumComponent(
-                                                      const Eigen::VectorXd&, kfbase::core::MOMENT_COMPONENT) const override final;
-      virtual double calcVertexComponent(
-                                         const Eigen::VectorXd&, kfbase::core::VERTEX_COMPONENT) const override final;
-      virtual Eigen::VectorXd calcDVertexComponent(
-                                                   const Eigen::VectorXd&, kfbase::core::VERTEX_COMPONENT) const override final;
-      virtual Eigen::MatrixXd calcD2VertexComponent(
-                                                    const Eigen::VectorXd&, kfbase::core::VERTEX_COMPONENT) const override final;
-
+      virtual double calcOutputMomentumComponent(const Eigen::VectorXd&, kfbase::core::MOMENT_COMPONENT) const override final;
+      virtual double calcInputMomentumComponent(const Eigen::VectorXd&, kfbase::core::MOMENT_COMPONENT) const override final;
+      virtual Eigen::VectorXd calcOutputDMomentumComponent(const Eigen::VectorXd&, kfbase::core::MOMENT_COMPONENT) const override final;
+      virtual Eigen::VectorXd calcInputDMomentumComponent(const Eigen::VectorXd&, kfbase::core::MOMENT_COMPONENT) const override final;
+      virtual Eigen::MatrixXd calcOutputD2MomentumComponent(const Eigen::VectorXd&, kfbase::core::MOMENT_COMPONENT) const override final;
+      virtual Eigen::MatrixXd calcInputD2MomentumComponent(const Eigen::VectorXd&, kfbase::core::MOMENT_COMPONENT) const override final;
+      virtual double calcOutputVertexComponent(const Eigen::VectorXd&, kfbase::core::VERTEX_COMPONENT) const override final;
+      virtual double calcInputVertexComponent(const Eigen::VectorXd&, kfbase::core::VERTEX_COMPONENT) const override final;
+      virtual Eigen::VectorXd calcOutputDVertexComponent(const Eigen::VectorXd&, kfbase::core::VERTEX_COMPONENT) const override final;
+      virtual Eigen::VectorXd calcInputDVertexComponent(const Eigen::VectorXd&, kfbase::core::VERTEX_COMPONENT) const override final;
+      virtual Eigen::MatrixXd calcOutputD2VertexComponent(const Eigen::VectorXd&, kfbase::core::VERTEX_COMPONENT) const override final;
+      virtual Eigen::MatrixXd calcInputD2VertexComponent(const Eigen::VectorXd&, kfbase::core::VERTEX_COMPONENT) const override final;
     protected:
       //! A magnetic field getter
       double getMagneticField() const;
-      
     private:
       //! A constant that proportional to the light velocity
       static const double _c;

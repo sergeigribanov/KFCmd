@@ -18,9 +18,9 @@
  */
 
 /**
- * @file ParticlePxPyPzE.hpp
+ * @file ParticlePxPyPz.cpp
  *
- * @brief ParticlePxPyPzE class definition
+ * @brief Implementation of ParticlePxPyPz methods
  *
  * @ingroup KFCmd
  *
@@ -29,18 +29,17 @@
  *
  */
 
-#ifndef __KFCMD_PARTICLE_PXPYPZE_HPP__
-#define __KFCMD_PARTICLE_PXPYPZE_HPP__
-#include <kfbase/core/ParticlePxPyPzE.hpp>
+#include <cmath>
+#include "kfcmd/core/ParticlePxPyPz.hpp"
 
-namespace kfcmd {
-  namespace core {
-    class ParticlePxPyPzE : public kfbase::core::ParticlePxPyPzE {
-    public:
-      ParticlePxPyPzE(const std::string&, double);
-      virtual ~ParticlePxPyPzE();
-    };
-  } // namespace core
-} // namespace kfcmd
+kfcmd::core::ParticlePxPyPz::ParticlePxPyPz(const std::string& name, double mass) :
+  kfbase::core::ParticlePxPyPz(name, mass) {
+  setLowerLimit(0, -1.1);
+  setUpperLimit(0, 1.1);
+  setLowerLimit(1, -1.1);
+  setUpperLimit(1, 1.1);
+  setLowerLimit(2, -1.1);
+  setUpperLimit(2, 1.1);
+}
 
-#endif
+kfcmd::core::ParticlePxPyPz::~ParticlePxPyPz() {}

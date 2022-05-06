@@ -60,11 +60,11 @@ HypoKsKPlusPiMinus_NoKsMass::HypoKsKPlusPiMinus_NoKsMass(double energy, double m
                          {pipl1, pimi1});
   addEnergyConstraint("energy-constraint", {getParticle("origin")},
                       {pimi0, kpl, pipl1, pimi1});
-  addVertexConstraintsXYZ("pi-_0", "vtx0");
-  addVertexConstraintsXYZ("k+", "vtx0");
-  addVertexConstraintsXYZ("pi+_1", "vtx1");
-  addVertexConstraintsXYZ("pi-_1", "vtx1");
-  addVertexConstraintsXYZ("ks", "vtx1");
+  addOutputVertexConstraintsXYZ("pi-_0", "vtx0");
+  addOutputVertexConstraintsXYZ("k+", "vtx0");
+  addOutputVertexConstraintsXYZ("pi+_1", "vtx1");
+  addOutputVertexConstraintsXYZ("pi-_1", "vtx1");
+  addOutputVertexConstraintsXYZ("ks", "vtx1");
 }
 
 HypoKsKPlusPiMinus_NoKsMass::~HypoKsKPlusPiMinus_NoKsMass() {}

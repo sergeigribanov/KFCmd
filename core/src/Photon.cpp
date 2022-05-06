@@ -48,8 +48,8 @@ kfcmd::core::Photon::Photon(const std::string& name) : kfbase::core::Particle(na
 
 kfcmd::core::Photon::~Photon() {}
 
-double kfcmd::core::Photon::calcMomentumComponent(
-    const Eigen::VectorXd& x, kfbase::core::MOMENT_COMPONENT component) const {
+double kfcmd::core::Photon::calcOutputMomentumComponent(const Eigen::VectorXd& x,
+                                                        kfbase::core::MOMENT_COMPONENT component) const {
   long bi = getBeginIndex();
   double result = 0;
   // 0 --- energy
@@ -83,8 +83,13 @@ double kfcmd::core::Photon::calcMomentumComponent(
   return result;
 }
 
-Eigen::VectorXd kfcmd::core::Photon::calcDMomentumComponent(
-    const Eigen::VectorXd& x, kfbase::core::MOMENT_COMPONENT component) const {
+double kfcmd::core::Photon::calcInputMomentumComponent(const Eigen::VectorXd& x,
+                                                       kfbase::core::MOMENT_COMPONENT component) const {
+  return calcOutputMomentumComponent(x, component);
+}
+
+Eigen::VectorXd kfcmd::core::Photon::calcOutputDMomentumComponent(const Eigen::VectorXd& x,
+                                                                  kfbase::core::MOMENT_COMPONENT component) const {
   long bi = getBeginIndex();
   Eigen::VectorXd result = Eigen::VectorXd::Zero(x.size());
   double q = std::sqrt(
@@ -142,8 +147,13 @@ Eigen::VectorXd kfcmd::core::Photon::calcDMomentumComponent(
   return result;
 }
 
-Eigen::MatrixXd kfcmd::core::Photon::calcD2MomentumComponent(
-    const Eigen::VectorXd& x, kfbase::core::MOMENT_COMPONENT component) const {
+Eigen::VectorXd kfcmd::core::Photon::calcInputDMomentumComponent(const Eigen::VectorXd& x,
+                                                                 kfbase::core::MOMENT_COMPONENT component) const {
+  return calcOutputDMomentumComponent(x, component);
+}
+
+Eigen::MatrixXd kfcmd::core::Photon::calcOutputD2MomentumComponent(const Eigen::VectorXd& x,
+                                                                   kfbase::core::MOMENT_COMPONENT component) const {
   long bi = getBeginIndex();
   Eigen::MatrixXd result = Eigen::MatrixXd::Zero(x.size(), x.size());
   double q = std::sqrt(
@@ -369,6 +379,11 @@ Eigen::MatrixXd kfcmd::core::Photon::calcD2MomentumComponent(
       break;
   }
   return result;
+}
+
+Eigen::MatrixXd kfcmd::core::Photon::calcInputD2MomentumComponent(const Eigen::VectorXd& x,
+                                                                  kfbase::core::MOMENT_COMPONENT component) const {
+  return calcOutputD2MomentumComponent(x, component);
 }
 
 void kfcmd::core::Photon::setVertexX(const std::string& name) {
