@@ -65,7 +65,7 @@ HypoKsKMinusPiPlus_NoKsMass::HypoKsKMinusPiPlus_NoKsMass(double energy, double m
   addOutputVertexConstraintsXYZ("k-", "vtx0");
   addOutputVertexConstraintsXYZ("pi+_1", "vtx1");
   addOutputVertexConstraintsXYZ("pi-_1", "vtx1");
-  addOutputVertexConstraintsXYZ("ks", "vtx1");
+  addInputVertexConstraintsXYZ("ks", "vtx1");
 }
 
 HypoKsKMinusPiPlus_NoKsMass::~HypoKsKMinusPiPlus_NoKsMass() {}

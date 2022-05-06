@@ -73,8 +73,8 @@ kfcmd::hypos::Hypo2Ks2ChPions::Hypo2Ks2ChPions(double energy, double magnetField
   addOutputVertexConstraintsXYZ("pi+_2", "vtx2");
   addOutputVertexConstraintsXYZ("pi-_2", "vtx2");
 
-  addOutputVertexConstraintsXYZ("ks1", "vtx1");
-  addOutputVertexConstraintsXYZ("ks2", "vtx2");
+  addInputVertexConstraintsXYZ("ks1", "vtx1");
+  addInputVertexConstraintsXYZ("ks2", "vtx2");
 }
 
 kfcmd::hypos::Hypo2Ks2ChPions::~Hypo2Ks2ChPions() {}

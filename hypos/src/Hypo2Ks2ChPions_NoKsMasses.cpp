@@ -75,8 +75,8 @@ kfcmd::hypos::Hypo2Ks2ChPions_NoKsMasses::Hypo2Ks2ChPions_NoKsMasses(double ener
   addOutputVertexConstraintsXYZ("pi+_2", "vtx2");
   addOutputVertexConstraintsXYZ("pi-_2", "vtx2");
 
-  addOutputVertexConstraintsXYZ("ks1", "vtx1");
-  addOutputVertexConstraintsXYZ("ks2", "vtx2");
+  addInputVertexConstraintsXYZ("ks1", "vtx1");
+  addInputVertexConstraintsXYZ("ks2", "vtx2");
 }
 
 kfcmd::hypos::Hypo2Ks2ChPions_NoKsMasses::~Hypo2Ks2ChPions_NoKsMasses() {}

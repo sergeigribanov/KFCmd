@@ -57,7 +57,7 @@ HypoKsKl::HypoKsKl(double energy, double magnetField,
                       {pipl1, pimi1, getParticle("kl")});
   addOutputVertexConstraintsXYZ("pi+_1", "vtx1");
   addOutputVertexConstraintsXYZ("pi-_1", "vtx1");
-  addOutputVertexConstraintsXYZ("ks", "vtx1");
+  addInputVertexConstraintsXYZ("ks", "vtx1");
 }
 
 HypoKsKl::~HypoKsKl() {}

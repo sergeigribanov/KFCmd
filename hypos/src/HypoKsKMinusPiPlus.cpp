@@ -62,7 +62,7 @@ HypoKsKMinusPiPlus::HypoKsKMinusPiPlus(double energy, double magnetField,
   addOutputVertexConstraintsXYZ("k-", "vtx0");
   addOutputVertexConstraintsXYZ("pi+_1", "vtx1");
   addOutputVertexConstraintsXYZ("pi-_1", "vtx1");
-  addOutputVertexConstraintsXYZ("ks", "vtx1");
+  addInputVertexConstraintsXYZ("ks", "vtx1");
 }
 
 HypoKsKMinusPiPlus::~HypoKsKMinusPiPlus() {}
