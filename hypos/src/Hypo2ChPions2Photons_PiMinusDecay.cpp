@@ -43,6 +43,7 @@ Hypo2ChPions2Photons_PiMinusDecay::Hypo2ChPions2Photons_PiMinusDecay(double ener
                                                                      double tolerance)
     : kfcmd::core::Hypothesis(energy, magneticField, nIter, tolerance) {
   addVertex("vtx0");
+  addVertex("vtx1");
   auto pip = new kfcmd::core::PiPlusMeson("pi+");
   addChargedParticle(pip);
   auto pim = new kfcmd::core::PiMinusMeson("pi-");
