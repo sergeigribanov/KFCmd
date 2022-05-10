@@ -31,9 +31,6 @@
 
 #include "kfcmd/hypos/Hypo2ChPions2Photons.hpp"
 
-#include "kfcmd/core/PiMinusMeson.hpp"
-#include "kfcmd/core/PiPlusMeson.hpp"
-
 using namespace kfcmd::hypos;
 
 Hypo2ChPions2Photons::Hypo2ChPions2Photons(double energy,
@@ -41,19 +38,21 @@ Hypo2ChPions2Photons::Hypo2ChPions2Photons(double energy,
                                            long nIter,
                                            double tolerance)
     : kfcmd::core::Hypothesis(energy, magneticField, nIter, tolerance) {
-  addVertex("vtx0");
+  addVertexXYZ("vtx0");
   auto pip = new kfcmd::core::PiPlusMeson("pi+");
   addChargedParticle(pip);
   auto pim = new kfcmd::core::PiMinusMeson("pi-");
   addChargedParticle(pim);
   auto ph0 = new kfcmd::core::Photon("g0");
-  addPhoton(ph0, "vtx0");
+  addParticle(ph0);
   auto ph1 = new kfcmd::core::Photon("g1");
-  addPhoton(ph1, "vtx0");
+  addParticle(ph1);
   addConstantMomentumParticle("origin", energy, Eigen::Vector3d::Zero());
   addEnergyMomentumConstraints("em-vtx0", {getParticle("origin")}, {pip, pim, ph0, ph1});
   addOutputVertexConstraintsXYZ("pi+", "vtx0");
   addOutputVertexConstraintsXYZ("pi-", "vtx0");
+  addOutputVertexConstraintsXYZ("g0", "vtx0");
+  addOutputVertexConstraintsXYZ("g1", "vtx0");
 }
 
 Hypo2ChPions2Photons::~Hypo2ChPions2Photons() {}

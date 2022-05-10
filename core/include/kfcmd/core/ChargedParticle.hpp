@@ -32,7 +32,6 @@
 #ifndef __KFCMD_CHARGEDPARTICLE_HPP__
 #define __KFCMD_CHARGEDPARTICLE_HPP__
 #include <kfbase/core/VertexParticle.hpp>
-#include <kfbase/newtonian_opt/CommonParams.hpp>
 
 namespace kfcmd {
   namespace core {

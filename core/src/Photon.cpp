@@ -33,8 +33,14 @@
 
 #include <cmath>
 
-kfcmd::core::Photon::Photon(const std::string& name) : kfbase::core::Particle(name, 4) {
-  setPeriod(2, 0, 2 * TMath::Pi());
+kfcmd::core::Photon::Photon(const std::string& name) : kfbase::core::VertexParticle(name, 7) {
+  // 0 --- energy
+  // 1 --- R_c (conversion point coordinate)
+  // 2 --- phi_c (conversion point coordinate)
+  // 3 --- z0_c (conversion point coordinate)
+  // 4 --- theta (momentum direction coordinate)
+  // 5 --- phi (momentum direction coordinate)
+  // 6 --- ct
   setLowerLimit(0, 1.e-2);
   setUpperLimit(0, 1.1);
   setLowerLimit(1, 10);
@@ -44,41 +50,217 @@ kfcmd::core::Photon::Photon(const std::string& name) : kfbase::core::Particle(na
   setUpperLimit(2, 1000 * TMath::Pi());
   setLowerLimit(3, -50);
   setUpperLimit(3, 50);
+  // setPeriod(4, 0, 2 * TMath::Pi()); // !!!
+  setLowerLimit(4, 0.); // !!!
+  setUpperLimit(4, TMath::Pi()); // !!!
+  setPeriod(5, 0, 2 * TMath::Pi()); // !!!
+  setLowerLimit(5, -1000 * TMath::Pi()); // !!!
+  setUpperLimit(5, 1000 * TMath::Pi()); // !!!
+  setLowerLimit(6, 0.);
+  setUpperLimit(6, 200.);
 }
 
 kfcmd::core::Photon::~Photon() {}
 
+double kfcmd::core::Photon::calcDirection(const Eigen::VectorXd &x,
+                                          kfbase::core::VERTEX_COMPONENT component) const {
+  // 0 --- energy
+  // 1 --- R_c (conversion point coordinate)
+  // 2 --- phi_c (conversion point coordinate)
+  // 3 --- z0_c (conversion point coordinate)
+  // 4 --- theta (momentum direction coordinate)
+  // 5 --- phi (momentum direction coordinate)
+  // 6 --- ct
+  const long bi = getBeginIndex();
+  const double theta = x(bi + 4);
+  const double phi = x(bi + 5);
+  double result = 0;
+  switch (component) {
+  case kfbase::core::VERTEX_X:
+    result = std::sin(theta) * std::cos(phi);
+    break;
+  case kfbase::core::VERTEX_Y:
+    result = std::sin(theta) * std::sin(phi);
+    break;
+  case kfbase::core::VERTEX_Z:
+    result = std::cos(theta);
+    break;
+  }
+  return result;
+}
+
+Eigen::VectorXd kfcmd::core::Photon::calcDDirection(const Eigen::VectorXd &x,
+                                                    kfbase::core::VERTEX_COMPONENT component) const {
+  // 0 --- energy
+  // 1 --- R_c (conversion point coordinate)
+  // 2 --- phi_c (conversion point coordinate)
+  // 3 --- z0_c (conversion point coordinate)
+  // 4 --- theta (momentum direction coordinate)
+  // 5 --- phi (momentum direction coordinate)
+  // 6 --- ct
+  const long bi = getBeginIndex();
+  const long thetaInd = bi + 4;
+  const long phiInd = bi + 5;
+  Eigen::VectorXd result = Eigen::VectorXd::Zero(x.size());
+  switch (component) {
+  case kfbase::core::VERTEX_X:
+    result(thetaInd) = std::cos(x(thetaInd)) * std::cos(x(phiInd));
+    result(phiInd) = -std::sin(x(thetaInd)) * std::sin(x(phiInd));
+    break;
+  case kfbase::core::VERTEX_Y:
+    result(thetaInd) = std::cos(x(thetaInd)) * std::sin(x(phiInd));
+    result(phiInd) = std::sin(x(thetaInd)) * std::cos(x(phiInd));
+    break;
+  case kfbase::core::VERTEX_Z:
+    result(thetaInd) = -std::sin(x(thetaInd));
+    break;
+  }
+  return result;
+}
+
+Eigen::MatrixXd kfcmd::core::Photon::calcD2Direction(const Eigen::VectorXd& x,
+                                                     kfbase::core::VERTEX_COMPONENT component) const {
+  // 0 --- energy
+  // 1 --- R_c (conversion point coordinate)
+  // 2 --- phi_c (conversion point coordinate)
+  // 3 --- z0_c (conversion point coordinate)
+  // 4 --- theta (momentum direction coordinate)
+  // 5 --- phi (momentum direction coordinate)
+  // 6 --- ct
+  const long bi = getBeginIndex();
+  const long thetaInd = bi + 4;
+  const long phiInd = bi + 5;
+  Eigen::MatrixXd result = Eigen::MatrixXd::Zero(x.size(), x.size());
+  const double sinTheta = std::sin(x(thetaInd));
+  const double cosTheta = std::cos(x(thetaInd));
+  const double sinPhi = std::sin(x(phiInd));
+  const double cosPhi = std::cos(x(phiInd));
+  switch (component) {
+  case kfbase::core::VERTEX_X:
+    result(thetaInd, thetaInd) = -sinTheta * cosPhi;
+    result(phiInd, phiInd) = result(thetaInd, thetaInd);
+    result(thetaInd, phiInd) = -cosTheta * sinPhi;
+    result(phiInd, thetaInd) = result(thetaInd, phiInd);
+    break;
+  case kfbase::core::VERTEX_Y:
+    result(thetaInd, thetaInd) = -sinTheta * sinPhi;
+    result(phiInd, phiInd) = result(thetaInd, thetaInd);
+    result(thetaInd, phiInd) = cosTheta * cosPhi;
+    result(phiInd, thetaInd) = result(thetaInd, phiInd);
+    break;
+  case kfbase::core::VERTEX_Z:
+    result(thetaInd, thetaInd) = -cosTheta;
+    break;
+  }
+  return result;
+}
+
+double kfcmd::core::Photon::calcConversionPoint(const Eigen::VectorXd &x,
+                                                kfbase::core::VERTEX_COMPONENT component) const {
+  // 0 --- energy
+  // 1 --- R_c (conversion point coordinate)
+  // 2 --- phi_c (conversion point coordinate)
+  // 3 --- z0_c (conversion point coordinate)
+  // 4 --- theta (momentum direction coordinate)
+  // 5 --- phi (momentum direction coordinate)
+  // 6 --- ct
+  const long bi = getBeginIndex();
+  double result = 0;
+  switch (component) {
+  case kfbase::core::VERTEX_X:
+    result = x(bi + 1) * std::cos(x(bi + 2));
+    break;
+  case kfbase::core::VERTEX_Y:
+    result = x(bi + 1) * std::sin(x(bi + 2));
+    break;
+  case kfbase::core::VERTEX_Z:
+    result = x(bi + 3);
+    break;
+  }
+  return result;
+}
+
+Eigen::VectorXd kfcmd::core::Photon::calcDConversionPoint(const Eigen::VectorXd &x,
+                                                          kfbase::core::VERTEX_COMPONENT component) const {
+  // 0 --- energy
+  // 1 --- R_c (conversion point coordinate)
+  // 2 --- phi_c (conversion point coordinate)
+  // 3 --- z0_c (conversion point coordinate)
+  // 4 --- theta (momentum direction coordinate)
+  // 5 --- phi (momentum direction coordinate)
+  // 6 --- ct
+  const long bi = getBeginIndex();
+  Eigen::VectorXd result = Eigen::VectorXd::Zero(x.size());
+  switch (component) {
+  case kfbase::core::VERTEX_X:
+    result(bi + 1) = std::cos(x(bi + 2));
+    result(bi + 2) = -x(bi + 1) * std::sin(x(bi + 2));
+    break;
+  case kfbase::core::VERTEX_Y:
+    result(bi + 1) = std::sin(x(bi + 1));
+    result(bi + 2) = x(bi + 1) * std::cos(x(bi + 2));
+    break;
+  case kfbase::core::VERTEX_Z:
+    result(bi + 3) = 1.;
+    break;
+  }
+  return result;
+}
+
+Eigen::MatrixXd kfcmd::core::Photon::calcD2ConversionPoint(const Eigen::VectorXd& x,
+                                                           kfbase::core::VERTEX_COMPONENT component) const {
+  // 0 --- energy
+  // 1 --- R_c (conversion point coordinate)
+  // 2 --- phi_c (conversion point coordinate)
+  // 3 --- z0_c (conversion point coordinate)
+  // 4 --- theta (momentum direction coordinate)
+  // 5 --- phi (momentum direction coordinate)
+  // 6 --- ct
+  const long bi = getBeginIndex();
+  const long rhoInd = bi + 1;
+  const long phiInd = bi + 2;
+  Eigen::MatrixXd result = Eigen::MatrixXd::Zero(x.size(), x.size());
+  switch (component) {
+  case kfbase::core::VERTEX_X:
+    result(phiInd, phiInd) = -x(rhoInd) * std::cos(x(phiInd));
+    result(rhoInd, phiInd) = -std::sin(x(phiInd));
+    result(phiInd, rhoInd) = result(rhoInd, phiInd);
+    break;
+  case kfbase::core::VERTEX_Y:
+    result(phiInd, phiInd) = -x(rhoInd) * std::sin(x(phiInd));
+    result(rhoInd, phiInd) = std::cos(x(phiInd));
+    result(phiInd, rhoInd) = result(rhoInd, phiInd);
+    break;
+  case kfbase::core::VERTEX_Z:
+    break;
+  }
+  return result;
+}
+
 double kfcmd::core::Photon::calcOutputMomentumComponent(const Eigen::VectorXd& x,
                                                         kfbase::core::MOMENT_COMPONENT component) const {
-  long bi = getBeginIndex();
-  double result = 0;
   // 0 --- energy
-  // 1 --- R
-  // 2 --- phi
-  // 3 --- z0
-  double q = std::sqrt(
-      std::pow(x(bi + 3) - x(_vertexZ->getBeginIndex()), 2) +
-      std::pow(x(bi + 1) * std::cos(x(bi + 2)) - x(_vertexX->getBeginIndex()),
-               2) +
-      std::pow(x(bi + 1) * std::sin(x(bi + 2)) - x(_vertexY->getBeginIndex()),
-               2));
+  // 1 --- R_c (conversion point coordinate)
+  // 2 --- phi_c (conversion point coordinate)
+  // 3 --- z0_c (conversion point coordinate)
+  // 4 --- theta (momentum direction coordinate)
+  // 5 --- phi (momentum direction coordinate)
+  // 6 --- ct
+  const long bi = getBeginIndex();
+  double result = 0;
   switch (component) {
-    case kfbase::core::MOMENT_X:
-      result =
-          x(bi) *
-          (x(bi + 1) * std::cos(x(bi + 2)) - x(_vertexX->getBeginIndex())) / q;
-      break;
-    case kfbase::core::MOMENT_Y:
-      result =
-          x(bi) *
-          (x(bi + 1) * std::sin(x(bi + 2)) - x(_vertexY->getBeginIndex())) / q;
-      break;
-    case kfbase::core::MOMENT_Z:
-      result = x(bi) * (x(bi + 3) - x(_vertexZ->getBeginIndex())) / q;
-      break;
-    case kfbase::core::MOMENT_E:
-      result = x(bi);
-      break;
+  case kfbase::core::MOMENT_X:
+    result = x(bi) * calcDirection(x, kfbase::core::VERTEX_X);
+    break;
+  case kfbase::core::MOMENT_Y:
+    result = x(bi) * calcDirection(x, kfbase::core::VERTEX_Y);
+    break;
+  case kfbase::core::MOMENT_Z:
+    result = x(bi) * calcDirection(x, kfbase::core::VERTEX_Z);
+    break;
+  case kfbase::core::MOMENT_E:
+    result = x(bi);
+    break;
   }
   return result;
 }
@@ -90,59 +272,31 @@ double kfcmd::core::Photon::calcInputMomentumComponent(const Eigen::VectorXd& x,
 
 Eigen::VectorXd kfcmd::core::Photon::calcOutputDMomentumComponent(const Eigen::VectorXd& x,
                                                                   kfbase::core::MOMENT_COMPONENT component) const {
-  long bi = getBeginIndex();
+  // 0 --- energy
+  // 1 --- R_c (conversion point coordinate)
+  // 2 --- phi_c (conversion point coordinate)
+  // 3 --- z0_c (conversion point coordinate)
+  // 4 --- theta (momentum direction coordinate)
+  // 5 --- phi (momentum direction coordinate)
+  // 6 --- ct
+  const long bi = getBeginIndex();
   Eigen::VectorXd result = Eigen::VectorXd::Zero(x.size());
-  double q = std::sqrt(
-      std::pow(x(bi + 3) - x(_vertexZ->getBeginIndex()), 2) +
-      std::pow(x(bi + 1) * std::cos(x(bi + 2)) - x(_vertexX->getBeginIndex()),
-               2) +
-      std::pow(x(bi + 1) * std::sin(x(bi + 2)) - x(_vertexY->getBeginIndex()),
-               2));
-  double q3 = std::pow(q, 3);
-  double sinP = std::sin(x(bi + 2));
-  double cosP = std::cos(x(bi + 2));
-  long biX = _vertexX->getBeginIndex();
-  long biY = _vertexY->getBeginIndex();
-  long biZ = _vertexZ->getBeginIndex();
-  double vX = x(biX);
-  double vY = x(biY);
-  double vZ = x(biZ);
-  double dx = x(bi + 1) * cosP - vX;
-  double dy = x(bi + 1) * sinP - vY;
-  double dz = x(bi + 3) - vZ;
-  double dqR = x(bi + 1) - vX * cosP - vY * sinP;
-  double dqP = x(bi + 1) * (vX * sinP - vY * cosP);
   switch (component) {
-    case kfbase::core::MOMENT_X:
-      result(bi) = dx / q;
-      result(bi + 1) = x(bi) * cosP / q - x(bi) * dx / q3 * dqR;
-      result(bi + 2) = -x(bi) * x(bi + 1) * sinP / q - x(bi) * dx * dqP / q3;
-      result(bi + 3) = -x(bi) * dx * dz / q3;
-      result(biX) = -x(bi) / q + x(bi) * dx * dx / q3;
-      result(biY) = x(bi) * dx * dy / q3;
-      result(biZ) = -result(bi + 3);
-      break;
-    case kfbase::core::MOMENT_Y:
-      result(bi) = dy / q;
-      result(bi + 1) = x(bi) * sinP / q - x(bi) * dy * dqR / q3;
-      result(bi + 2) = x(bi) * x(bi + 1) * cosP / q - x(bi) * dy * dqP / q3;
-      result(bi + 3) = -x(bi) * dy * dz / q3;
-      result(biX) = x(bi) * dx * dy / q3;
-      result(biY) = -x(bi) / q + x(bi) * dy * dy / q3;
-      result(biZ) = -result(bi + 3);
-      break;
-    case kfbase::core::MOMENT_Z:
-      result(bi) = dz / q;
-      result(bi + 1) = -x(bi) * dz * dqR / q3;
-      result(bi + 2) = -x(bi) * dz * dqP / q3;
-      result(bi + 3) = x(bi) / q - x(bi) * dz * dz / q3;
-      result(biX) = x(bi) * dz * dx / q3;
-      result(biY) = x(bi) * dz * dy / q3;
-      result(biZ) = -result(bi + 3);
-      break;
-    case kfbase::core::MOMENT_E:
-      result(bi) = 1;
-      break;
+  case kfbase::core::MOMENT_X:
+    result(bi) = calcDirection(x, kfbase::core::VERTEX_X);
+    result += x(bi) * calcDDirection(x, kfbase::core::VERTEX_X);
+    break;
+  case kfbase::core::MOMENT_Y:
+    result(bi) = calcDirection(x, kfbase::core::VERTEX_Y);
+    result += x(bi) * calcDDirection(x, kfbase::core::VERTEX_Y);
+    break;
+  case kfbase::core::MOMENT_Z:
+    result(bi) = calcDirection(x, kfbase::core::VERTEX_Z);
+    result += x(bi) * calcDDirection(x, kfbase::core::VERTEX_Z);
+    break;
+  case kfbase::core::MOMENT_E:
+    result(bi) = 1.;
+    break;
   }
   return result;
 }
@@ -154,229 +308,33 @@ Eigen::VectorXd kfcmd::core::Photon::calcInputDMomentumComponent(const Eigen::Ve
 
 Eigen::MatrixXd kfcmd::core::Photon::calcOutputD2MomentumComponent(const Eigen::VectorXd& x,
                                                                    kfbase::core::MOMENT_COMPONENT component) const {
-  long bi = getBeginIndex();
+  // 0 --- energy
+  // 1 --- R_c (conversion point coordinate)
+  // 2 --- phi_c (conversion point coordinate)
+  // 3 --- z0_c (conversion point coordinate)
+  // 4 --- theta (momentum direction coordinate)
+  // 5 --- phi (momentum direction coordinate)
+  // 6 --- ct
+  const long bi = getBeginIndex();
   Eigen::MatrixXd result = Eigen::MatrixXd::Zero(x.size(), x.size());
-  double q = std::sqrt(
-      std::pow(x(bi + 3) - x(_vertexZ->getBeginIndex()), 2) +
-      std::pow(x(bi + 1) * std::cos(x(bi + 2)) - x(_vertexX->getBeginIndex()),
-               2) +
-      std::pow(x(bi + 1) * std::sin(x(bi + 2)) - x(_vertexY->getBeginIndex()),
-               2));
-  double q3 = std::pow(q, 3);
-  double q5 = std::pow(q, 5);
-  double sinP = std::sin(x(bi + 2));
-  double cosP = std::cos(x(bi + 2));
-  long biX = _vertexX->getBeginIndex();
-  long biY = _vertexY->getBeginIndex();
-  long biZ = _vertexZ->getBeginIndex();
-  double vX = x(biX);
-  double vY = x(biY);
-  double vZ = x(biZ);
-  double dx = x(bi + 1) * cosP - vX;
-  double dy = x(bi + 1) * sinP - vY;
-  double dz = x(bi + 3) - vZ;
-  double dxdy = dx * dy;
-  double dxdz = dx * dz;
-  double dydz = dy * dz;
-  double dx2 = dx * dx;
-  double dy2 = dy * dy;
-  double dz2 = dz * dz;
-  double dqR = x(bi + 1) - vX * cosP - vY * sinP;
-  double dqP = x(bi + 1) * (vX * sinP - vY * cosP);
   switch (component) {
-    case kfbase::core::MOMENT_X:
-      result(bi, bi + 1) = cosP / q - dx * dqR / q3;
-      result(bi + 1, bi) = result(bi, bi + 1);
-      result(bi, bi + 2) = -x(bi + 1) * sinP / q - dx * dqP / q3;
-      result(bi + 2, bi) = result(bi, bi + 2);
-      result(bi, bi + 3) = -dxdz / q3;
-      result(bi + 3, bi) = result(bi, bi + 3);
-      result(bi, biX) = -1. / q + dx2 / q3;
-      result(biX, bi) = result(bi, biX);
-      result(bi, biY) = dxdy / q3;
-      result(biY, bi) = result(bi, biY);
-      result(bi, biZ) = -result(bi, bi + 3);
-      result(biZ, bi) = result(bi, biZ);
-      result(bi + 1, bi + 1) = -2. * x(bi) * cosP * dqR / q3 - x(bi) * dx / q3 +
-                               3. * x(bi) * dx * dqR * dqR / q5;
-      result(bi + 1, bi + 2) = -x(bi) * sinP / q - x(bi) * cosP * dqP / q3 +
-                               x(bi) * x(bi + 1) * sinP * dqR / q3 -
-                               x(bi) * dx * (vX * sinP - vY * cosP) / q3 +
-                               3. * x(bi) * dx * dqR * dqP / q5;
-      result(bi + 2, bi + 1) = result(bi + 1, bi + 2);
-      result(bi + 1, bi + 3) =
-          -x(bi) * dz * cosP / q3 + 3. * x(bi) * dxdz * dqR / q5;
-      result(bi + 3, bi + 1) = result(bi + 1, bi + 3);
-      result(bi + 1, biX) = 2. * x(bi) * dx * cosP / q3 + x(bi) * dqR / q3 -
-                            3. * x(bi) * dx2 * dqR / q5;
-      result(biX, bi + 1) = result(bi + 1, biX);
-      result(bi + 1, biY) = x(bi) * dy * cosP / q3 + x(bi) * dx * sinP / q3 -
-                            3. * x(bi) * dxdy * dqR / q5;
-      result(biY, bi + 1) = result(bi + 1, biY);
-      result(bi + 1, biZ) = -result(bi + 1, bi + 3);
-      result(biZ, bi + 1) = result(bi + 1, biZ);
-      result(bi + 2, bi + 2) =
-          -x(bi) * x(bi + 1) * cosP / q +
-          2. * x(bi) * x(bi + 1) * dqP * sinP / q3 -
-          x(bi) * x(bi + 1) * dx * (vX * cosP + vY * sinP) / q3 +
-          3. * x(bi) * dx * dqP * dqP / q5;
-      result(bi + 2, bi + 3) =
-          x(bi) * x(bi + 1) * dz * sinP / q3 + 3. * x(bi) * dxdz * dqP / q5;
-      result(bi + 3, bi + 2) = result(bi + 2, bi + 3);
-      result(bi + 2, biX) = -2. * x(bi) * x(bi + 1) * dx * sinP / q3 +
-                            x(bi) * dqP / q3 - 3. * x(bi) * dx2 * dqP / q5;
-      result(biX, bi + 2) = result(bi + 2, biX);
-      result(bi + 2, biY) = -x(bi) * x(bi + 1) * dy * sinP / q3 +
-                            x(bi) * x(bi + 1) * dx * cosP / q3 -
-                            3. * x(bi) * dxdy * dqP / q5;
-      result(biY, bi + 2) = result(bi + 2, biY);
-      result(bi + 2, biZ) = -result(bi + 2, bi + 3);
-      result(biZ, bi + 2) = result(bi + 2, biZ);
-      result(bi + 3, bi + 3) = -x(bi) * dx / q3 + 3. * x(bi) * dx * dz2 / q5;
-      result(bi + 3, biX) = x(bi) * dz / q3 - 3. * x(bi) * dx2 * dz / q5;
-      result(biX, bi + 3) = result(bi + 3, biX);
-      result(bi + 3, biY) = -3. * x(bi) * dxdy * dz / q5;
-      result(biY, bi + 3) = result(bi + 3, biY);
-      result(bi + 3, biZ) = -result(bi + 3, bi + 3);
-      result(biZ, bi + 3) = result(bi + 3, biZ);
-      result(biX, biX) = -3. * x(bi) * dx / q3 + 3. * x(bi) * dx2 * dx / q5;
-      result(biX, biY) = -x(bi) * dy / q3 + 3. * x(bi) * dx2 * dy / q5;
-      result(biY, biX) = result(biX, biY);
-      result(biX, biZ) = -result(bi + 3, biX);
-      result(biZ, biX) = result(biX, biZ);
-      result(biY, biY) = -x(bi) * dx / q3 + 3. * x(bi) * dx * dy2 / q5;
-      result(biY, biZ) = -result(bi + 3, biY);
-      result(biZ, biY) = result(biY, biZ);
-      result(biZ, biZ) = result(bi + 3, bi + 3);
-      break;
-    case kfbase::core::MOMENT_Y:
-      result(bi, bi + 1) = sinP / q - dy * dqR / q3;
-      result(bi + 1, bi) = result(bi, bi + 1);
-      result(bi, bi + 2) = x(bi + 1) * cosP / q - dy * dqP / q3;
-      result(bi + 2, bi) = result(bi, bi + 2);
-      result(bi, bi + 3) = -dydz / q3;
-      result(bi + 3, bi) = result(bi, bi + 3);
-      result(bi, biX) = dxdy / q3;
-      result(biX, bi) = result(bi, biX);
-      result(bi, biY) = -1. / q + dy2 / q3;
-      result(biY, bi) = result(bi, biY);
-      result(bi, biZ) = -result(bi, bi + 3);
-      result(biZ, bi) = result(bi, biZ);
-      result(bi + 1, bi + 1) = -2. * x(bi) * sinP * dqR / q3 - x(bi) * dy / q3 +
-                               3. * x(bi) * dy * dqR * dqR / q5;
-      result(bi + 1, bi + 2) = x(bi) * cosP / q - x(bi) * sinP * dqP / q3 -
-                               x(bi) * x(bi + 1) * cosP * dqR / q3 -
-                               x(bi) * dy * (vX * sinP - vY * cosP) / q3 +
-                               3. * x(bi) * dy * dqR * dqP / q5;
-      result(bi + 2, bi + 1) = result(bi + 1, bi + 2);
-      result(bi + 1, bi + 3) =
-          -x(bi) * dz * sinP / q3 + 3. * x(bi) * dydz * dqR / q5;
-      result(bi + 3, bi + 1) = result(bi + 1, bi + 3);
-      result(bi + 1, biX) = x(bi) * dx * sinP / q3 + x(bi) * dy * cosP / q3 -
-                            3. * x(bi) * dxdy * dqR / q5;
-      result(biX, bi + 1) = result(bi + 1, biX);
-      result(bi + 1, biY) = x(bi) * dy * sinP / q3 + x(bi) * dqR / q3 +
-                            x(bi) * dy * sinP / q3 -
-                            3. * x(bi) * dy2 * dqR / q5;
-      result(biY, bi + 1) = result(bi + 1, biY);
-      result(bi + 1, biZ) = -result(bi + 1, bi + 3);
-      result(biZ, bi + 1) = result(bi + 1, biZ);
-      result(bi + 2, bi + 2) =
-          -x(bi) * x(bi + 1) * sinP / q -
-          2. * x(bi) * x(bi + 1) * cosP * dqP / q3 -
-          x(bi) * dy * x(bi + 1) * (vX * cosP + vY * sinP) / q3 +
-          3. * x(bi) * dy * dqP * dqP / q5;
-      result(bi + 2, bi + 3) =
-          -x(bi) * x(bi + 1) * dz * cosP / q3 + 3. * x(bi) * dydz * dqP / q5;
-      result(bi + 3, bi + 2) = result(bi + 2, bi + 3);
-      result(bi + 2, biX) = x(bi) * x(bi + 1) * dx * cosP / q3 -
-                            x(bi) * x(bi + 1) * dy * sinP / q3 -
-                            3. * x(bi) * dxdy * dqP / q5;
-      result(biX, bi + 2) = result(bi + 2, biX);
-      result(bi + 2, biY) =
-          x(bi) * x(bi + 1) * dy * cosP / q3 + x(bi) * dqP / q3 +
-          x(bi) * x(bi + 1) * dy * cosP / q3 - 3. * x(bi) * dy2 * dqP / q5;
-      result(biY, bi + 2) = result(bi + 2, biY);
-      result(bi + 2, biZ) = -result(bi + 2, bi + 3);
-      result(biZ, bi + 2) = result(bi + 2, biZ);
-      result(bi + 3, bi + 3) = -x(bi) * dy / q3 + 3. * x(bi) * dy * dz2 / q5;
-      result(bi + 3, biX) = -3. * x(bi) * dxdy * dz / q5;
-      result(biX, bi + 3) = result(bi + 3, biX);
-      result(bi + 3, biY) = x(bi) * dz / q3 - 3. * x(bi) * dy2 * dz / q5;
-      result(biY, bi + 3) = result(bi + 3, biY);
-      result(bi + 3, biZ) = -result(bi + 3, bi + 3);
-      result(biZ, bi + 3) = result(bi + 3, biZ);
-      result(biX, biX) = -x(bi) * dy / q3 + 3. * x(bi) * dx2 * dy / q5;
-      result(biX, biY) = -x(bi) * dx / q3 + 3. * x(bi) * dx * dy2 / q5;
-      result(biY, biX) = result(biX, biY);
-      result(biX, biZ) = -result(bi + 3, biX);
-      result(biZ, biX) = result(biX, biZ);
-      result(biY, biY) = -3. * x(bi) * dy / q3 + 3. * x(bi) * dy2 * dy / q5;
-      result(biY, biZ) = -result(bi + 3, biY);
-      result(biZ, biY) = result(biY, biZ);
-      result(biZ, biZ) = result(bi + 3, bi + 3);
-      break;
-    case kfbase::core::MOMENT_Z:
-      result(bi, bi + 1) = -dz * dqR / q3;
-      result(bi + 1, bi) = result(bi, bi + 1);
-      result(bi, bi + 2) = -dz * dqP / q3;
-      result(bi + 2, bi) = result(bi, bi + 2);
-      result(bi, bi + 3) = 1. / q - dz2 / q3;
-      result(bi + 3, bi) = result(bi, bi + 3);
-      result(bi, biX) = dxdz / q3;
-      result(biX, bi) = result(bi, biX);
-      result(bi, biY) = dydz / q3;
-      result(biY, bi) = result(bi, biY);
-      result(bi, biZ) = -result(bi, bi + 3);
-      result(biZ, bi) = result(bi, biZ);
-      result(bi + 1, bi + 1) =
-          -x(bi) * dz / q3 + 3. * x(bi) * dz * dqR * dqR / q5;
-      result(bi + 1, bi + 2) = -x(bi) * dz * (vX * sinP - vY * cosP) / q3 +
-                               3. * x(bi) * dz * dqR * dqP / q5;
-      result(bi + 2, bi + 1) = result(bi + 1, bi + 2);
-      result(bi + 1, bi + 3) = -x(bi) * dqR / q3 + 3. * x(bi) * dz2 * dqR / q5;
-      result(bi + 3, bi + 1) = result(bi + 1, bi + 3);
-      result(bi + 1, biX) =
-          x(bi) * dz * cosP / q3 - 3. * x(bi) * dxdz * dqR / q5;
-      result(biX, bi + 1) = result(bi + 1, biX);
-      result(bi + 1, biY) =
-          x(bi) * dz * sinP / q3 - 3. * x(bi) * dydz * dqR / q5;
-      result(biY, bi + 1) = result(bi + 1, biY);
-      result(bi + 1, biZ) = -result(bi + 3, bi + 1);
-      result(biZ, bi + 1) = result(bi + 1, biZ);
-      result(bi + 2, bi + 2) =
-          -x(bi) * x(bi + 1) * dz * (vX * cosP + vY * sinP) / q3 +
-          3. * x(bi) * dz * dqP * dqP / q5;
-      result(bi + 2, bi + 3) = -x(bi) * dqP / q3 + 3. * x(bi) * dz2 * dqP / q5;
-      result(bi + 3, bi + 2) = result(bi + 2, bi + 3);
-      result(bi + 2, biX) =
-          -x(bi) * x(bi + 1) * dz * sinP / q3 - 3. * x(bi) * dxdz * dqP / q5;
-      result(biX, bi + 2) = result(bi + 2, biX);
-      result(bi + 2, biY) =
-          x(bi) * x(bi + 1) * dz * cosP / q3 - 3. * x(bi) * dydz * dqP / q5;
-      result(biY, bi + 2) = result(bi + 2, biY);
-      result(bi + 2, biZ) = -result(bi + 2, bi + 3);
-      result(biZ, bi + 2) = result(bi + 2, biZ);
-      result(bi + 3, bi + 3) =
-          -3. * x(bi) * dz / q3 + 3. * x(bi) * dz2 * dz / q5;
-      result(bi + 3, biX) = x(bi) * dx / q3 - 3. * x(bi) * dx * dz2 / q5;
-      result(biX, bi + 3) = result(bi + 3, biX);
-      result(bi + 3, biY) = x(bi) * dy / q3 - 3. * x(bi) * dy * dz2 / q5;
-      result(biY, bi + 3) = result(bi + 3, biY);
-      result(bi + 3, biZ) = -result(bi + 3, bi + 3);
-      result(biZ, bi + 3) = result(bi + 3, biZ);
-      result(biX, biX) = -x(bi) * dz / q3 + 3. * x(bi) * dx2 * dz / q5;
-      result(biX, biY) = 3. * x(bi) * dxdy * dz / q5;
-      result(biY, biX) = result(biX, biY);
-      result(biX, biZ) = -result(bi + 3, biX);
-      result(biZ, biX) = result(biX, biZ);
-      result(biY, biY) = -x(bi) * dz / q3 + 3. * x(bi) * dy2 * dz / q5;
-      result(biY, biZ) = -result(bi + 3, biY);
-      result(biZ, biY) = result(biY, biZ);
-      result(biZ, biZ) = result(bi + 3, bi + 3);
-      break;
-    case kfbase::core::MOMENT_E:
-      break;
+  case kfbase::core::MOMENT_X:
+    result.col(bi) = calcDDirection(x, kfbase::core::VERTEX_X);
+    result.row(bi) = result.col(bi).transpose();
+    result += x(bi) * calcD2Direction(x, kfbase::core::VERTEX_X);
+    break;
+  case kfbase::core::MOMENT_Y:
+    result.col(bi) = calcDDirection(x, kfbase::core::VERTEX_Y);
+    result.row(bi) = result.col(bi).transpose();
+    result += x(bi) * calcD2Direction(x, kfbase::core::VERTEX_Y);
+    break;
+  case kfbase::core::MOMENT_Z:
+    result.col(bi) = calcDDirection(x, kfbase::core::VERTEX_Z);
+    result.row(bi) = result.col(bi).transpose();
+    result += x(bi) * calcD2Direction(x, kfbase::core::VERTEX_Z);
+    break;
+  case kfbase::core::MOMENT_E:
+    break;
   }
   return result;
 }
@@ -386,26 +344,97 @@ Eigen::MatrixXd kfcmd::core::Photon::calcInputD2MomentumComponent(const Eigen::V
   return calcOutputD2MomentumComponent(x, component);
 }
 
-void kfcmd::core::Photon::setVertexX(const std::string& name) {
-  auto it = getCommonParameters()->find(name);
-  if (it == getCommonParameters()->end()) {
-    // TO DO : exception
-  }
-  _vertexX = it->second;
+double kfcmd::core::Photon::calcOutputVertexComponent(const Eigen::VectorXd &x,
+                                                      kfbase::core::VERTEX_COMPONENT component) const {
+  // 0 --- energy
+  // 1 --- R_c (conversion point coordinate)
+  // 2 --- phi_c (conversion point coordinate)
+  // 3 --- z0_c (conversion point coordinate)
+  // 4 --- theta (momentum direction coordinate)
+  // 5 --- phi (momentum direction coordinate)
+  // 6 --- ct
+  const long bi = getBeginIndex();
+  return calcConversionPoint(x, component) - x(bi + 6) * calcDirection(x, component);
 }
 
-void kfcmd::core::Photon::setVertexY(const std::string& name) {
-  auto it = getCommonParameters()->find(name);
-  if (it == getCommonParameters()->end()) {
-    // TO DO : exception
-  }
-  _vertexY = it->second;
+double kfcmd::core::Photon::calcInputVertexComponent(const Eigen::VectorXd&, kfbase::core::VERTEX_COMPONENT) const {
+  return 0.;
 }
 
-void kfcmd::core::Photon::setVertexZ(const std::string& name) {
-  auto it = getCommonParameters()->find(name);
-  if (it == getCommonParameters()->end()) {
-    // TO DO : exception
-  }
-  _vertexZ = it->second;
+Eigen::VectorXd kfcmd::core::Photon::calcOutputDVertexComponent(const Eigen::VectorXd& x,
+                                                                kfbase::core::VERTEX_COMPONENT component) const {
+  // 0 --- energy
+  // 1 --- R_c (conversion point coordinate)
+  // 2 --- phi_c (conversion point coordinate)
+  // 3 --- z0_c (conversion point coordinate)
+  // 4 --- theta (momentum direction coordinate)
+  // 5 --- phi (momentum direction coordinate)
+  // 6 --- ct
+  const long bi = getBeginIndex();
+  Eigen::VectorXd result = calcDConversionPoint(x, component) - x(bi + 6) * calcDDirection(x, component);
+  result(bi + 6) -= calcDirection(x, component);
+  return result;
+}
+
+Eigen::VectorXd kfcmd::core::Photon::calcInputDVertexComponent(const Eigen::VectorXd &x,
+                                                               kfbase::core::VERTEX_COMPONENT) const {
+  return Eigen::VectorXd::Zero(x.size());
+}
+
+Eigen::MatrixXd kfcmd::core::Photon::calcOutputD2VertexComponent(const Eigen::VectorXd &x,
+                                                                 kfbase::core::VERTEX_COMPONENT component) const {
+  // 0 --- energy
+  // 1 --- R_c (conversion point coordinate)
+  // 2 --- phi_c (conversion point coordinate)
+  // 3 --- z0_c (conversion point coordinate)
+  // 4 --- theta (momentum direction coordinate)
+  // 5 --- phi (momentum direction coordinate)
+  // 6 --- ct
+  const long bi = getBeginIndex();
+  const long timeInd = bi + 6;
+  Eigen::MatrixXd result = calcD2ConversionPoint(x, component) - x(timeInd) * calcD2Direction(x, component);
+  result.col(timeInd) = -calcDDirection(x, component);
+  result.row(timeInd) = result.col(timeInd).transpose();
+  return result;
+}
+
+Eigen::MatrixXd kfcmd::core::Photon::calcInputD2VertexComponent(const Eigen::VectorXd& x,
+                                                                kfbase::core::VERTEX_COMPONENT component) const {
+  return Eigen::MatrixXd::Zero(x.size(), x.size());
+}
+
+void kfcmd::core::Photon::onFitBegin(const Eigen::VectorXd& x) {
+  kfbase::core::VertexParticle::onFitBegin(x);
+  initialDirection_ = TVector3(calcDirection(x, kfbase::core::VERTEX_X),
+                               calcDirection(x, kfbase::core::VERTEX_Y),
+                               calcDirection(x, kfbase::core::VERTEX_Z));
+  initialConvPoint_ = TVector3(calcConversionPoint(x, kfbase::core::VERTEX_X),
+                               calcConversionPoint(x, kfbase::core::VERTEX_Y),
+                               calcConversionPoint(x, kfbase::core::VERTEX_Z));
+}
+
+void kfcmd::core::Photon::onFitEnd(const Eigen::VectorXd& x) {
+  kfbase::core::VertexParticle::onFitEnd(x);
+  finalDirection_ = TVector3(calcDirection(x, kfbase::core::VERTEX_X),
+                               calcDirection(x, kfbase::core::VERTEX_Y),
+                               calcDirection(x, kfbase::core::VERTEX_Z));
+  finalConvPoint_ = TVector3(calcConversionPoint(x, kfbase::core::VERTEX_X),
+                               calcConversionPoint(x, kfbase::core::VERTEX_Y),
+                               calcConversionPoint(x, kfbase::core::VERTEX_Z));
+}
+
+const TVector3& kfcmd::core::Photon::getInitialDirection() const {
+  return initialDirection_;
+}
+
+const TVector3& kfcmd::core::Photon::getFinalDirection() const {
+  return finalDirection_;
+}
+
+const TVector3& kfcmd::core::Photon::getInitialConvPoint() const {
+  return initialConvPoint_;
+}
+
+const TVector3& kfcmd::core::Photon::getFinalConvPoint() const {
+  return finalConvPoint_;
 }

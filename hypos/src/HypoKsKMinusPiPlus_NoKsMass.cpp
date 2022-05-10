@@ -31,19 +31,13 @@
 
 #include "kfcmd/hypos/HypoKsKMinusPiPlus_NoKsMass.hpp"
 
-#include <TDatabasePDG.h>
-
-#include "kfcmd/core/KMinusMeson.hpp"
-#include "kfcmd/core/PiMinusMeson.hpp"
-#include "kfcmd/core/PiPlusMeson.hpp"
-
 using namespace kfcmd::hypos;
 
 HypoKsKMinusPiPlus_NoKsMass::HypoKsKMinusPiPlus_NoKsMass(double energy, double magnetField,
                                                      long nIter, double tolerance)
     : kfcmd::core::Hypothesis(energy, magnetField, nIter, tolerance) {
-  addVertex("vtx0");
-  addVertex("vtx1");
+  addVertexXYZ("vtx0");
+  addVertexXYZ("vtx1");
   auto pipl1 = new kfcmd::core::PiPlusMeson("pi+_1");
   addChargedParticle(pipl1);
   auto pimi1 = new kfcmd::core::PiMinusMeson("pi-_1");

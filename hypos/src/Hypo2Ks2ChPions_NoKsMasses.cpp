@@ -29,18 +29,14 @@
  *
  */
 
-#include <TDatabasePDG.h>
 #include "kfcmd/hypos/Hypo2Ks2ChPions_NoKsMasses.hpp"
-#include "kfcmd/core/KPlusMeson.hpp"
-#include "kfcmd/core/PiMinusMeson.hpp"
-#include "kfcmd/core/PiPlusMeson.hpp"
 
 kfcmd::hypos::Hypo2Ks2ChPions_NoKsMasses::Hypo2Ks2ChPions_NoKsMasses(double energy, double magneticField,
                                                  long nIter, double tolerance)
     : kfcmd::core::Hypothesis(energy, magneticField, nIter, tolerance) {
-  addVertex("vtx0");
-  addVertex("vtx1");
-  addVertex("vtx2");
+  addVertexXYZ("vtx0");
+  addVertexXYZ("vtx1");
+  addVertexXYZ("vtx2");
 
   auto pipl0 = new kfcmd::core::PiPlusMeson("pi+_0");
   addChargedParticle(pipl0);
@@ -65,16 +61,12 @@ kfcmd::hypos::Hypo2Ks2ChPions_NoKsMasses::Hypo2Ks2ChPions_NoKsMasses(double ener
                          {pipl2, pimi2});
   addEnergyConstraint("en-constraint", {getParticle("origin")},
                       {pipl0, pimi0, pipl1, pimi1, pipl2, pimi2});
-
   addOutputVertexConstraintsXYZ("pi-_0", "vtx0");
   addOutputVertexConstraintsXYZ("pi+_0", "vtx0");
-
   addOutputVertexConstraintsXYZ("pi+_1", "vtx1");
   addOutputVertexConstraintsXYZ("pi-_1", "vtx1");
-
   addOutputVertexConstraintsXYZ("pi+_2", "vtx2");
   addOutputVertexConstraintsXYZ("pi-_2", "vtx2");
-
   addInputVertexConstraintsXYZ("ks1", "vtx1");
   addInputVertexConstraintsXYZ("ks2", "vtx2");
 }

@@ -30,15 +30,13 @@
  */
 
 #include "kfcmd/hypos/Hypo4ChPions.hpp"
-#include "kfcmd/core/PiMinusMeson.hpp"
-#include "kfcmd/core/PiPlusMeson.hpp"
 
 using namespace kfcmd::hypos;
 
 Hypo4ChPions::Hypo4ChPions(double energy, double magnetField, long nIter,
                                   double tolerance)
     : kfcmd::core::Hypothesis(energy, magnetField, nIter, tolerance) {
-  addVertex("vtx0");
+  addVertexXYZ("vtx0");
   auto pipl0 = new kfcmd::core::PiPlusMeson("pi+_0");
   addChargedParticle(pipl0);
   auto pipl1 = new kfcmd::core::PiPlusMeson("pi+_1");

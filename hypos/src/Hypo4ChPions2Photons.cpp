@@ -31,18 +31,13 @@
 
 #include "kfcmd/hypos/Hypo4ChPions2Photons.hpp"
 
-#include <TDatabasePDG.h>
-
-#include "kfcmd/core/PiMinusMeson.hpp"
-#include "kfcmd/core/PiPlusMeson.hpp"
-
 using namespace kfcmd::hypos;
 
 Hypo4ChPions2Photons::Hypo4ChPions2Photons(double energy,
                                                   double magnetField,
                                                   long nIter, double tolerance)
     : kfcmd::core::Hypothesis(energy, magnetField, nIter, tolerance) {
-  addVertex("vtx0");
+  addVertexXYZ("vtx0");
   auto pipl0 = new kfcmd::core::PiPlusMeson("pi+_0");
   addChargedParticle(pipl0);
   auto pipl1 = new kfcmd::core::PiPlusMeson("pi+_1");
@@ -52,15 +47,17 @@ Hypo4ChPions2Photons::Hypo4ChPions2Photons(double energy,
   auto pimi1 = new kfcmd::core::PiMinusMeson("pi-_1");
   addChargedParticle(pimi1);
   auto g0 = new kfcmd::core::Photon("g0");
-  addPhoton(g0, "vtx0");
+  addParticle(g0);
   auto g1 = new kfcmd::core::Photon("g1");
-  addPhoton(g1, "vtx0");
+  addParticle(g1);
   addConstantMomentumParticle("origin", energy, Eigen::Vector3d::Zero());
   addEnergyMomentumConstraints("em-vtx0", {getParticle("origin")}, {pipl0, pipl1, pimi0, pimi1, g0, g1});
   addOutputVertexConstraintsXYZ("pi+_0", "vtx0");
   addOutputVertexConstraintsXYZ("pi+_1", "vtx0");
   addOutputVertexConstraintsXYZ("pi-_0", "vtx0");
   addOutputVertexConstraintsXYZ("pi-_1", "vtx0");
+  addOutputVertexConstraintsXYZ("g0", "vtx0");
+  addOutputVertexConstraintsXYZ("g1", "vtx0");
   addMassConstraint("m-pi0-constraint",
                     TDatabasePDG::Instance()->GetParticle(111)->Mass(),
                     {"g0", "g1"});

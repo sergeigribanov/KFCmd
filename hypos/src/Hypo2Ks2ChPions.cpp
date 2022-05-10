@@ -29,19 +29,14 @@
  *
  */
 
-#include <TDatabasePDG.h>
 #include "kfcmd/hypos/Hypo2Ks2ChPions.hpp"
-#include "kfcmd/core/KPlusMeson.hpp"
-#include "kfcmd/core/PiMinusMeson.hpp"
-#include "kfcmd/core/PiPlusMeson.hpp"
 
 kfcmd::hypos::Hypo2Ks2ChPions::Hypo2Ks2ChPions(double energy, double magnetField,
                                                  long nIter, double tolerance)
     : kfcmd::core::Hypothesis(energy, magnetField, nIter, tolerance) {
-  addVertex("vtx0");
-  addVertex("vtx1");
-  addVertex("vtx2");
-
+  addVertexXYZ("vtx0");
+  addVertexXYZ("vtx1");
+  addVertexXYZ("vtx2");
   auto pipl0 = new kfcmd::core::PiPlusMeson("pi+_0");
   addChargedParticle(pipl0);
   auto pimi0 = new kfcmd::core::PiMinusMeson("pi-_0");

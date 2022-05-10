@@ -36,14 +36,24 @@
 #include <kfbase/core/OutputVertexConstraint.hpp>
 #include <kfbase/core/InputVertexConstraint.hpp>
 #include <kfbase/core/ConstantMomentumParticle.hpp>
+
 #include <set>
 #include <string>
 
 #include <TVector3.h>
+#include <TDatabasePDG.h>
 
 #include "kfcmd/core/ChargedParticle.hpp"
 #include "kfcmd/core/Photon.hpp"
 #include "kfcmd/core/TrPh.hpp"
+#include "kfcmd/core/KMinusMeson.hpp"
+#include "kfcmd/core/KPlusMeson.hpp"
+#include "kfcmd/core/PiMinusMeson.hpp"
+#include "kfcmd/core/PiPlusMeson.hpp"
+#include "kfcmd/core/Muon.hpp"
+#include "kfcmd/core/AntiMuon.hpp"
+#include "kfcmd/core/Electron.hpp"
+#include "kfcmd/core/Positron.hpp"
 
 namespace kfcmd {
   namespace core {
@@ -75,58 +85,6 @@ namespace kfcmd {
        * @param vertexName (vertex name)
        */
       TVector3 getFinalVertex(const std::string&) const;
-      //! A getter for an inital vertex X coordinate by name
-      /*!
-       * @param vertexName (vertex name)
-       */
-      double getInitialVertexX(const std::string&) const;
-      //! A getter for an initial vertex Y coordinate by name
-      /*!
-       * @param vertexName (vertex name)
-       */
-      double getInitialVertexY(const std::string&) const;
-      //! A getter for an initial vertex Z coordinate by name
-      /*!
-       * @param vertexName (vertex name)
-       */
-      double getInitialVertexZ(const std::string&) const;
-      //! A getter for a final vertex X coordinate by name
-      /*!
-       * @param vertexName (vertex name)
-       */
-      double getFinalVertexX(const std::string&) const;
-      //! A getter for a final vertex Y coordinate by name
-      /*!
-       * @param vertexName (vertex name)
-       */
-      double getFinalVertexY(const std::string&) const;
-      //! A getter for a final vertex Z coordinate by name
-      /*!
-       * @param vertexName (vertex name)
-       */
-      double getFinalVertexZ(const std::string&) const;
-      //! A getter for an initial value of a track natural parameter [cm]
-      /*!
-       * @param chargedParticleName (charged particle name)
-       */
-      double getInitialChargedParticleTime(const std::string&) const;
-      //! A getter for a final value of a track natural parameter [cm]
-      /*!
-       * @param chargedParticleName (charged particle name)
-       */
-      double getFinalChargedParticleTime(const std::string&) const;
-      //! A method that used to calculate an initial recoil momentum for set of
-      //! particles
-      /*!
-       * @param particleNames (set of particle names)
-       */
-      TLorentzVector getInitialRecoilMomentum(const std::set<std::string>&) const;
-      //! A method that used to calculate a final recoil momentum for set of
-      //! particles
-      /*!
-       * @param particleNames (set of particle names)
-       */
-      TLorentzVector getFinalRecoilMomentum(const std::set<std::string>&) const;
       //! A center-of-mass energy getter
       double getEnergy() const;
       //! A method is used in ROOT scripts to check a matrix invertibility
@@ -151,60 +109,6 @@ namespace kfcmd {
       bool fillTrack(const std::string&, std::size_t, const TrPh&);
       //! A method that used to fill photon from TrPh
       bool fillPhoton(const std::string&, std::size_t, const TrPh&);
-      //! A method that used to disable vertex by name
-      /*!
-       * This method disabless common parameter containers that
-       * correspond to x, y and z coordinates of a vertex.
-       *
-       * @param vertexName (vertex name)
-       */
-      void disableVertex(const std::string&);
-      //! A method that used to enable vertex by name
-      /*!
-       * This method enables common parameter containers that
-       * correspond to x, y and z coordinates of a vertex.
-       *
-       * @param vertexName (vertex name)
-       */
-      void enableVertex(const std::string&);
-      //! A method that used to disable vertex component by vertex name
-      /*!
-       * This method disables common parameter container that corresponds
-       * to a specific component of a vertex.
-       *
-       * @param vertexName (vertex name)
-       *
-       * @param component (vertex component)
-       */
-      void disableVertexComponent(const std::string&, kfbase::core::VERTEX_COMPONENT);
-      //! A method that used to enable vertex component by vertex name
-      /*!
-       * This method enables common parameter container that corresponds
-       * to a specific component of a vertex.
-       *
-       * @param vertexName (vertex name)
-       *
-       * @param component (vertex component)
-       */
-      void enableVertexComponent(const std::string&, kfbase::core::VERTEX_COMPONENT);
-      //! A method that used to fix a specific coordinate of a vertex
-      /*!
-       * @param vertexName (vertex name)
-       *
-       * @param value (value of coordinate)
-       *
-       * @param component (vertex component)
-       */
-      void fixVertexComponent(const std::string&, double, kfbase::core::VERTEX_COMPONENT);
-      //! A method that used to release a specific coordinate of a vertex
-      /*!
-       * @param vertexName (vertex name)
-       *
-       * @param value (value of coordinate)
-       *
-       * @param component (vertex component)
-       */
-      void releaseVertexComponent(const std::string&, kfbase::core::VERTEX_COMPONENT);
       //! A method that used to disable X, Y and Z vertex constraint for a certain
       //! charged particle
       /*!
@@ -277,30 +181,18 @@ namespace kfcmd {
 
       void setParticleAngularConstraintAxis(const std::string&, const TVector3&);
       void setAngularConstraintSigma(const std::string&,  double);
-      void setInitialVertex(const std::string&, const Eigen::Vector3d&);
-      void setInitialVertexX(const std::string&, double);
-      void setInitialVertexY(const std::string&, double);
-      void setInitialVertexZ(const std::string&, double);
 
     protected:
       //! A method that used to add vertex to a hypothesis
       /*!
        * @param vertexName (vertex name)
        */
-      void addVertex(const std::string&);
-      void setInitialVertexRandomly(const std::string&, double = 1.e-2);
+      void addVertexXYZ(const std::string&);
       //! A method that used to add charged particle to a hypothesis
       /*!
        * @param particle (pointer to ChargedParticle object)
        */
       void addChargedParticle(kfcmd::core::ChargedParticle*);
-      //! A method that used to add a photon to a hypothesis
-      /*!
-       * @param photon (Pointer to a Photon object)
-       *
-       * @param vertexName (photon vertex)
-       */
-      void addPhoton(kfcmd::core::Photon*, const std::string&);
       void addConstantMomentumParticle(const std::string&, double,
                                        const Eigen::Vector3d&);
       void addIntermediateNeutralParticle(const std::string&, double, const std::string&);
@@ -336,8 +228,6 @@ namespace kfcmd {
     private:
       //! A center-of-mass energy
       double _energy;
-      //! A set of vertex names
-      std::set<std::string> _vertices;
     };
   } // namespace core
 }  // namespace kfcmd

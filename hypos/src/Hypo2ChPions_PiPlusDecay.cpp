@@ -31,10 +31,6 @@
 
 #include "kfcmd/hypos/Hypo2ChPions2Photons_PiPlusDecay.hpp"
 
-#include "kfcmd/core/PiMinusMeson.hpp"
-#include "kfcmd/core/PiPlusMeson.hpp"
-#include "kfcmd/core/AntiMuon.hpp"
-
 using namespace kfcmd::hypos;
 
 Hypo2ChPions2Photons_PiPlusDecay::Hypo2ChPions2Photons_PiPlusDecay(double energy,
@@ -42,8 +38,8 @@ Hypo2ChPions2Photons_PiPlusDecay::Hypo2ChPions2Photons_PiPlusDecay(double energy
                                                                    long nIter,
                                                                    double tolerance)
     : kfcmd::core::Hypothesis(energy, magneticField, nIter, tolerance) {
-  addVertex("vtx0");
-  addVertex("vtx1");
+  addVertexXYZ("vtx0");
+  addVertexXYZ("vtx1");
   auto pip = new kfcmd::core::PiPlusMeson("pi+");
   addChargedParticle(pip);
   auto mup = new kfcmd::core::AntiMuon("mu+");
@@ -52,15 +48,16 @@ Hypo2ChPions2Photons_PiPlusDecay::Hypo2ChPions2Photons_PiPlusDecay(double energy
   auto pim = new kfcmd::core::PiMinusMeson("pi-");
   addChargedParticle(pim);
   auto ph0 = new kfcmd::core::Photon("g0");
-  addPhoton(ph0, "vtx0");
+  addParticle(ph0);
   auto ph1 = new kfcmd::core::Photon("g1");
-  addPhoton(ph1, "vtx0");
+  addParticle(ph1);
   addConstantMomentumParticle("origin", energy, Eigen::Vector3d::Zero());
   addEnergyMomentumConstraints("em-vtx0", {getParticle("origin")}, {pip, pim, ph0, ph1});
   addEnergyMomentumConstraints("em-vtx1", {pip}, {mup, getParticle("nu")});
-
   addOutputVertexConstraintsXYZ("pi+", "vtx0");
   addOutputVertexConstraintsXYZ("pi-", "vtx0");
+  addOutputVertexConstraintsXYZ("g0", "vtx0");
+  addOutputVertexConstraintsXYZ("g1", "vtx0");
   addOutputVertexConstraintsXYZ("mu+", "vtx1");
   addInputVertexConstraintsXYZ("pi+", "vtx1");
 }

@@ -31,7 +31,8 @@
 
 #ifndef __KFCMDPHOTON_HPP__
 #define __KFCMDPHOTON_HPP__
-#include <kfbase/core/Particle.hpp>
+
+#include <kfbase/core/VertexParticle.hpp>
 
 namespace kfcmd {
   namespace core {
@@ -39,7 +40,7 @@ namespace kfcmd {
      * Implementation of facility that describes a photon properties in
      * the case of the CMD-3 detector ussage.
      */
-    class Photon : public kfbase::core::Particle {
+    class Photon : public kfbase::core::VertexParticle {
     public:
       //! A constructor
       /*!
@@ -48,30 +49,6 @@ namespace kfcmd {
       explicit Photon(const std::string&);
       //! A destructor
       virtual ~Photon();
-      //! A vertex X coordinate setter
-      /*!
-       * This method is used to set the common parameter container,
-       * that represetns X coordinate of a photon vertex.
-       *
-       * @param name (name of a common parameter container)
-       */
-      void setVertexX(const std::string&);
-      //! A vertex Y coordinate setter
-      /*!
-       * This method is used to set the common parameter container,
-       * that represetns Y coordinate of a photon vertex.
-       *
-       * @param name (name of a common parameter container)
-       */
-      void setVertexY(const std::string&);
-      //! A vertex Z coordinate setter
-      /*!
-       * This method is used to set the common parameter container,
-       * that represetns Z coordinate of a photon vertex.
-       *
-       * @param name (name of a common parameter container)
-       */
-      void setVertexZ(const std::string&);
       virtual double calcOutputMomentumComponent(const Eigen::VectorXd&,
                                                  kfbase::core::MOMENT_COMPONENT) const override final;
       virtual double calcInputMomentumComponent(const Eigen::VectorXd&,
@@ -84,14 +61,33 @@ namespace kfcmd {
                                                             kfbase::core::MOMENT_COMPONENT) const override final;
       virtual Eigen::MatrixXd calcInputD2MomentumComponent(const Eigen::VectorXd&,
                                                            kfbase::core::MOMENT_COMPONENT) const override final;
+      virtual double calcOutputVertexComponent(const Eigen::VectorXd&, kfbase::core::VERTEX_COMPONENT) const override final;
+      virtual double calcInputVertexComponent(const Eigen::VectorXd&, kfbase::core::VERTEX_COMPONENT) const override final;
+      virtual Eigen::VectorXd calcOutputDVertexComponent(const Eigen::VectorXd&, kfbase::core::VERTEX_COMPONENT) const override final;
+      virtual Eigen::VectorXd calcInputDVertexComponent(const Eigen::VectorXd&, kfbase::core::VERTEX_COMPONENT) const override final;
+      virtual Eigen::MatrixXd calcOutputD2VertexComponent(const Eigen::VectorXd&, kfbase::core::VERTEX_COMPONENT) const override final;
+      virtual Eigen::MatrixXd calcInputD2VertexComponent(const Eigen::VectorXd&, kfbase::core::VERTEX_COMPONENT) const override final;
+      double calcDirection(const Eigen::VectorXd&, kfbase::core::VERTEX_COMPONENT) const;
+      Eigen::VectorXd calcDDirection(const Eigen::VectorXd&, kfbase::core::VERTEX_COMPONENT) const;
+      Eigen::MatrixXd calcD2Direction(const Eigen::VectorXd&, kfbase::core::VERTEX_COMPONENT) const;
+      virtual double calcConversionPoint(const Eigen::VectorXd&,
+                                         kfbase::core::VERTEX_COMPONENT) const;
+      virtual Eigen::VectorXd calcDConversionPoint(const Eigen::VectorXd&,
+                                                   kfbase::core::VERTEX_COMPONENT) const;
+      virtual Eigen::MatrixXd calcD2ConversionPoint(const Eigen::VectorXd&,
+                                                    kfbase::core::VERTEX_COMPONENT) const;
+      const TVector3& getInitialDirection() const;
+      const TVector3& getFinalDirection() const;
+      const TVector3& getInitialConvPoint() const;
+      const TVector3& getFinalConvPoint() const;
+      virtual void onFitBegin(const Eigen::VectorXd&) override final;
+      virtual void onFitEnd(const Eigen::VectorXd&) override final;
 
     private:
-      //! A poiner to common parameter conatainer for X coordinate of a vertex
-      kfbase::newtonian_opt::CommonParams* _vertexX;
-      //! A poiner to common parameter conatainer for Y coordinate of a vertex
-      kfbase::newtonian_opt::CommonParams* _vertexY;
-      //! A poiner to common parameter conatainer for Z coordinate of a vertex
-      kfbase::newtonian_opt::CommonParams* _vertexZ;
+      TVector3 initialDirection_; // !!! remove after debuging
+      TVector3 finalDirection_; // !!! remove after debuging
+      TVector3 initialConvPoint_;
+      TVector3 finalConvPoint_;
     };
   } // namespace core
 }  // namespace kfcmd
