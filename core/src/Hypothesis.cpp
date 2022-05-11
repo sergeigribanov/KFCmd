@@ -176,6 +176,14 @@ void kfcmd::core::Hypothesis::addChargedParticle(kfcmd::core::ChargedParticle* p
   particle->setBeamY("#beam-y");
 }
 
+void kfcmd::core::Hypothesis::addPhoton(const std::string& name,
+                                        const std::string& vertexName) {
+  auto particle = new kfcmd::core::Photon(name);
+  addParticle(particle);
+  auto vtx = vertices_.at(vertexName); // !!! TODO: exception
+  particle->setOutputVertex(vtx);
+}
+
 void kfcmd::core::Hypothesis::addConstantMomentumParticle(const std::string& name,
                                                           double energy,
                                                           const Eigen::Vector3d& p) {
@@ -452,7 +460,7 @@ bool kfcmd::core::Hypothesis::fillPhoton(const std::string& name,
   // 1 --- R
   // 2 --- phi
   // 3 --- z0
-  Eigen::VectorXd par = Eigen::VectorXd::Zero(7);
+  Eigen::VectorXd par = Eigen::VectorXd::Zero(4);
   Eigen::MatrixXd cov = Eigen::MatrixXd::Zero(4, 4);
   double sigma2_z = 0.30;
   double sigma2_rho = 0.35;
@@ -478,16 +486,9 @@ bool kfcmd::core::Hypothesis::fillPhoton(const std::string& name,
   par(1) = (data.phrho)[index];
   par(2) = (data.phphi0)[index];
   par(3) = z;
-  TVector3 covpt(par(1) * std::cos(par(2)),
-                 par(1) * std::sin(par(2)),
-                 par(3));
-  par(4) = covpt.Theta();
-  par(5) = covpt.Phi();
-  par(6) = std::sqrt(par(1) * par(1) + par(3) * par(3));
 
   this->setInitialParticleParams(name, par);
-  Eigen::MatrixXd inv = Eigen::MatrixXd::Zero(7, 7);
-  inv.block(0, 0, 4, 4) = cov.inverse();
+  Eigen::MatrixXd inv = cov.inverse();
   this->setParticleInverseCovarianceMatrix(name, inv);
   return true;
 }

@@ -42,24 +42,26 @@ HypoKsKlPi0::HypoKsKlPi0(double energy, double magnetField,
   addChargedParticle(pipl1);
   auto pimi1 = new kfcmd::core::PiMinusMeson("pi-_1");
   addChargedParticle(pimi1);
-  auto g0 = new kfcmd::core::Photon("g0");
-  addParticle(g0);
-  auto g1 = new kfcmd::core::Photon("g1");
-  addParticle(g1);
+  addPhoton("g0", "vtx0");
+  addPhoton("g1", "vtx0");
   addIntermediateNeutralParticle("ks", TDatabasePDG::Instance()->GetParticle(310)->Mass(), "vtx0");
   addParticlePxPyPz("kl", TDatabasePDG::Instance()->GetParticle(130)->Mass());
   addConstantMomentumParticle("origin", energy, Eigen::Vector3d::Zero());
   addMomentumConstraints("em-vtx0", {getParticle("origin")},
-                         {g0, g1, getParticle("kl"), getParticle("ks")});
+                         {getParticle("g0"),
+                          getParticle("g1"),
+                          getParticle("kl"),
+                          getParticle("ks")});
   addMomentumConstraints("em-vtx1", {getParticle("ks")},
                          {pipl1, pimi1});
   addEnergyConstraint("energy-constraint", {getParticle("origin")},
-                      {pipl1, pimi1, g0, g1, getParticle("kl")});
+                      {pipl1, pimi1,
+                       getParticle("g0"),
+                       getParticle("g1"),
+                       getParticle("kl")});
   addOutputVertexConstraintsXYZ("pi+_1", "vtx1");
   addOutputVertexConstraintsXYZ("pi-_1", "vtx1");
   addInputVertexConstraintsXYZ("ks", "vtx1");
-  addOutputVertexConstraintsXYZ("g0", "vtx0");
-  addOutputVertexConstraintsXYZ("g1", "vtx0");
 }
 
 HypoKsKlPi0::~HypoKsKlPi0() {}

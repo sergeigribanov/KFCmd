@@ -32,7 +32,8 @@
 #ifndef __KFCMDPHOTON_HPP__
 #define __KFCMDPHOTON_HPP__
 
-#include <kfbase/core/VertexParticle.hpp>
+#include <kfbase/core/Particle.hpp>
+#include <kfbase/core/Vertex.hpp>
 
 namespace kfcmd {
   namespace core {
@@ -40,7 +41,7 @@ namespace kfcmd {
      * Implementation of facility that describes a photon properties in
      * the case of the CMD-3 detector ussage.
      */
-    class Photon : public kfbase::core::VertexParticle {
+    class Photon : public kfbase::core::Particle {
     public:
       //! A constructor
       /*!
@@ -61,33 +62,18 @@ namespace kfcmd {
                                                             kfbase::core::MOMENT_COMPONENT) const override final;
       virtual Eigen::MatrixXd calcInputD2MomentumComponent(const Eigen::VectorXd&,
                                                            kfbase::core::MOMENT_COMPONENT) const override final;
-      virtual double calcOutputVertexComponent(const Eigen::VectorXd&, kfbase::core::VERTEX_COMPONENT) const override final;
-      virtual double calcInputVertexComponent(const Eigen::VectorXd&, kfbase::core::VERTEX_COMPONENT) const override final;
-      virtual Eigen::VectorXd calcOutputDVertexComponent(const Eigen::VectorXd&, kfbase::core::VERTEX_COMPONENT) const override final;
-      virtual Eigen::VectorXd calcInputDVertexComponent(const Eigen::VectorXd&, kfbase::core::VERTEX_COMPONENT) const override final;
-      virtual Eigen::MatrixXd calcOutputD2VertexComponent(const Eigen::VectorXd&, kfbase::core::VERTEX_COMPONENT) const override final;
-      virtual Eigen::MatrixXd calcInputD2VertexComponent(const Eigen::VectorXd&, kfbase::core::VERTEX_COMPONENT) const override final;
-      double calcDirection(const Eigen::VectorXd&, kfbase::core::VERTEX_COMPONENT) const;
-      Eigen::VectorXd calcDDirection(const Eigen::VectorXd&, kfbase::core::VERTEX_COMPONENT) const;
-      Eigen::MatrixXd calcD2Direction(const Eigen::VectorXd&, kfbase::core::VERTEX_COMPONENT) const;
       virtual double calcConversionPoint(const Eigen::VectorXd&,
                                          kfbase::core::VERTEX_COMPONENT) const;
       virtual Eigen::VectorXd calcDConversionPoint(const Eigen::VectorXd&,
                                                    kfbase::core::VERTEX_COMPONENT) const;
       virtual Eigen::MatrixXd calcD2ConversionPoint(const Eigen::VectorXd&,
                                                     kfbase::core::VERTEX_COMPONENT) const;
-      const TVector3& getInitialDirection() const;
-      const TVector3& getFinalDirection() const;
-      const TVector3& getInitialConvPoint() const;
-      const TVector3& getFinalConvPoint() const;
-      virtual void onFitBegin(const Eigen::VectorXd&) override final;
-      virtual void onFitEnd(const Eigen::VectorXd&) override final;
-
-    private:
-      TVector3 initialDirection_; // !!! remove after debuging
-      TVector3 finalDirection_; // !!! remove after debuging
-      TVector3 initialConvPoint_;
-      TVector3 finalConvPoint_;
+      double calcDirection(const Eigen::VectorXd&, kfbase::core::VERTEX_COMPONENT) const;
+      Eigen::VectorXd calcDDirection(const Eigen::VectorXd&, kfbase::core::VERTEX_COMPONENT) const;
+      Eigen::MatrixXd calcD2Direction(const Eigen::VectorXd&, kfbase::core::VERTEX_COMPONENT) const;
+      void setOutputVertex(kfbase::core::Vertex *);
+    protected:
+      kfbase::core::Vertex* vertex_;
     };
   } // namespace core
 }  // namespace kfcmd

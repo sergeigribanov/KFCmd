@@ -47,17 +47,14 @@ Hypo2ChPions2Photons_PiPlusDecay::Hypo2ChPions2Photons_PiPlusDecay(double energy
   addParticleMassLessThetaPhiE("nu");
   auto pim = new kfcmd::core::PiMinusMeson("pi-");
   addChargedParticle(pim);
-  auto ph0 = new kfcmd::core::Photon("g0");
-  addParticle(ph0);
-  auto ph1 = new kfcmd::core::Photon("g1");
-  addParticle(ph1);
+  addPhoton("g0", "vtx0");
+  addPhoton("g1", "vtx0");
   addConstantMomentumParticle("origin", energy, Eigen::Vector3d::Zero());
-  addEnergyMomentumConstraints("em-vtx0", {getParticle("origin")}, {pip, pim, ph0, ph1});
+  addEnergyMomentumConstraints("em-vtx0", {getParticle("origin")},
+                               {pip, pim, getParticle("g0"), getParticle("g1")});
   addEnergyMomentumConstraints("em-vtx1", {pip}, {mup, getParticle("nu")});
   addOutputVertexConstraintsXYZ("pi+", "vtx0");
   addOutputVertexConstraintsXYZ("pi-", "vtx0");
-  addOutputVertexConstraintsXYZ("g0", "vtx0");
-  addOutputVertexConstraintsXYZ("g1", "vtx0");
   addOutputVertexConstraintsXYZ("mu+", "vtx1");
   addInputVertexConstraintsXYZ("pi+", "vtx1");
 }

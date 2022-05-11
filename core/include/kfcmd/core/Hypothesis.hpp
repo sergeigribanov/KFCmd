@@ -193,6 +193,7 @@ namespace kfcmd {
        * @param particle (pointer to ChargedParticle object)
        */
       void addChargedParticle(kfcmd::core::ChargedParticle*);
+      void addPhoton(const std::string& , const std::string&);
       void addConstantMomentumParticle(const std::string&, double,
                                        const Eigen::Vector3d&);
       void addIntermediateNeutralParticle(const std::string&, double, const std::string&);
