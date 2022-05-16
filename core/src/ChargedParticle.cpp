@@ -52,6 +52,8 @@ kfcmd::core::ChargedParticle::ChargedParticle(const std::string& name, double ma
   setUpperLimit(4, 20);
   setLowerLimit(5, -100.); // !!!
   setUpperLimit(5, 100.); // !!!
+  setLowerLimit(6, -100.); // !!!
+  setUpperLimit(6, 100.); // !!!
   fixParameter(6, 0.);
 }
 
