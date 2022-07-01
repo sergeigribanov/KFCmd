@@ -72,7 +72,7 @@ namespace kfcmd {
        *
        * @param tolerance (optimization tolerance)
        */
-      Hypothesis(double, double, long = 20, double = 1.e-3);
+      Hypothesis(double, double, long = 20, double = 1.e-4);
       //! A destructor
       virtual ~Hypothesis();
       //! A getter for an initial vertex
