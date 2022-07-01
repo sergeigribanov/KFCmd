@@ -134,6 +134,7 @@ namespace kfcmd {
       Float_t phth[10];               //[nph]
       Float_t phphi[10];              //[nph]
       Float_t phrho[10];              //[nph]
+      Float_t phrad[10];              //[nph]
       Float_t phen0[10];              //[nph]
       Float_t phth0[10];              //[nph]
       Float_t phphi0[10];             //[nph]
@@ -305,6 +306,7 @@ namespace kfcmd {
       TBranch *b_phth;             //!
       TBranch *b_phphi;            //!
       TBranch *b_phrho;            //!
+      TBranch *b_phrad;            //!
       TBranch *b_phen0;            //!
       TBranch *b_phth0;            //!
       TBranch *b_phphi0;           //!

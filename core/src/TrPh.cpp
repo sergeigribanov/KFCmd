@@ -157,6 +157,7 @@ void kfcmd::core::TrPh::Init(TTree *tree) {
   fChain->SetBranchAddress("phth", phth, &b_phth);
   fChain->SetBranchAddress("phphi", phphi, &b_phphi);
   fChain->SetBranchAddress("phrho", phrho, &b_phrho);
+  fChain->SetBranchAddress("phrad", phrad, &b_phrad);
   fChain->SetBranchAddress("phen0", phen0, &b_phen0);
   fChain->SetBranchAddress("phth0", phth0, &b_phth0);
   fChain->SetBranchAddress("phphi0", phphi0, &b_phphi0);
