@@ -88,7 +88,7 @@ namespace kfcmd {
       Float_t tclth[7];               //[nt]
       Float_t tclphi[7];              //[nt]
       Float_t terr[7][3][3];          //[nt]
-      Float_t terr0[7][5][5];         //[nt]
+      Float_t terr0[7][6][6];         //[nt]
       Int_t tindlxe[7];               //[nt]
       Float_t tzcc[7][2];             //[nt]
       Float_t txyzatcl[7][3];         //[nt]
