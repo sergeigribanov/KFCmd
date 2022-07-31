@@ -52,7 +52,7 @@ Hypo2ChPions2Photons_PiMinusDecay::Hypo2ChPions2Photons_PiMinusDecay(double ener
   addConstantMomentumParticle("origin", energy, Eigen::Vector3d::Zero());
   addEnergyMomentumConstraints("em-vtx0", {getParticle("origin")},
                                {pip, pim, getParticle("g0"), getParticle("g1")});
-  addEnergyMomentumConstraints("em-vtx1", {pip}, {mum, getParticle("nu")});
+  addEnergyMomentumConstraints("em-vtx1", {pim}, {mum, getParticle("nu")});
 
   addOutputVertexConstraintsXYZ("pi+", "vtx0");
   addOutputVertexConstraintsXYZ("pi-", "vtx0");
