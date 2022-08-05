@@ -12,22 +12,26 @@
 ```console
 git clone https://github.com/sergeigribanov/KFCmd
 ```
-2. Create a build directory:
+2. Setup `ROOT` environment:
+```console
+source <path to ROOT installation>/bin/thisroot.sh
+```
+3. Create a build directory:
 ```console
 mkdir <path to a build directory>
 cd <path to a build directory>
 ```
-3. Run CMake:
+4. Run CMake:
 ```console
 cmake -DCMAKE_INSTALL_PREFIX=<installation prefix> <path to the source code directory>
 ```
 To set `C++` standard, `-DCMAKE_CXX_STANDARD` option can be used. The same standard should be used that was used to build the `ROOT` frameworkand `KFBase` package.
 
-4. Build the package:
+5. Build the package:
 ```console
 make
 ```
-5. Install the package:
+6. Install the package:
 ```console
 make install
 ```
