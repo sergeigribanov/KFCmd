@@ -109,6 +109,8 @@ namespace kfcmd {
       bool fillTrack(const std::string&, std::size_t, const TrPh&);
       //! A method that used to fill photon from TrPh
       bool fillPhoton(const std::string&, std::size_t, const TrPh&);
+      //! A method that used to fill alternative parametrized photon from TrPh
+      bool fillAltPhoton(const std::string&, std::size_t, const TrPh&);
       //! A method that used to disable X, Y and Z vertex constraint for a certain
       //! charged particle
       /*!
@@ -194,6 +196,7 @@ namespace kfcmd {
        */
       void addChargedParticle(kfcmd::core::ChargedParticle*);
       void addPhoton(const std::string& , const std::string&);
+      void addAltPhoton(const std::string&);
       void addConstantMomentumParticle(const std::string&, double,
                                        const Eigen::Vector3d&);
       void addIntermediateNeutralParticle(const std::string&, double, const std::string&);
