@@ -33,7 +33,7 @@
 #include "kfcmd/core/Hypothesis.hpp"
 #include "kfcmd/core/ParticlePxPyPz.hpp"
 #include "kfcmd/core/ParticleMassLessThetaPhiE.hpp"
-
+#include "kfcmd/core/AltPhoton.hpp"
 #include <kfbase/core/MassConstraint.hpp>
 #include <kfbase/core/MomentumConstraint.hpp>
 #include <kfbase/core/DoubleParticleAngularConstraint.hpp>
@@ -180,8 +180,13 @@ void kfcmd::core::Hypothesis::addPhoton(const std::string& name,
                                         const std::string& vertexName) {
   auto particle = new kfcmd::core::Photon(name);
   addParticle(particle);
-  auto vtx = vertices_.at(vertexName); // !!! TODO: exception
+  auto vtx = vertices_.at(vertexName);
   particle->setOutputVertex(vtx);
+}
+
+void kfcmd::core::Hypothesis::addAltPhoton(const std::string& name) {
+  auto particle = new kfcmd::core::AltPhoton(name);
+  addParticle(particle);
 }
 
 void kfcmd::core::Hypothesis::addConstantMomentumParticle(const std::string& name,
@@ -490,6 +495,24 @@ bool kfcmd::core::Hypothesis::fillPhoton(const std::string& name,
   par(2) = (data.phphi0)[index];
   par(3) = z;
 
+  this->setInitialParticleParams(name, par);
+  Eigen::MatrixXd inv = cov.inverse();
+  this->setParticleInverseCovarianceMatrix(name, inv);
+  return true;
+}
+
+bool kfcmd::core::Hypothesis::fillAltPhoton(const std::string& name,
+                                            std::size_t index,
+                                            const kfcmd::core::TrPh& data) {
+  Eigen::VectorXd par(3);
+  Eigen::MatrixXd cov = Eigen::MatrixXd::Zero(3, 3);
+  par(0) = (data.phen)[index] * 1.e-3;
+  par(1) = (data.phth)[index];
+  par(2) = (data.phphi)[index];
+  cov(0, 0) = std::pow((data.pherr)[index][0] * 1.e-3, 2);
+  cov(1, 1) = std::pow((data.pherr)[index][1], 2);
+  cov(2, 2) = std::pow((data.pherr)[index][2], 2);
+  if (0 == cov.determinant()) return false;
   this->setInitialParticleParams(name, par);
   Eigen::MatrixXd inv = cov.inverse();
   this->setParticleInverseCovarianceMatrix(name, inv);
