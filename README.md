@@ -2,6 +2,10 @@
 
 ## Overview
 `KFCmd` is a detector-dependent part of the kinematic and vertex fitting software developed for the CMD-3 experiment.
+
+## Input tree version
+1. tr_ph v9 (with phrad branch)
+
 ## Dependencies
 1. `Eigen 3` template library for linear algebra: matrices, vectors, numerical solvers, and related algorithms: https://eigen.tuxfamily.org/index.php?title=Main_Page (successfully tested with version `3.4`).
 2. `ROOT` data analysis framework used by high energy physics and others: https://root.cern (successfully tested with version `6.26`).
