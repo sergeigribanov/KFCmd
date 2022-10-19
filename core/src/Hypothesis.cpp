@@ -459,14 +459,12 @@ bool kfcmd::core::Hypothesis::fillTrack(const std::string& name, std::size_t ind
   return true;
 }
 
-
 bool kfcmd::core::Hypothesis::fillPhoton(const std::string& name,
                                          std::size_t index,
                                          const kfcmd::core::TrPh& data) {
   // 0 --- energy
   // 1 --- rho
   // 2 --- phi
-  // 3 --- z0
   Eigen::VectorXd par = Eigen::VectorXd::Zero(4);
   Eigen::MatrixXd cov = Eigen::MatrixXd::Zero(4, 4);
   double sigma2_z = 0.30;
