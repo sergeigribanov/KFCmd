@@ -453,7 +453,7 @@ bool kfcmd::core::Hypothesis::fillTrack(const std::string& name, std::size_t ind
   this->setInitialParticleParams(name, par);
   // index 5 --- ct_out
   // index 6 --- ct_in
-  Eigen::MatrixXd inv = Eigen::MatrixXd::Zero(6, 6); // 7x7
+  Eigen::MatrixXd inv = Eigen::MatrixXd::Zero(7, 7);
   inv.block(0, 0, 5, 5) =  cov.inverse();
   this->setParticleInverseCovarianceMatrix(name, inv);
   return true;
