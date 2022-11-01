@@ -418,10 +418,10 @@ Eigen::MatrixXd kfcmd::core::Hypothesis::inverseMatrix(
 
 bool kfcmd::core::Hypothesis::fillTrack(const std::string& name, std::size_t index,
                                         const kfcmd::core::TrPh& data) {
-  Eigen::VectorXd par = Eigen::VectorXd::Zero(7);
+  Eigen::VectorXd par = Eigen::VectorXd::Zero(6); // 7
   const Float_t* fst_terr0 = &((data.terr0)[index][0][0]);
   const int s = 5;
-  const int s_t = 6;
+  const int s_t = 5; // 6
   const int sxs_t = s_t * s_t;
   double tmp_terr0[sxs_t];
   std::copy(fst_terr0, fst_terr0 + sxs_t, tmp_terr0);
@@ -453,7 +453,7 @@ bool kfcmd::core::Hypothesis::fillTrack(const std::string& name, std::size_t ind
   this->setInitialParticleParams(name, par);
   // index 5 --- ct_out
   // index 6 --- ct_in
-  Eigen::MatrixXd inv = Eigen::MatrixXd::Zero(7, 7);
+  Eigen::MatrixXd inv = Eigen::MatrixXd::Zero(6, 6); // 7x7
   inv.block(0, 0, 5, 5) =  cov.inverse();
   this->setParticleInverseCovarianceMatrix(name, inv);
   return true;
