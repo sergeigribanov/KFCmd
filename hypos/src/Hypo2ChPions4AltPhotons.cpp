@@ -57,10 +57,19 @@ Hypo2ChPions4AltPhotons::Hypo2ChPions4AltPhotons(double energy,
   addOutputVertexConstraintsXYZ("pi+", "vtx0");
   addOutputVertexConstraintsXYZ("pi-", "vtx0");
   const double pi0_mass = TDatabasePDG::Instance()->GetParticle(111)->Mass();
+
   addMassConstraint("pi0-mass-g0-g1", pi0_mass, {"g0", "g1"});
+  addMassConstraint("pi0-mass-g0-g2", pi0_mass, {"g0", "g2"});
+  addMassConstraint("pi0-mass-g0-g3", pi0_mass, {"g0", "g3"});
+  addMassConstraint("pi0-mass-g1-g2", pi0_mass, {"g1", "g2"});
+  addMassConstraint("pi0-mass-g1-g3", pi0_mass, {"g1", "g3"});
   addMassConstraint("pi0-mass-g2-g3", pi0_mass, {"g2", "g3"});
-  disableConstraint("pi0-mass-g0-g1");
-  disableConstraint("pi0-mass-g2-g3");
+  hypo.disableConstraint("pi0-mass-g0-g1");
+  hypo.disableConstraint("pi0-mass-g0-g2");
+  hypo.disableConstraint("pi0-mass-g0-g3");
+  hypo.disableConstraint("pi0-mass-g1-g2");
+  hypo.disableConstraint("pi0-mass-g1-g3");
+  hypo.disableConstraint("pi0-mass-g2-g3");
 }
 
 Hypo2ChPions4AltPhotons::~Hypo2ChPions4AltPhotons() {}
