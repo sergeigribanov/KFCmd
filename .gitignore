@@ -2,3 +2,4 @@ docs
 build
 *.~undo-tree~
 *.md.temp
+.cache/
