@@ -13,7 +13,7 @@ Hypo2ChPionsPhotonLostPhoton::Hypo2ChPionsPhotonLostPhoton(double energy,
   auto pim = new kfcmd::core::PiMinusMeson("pi-");
   addChargedParticle(pim);
   addPhoton("g0", "vtx0");
-  addParticleMassLessThetaPhiE("g1");
+  addAltPhoton("g1");
   addConstantMomentumParticle("origin", energy, Eigen::Vector3d::Zero());
   addEnergyMomentumConstraints("em-vtx0", {getParticle("origin")},
                                {pip, pim, getParticle("g0"), getParticle("g1")});
