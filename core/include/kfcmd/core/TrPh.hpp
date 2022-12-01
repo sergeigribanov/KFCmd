@@ -72,16 +72,10 @@ namespace kfcmd {
       Float_t tfc[20];                 //[nt]
       Float_t tenlxe[20];              //[nt]
       Float_t tlengthlxe[20];          //[nt]
-      Float_t tenslxe_layers[20][14];  //[nt]
       Float_t tencsi[20];              //[nt]
       Float_t tenbgo[20];              //[nt]
-      Float_t tclth[20];               //[nt]
-      Float_t tclphi[20];              //[nt]
       Float_t terr[20][3][3];          //[nt]
       Float_t terr0[20][6][6];         //[nt]
-      Int_t tindlxe[20];               //[nt]
-      Float_t tzcc[20][2];             //[nt]
-      Float_t txyzatcl[20][3];         //[nt]
       Float_t txyzatlxe[20][3];        //[nt]
       Int_t tenconv[20];               //[nt]
       Int_t nph_total;
@@ -93,13 +87,10 @@ namespace kfcmd {
       Float_t phen0[50];              //[nph]
       Float_t phth0[50];              //[nph]
       Float_t phphi0[50];             //[nph]
-      Float_t phlxe[50];              //[nph]
-      Float_t phslxe_layers[50][14];  //[nph]
       Float_t pherr[50][3];           //[nph]
       Float_t phcsi[50];              //[nph]
       Float_t phbgo[50];              //[nph]
       Int_t phflag[50];               //[nph]
-      Int_t phconv[50];               //[nph]
       Int_t phfc[50];                 //[nph]
       Int_t nsim;
       Int_t simtype[50];     //[nsim]
@@ -110,14 +101,6 @@ namespace kfcmd {
       Float_t simvtx[50];    //[nsim]
       Float_t simvty[50];    //[nsim]
       Float_t simvtz[50];    //[nsim]
-      Int_t ncorr;
-      Int_t idcorr[50];   //[ncorr]
-      Int_t bitcorr[50];  //[ncorr]
-      Int_t nbadbank;
-      Int_t nbadbankg;
-      Int_t nbadbanks[500];  //[nbadbankg]
-      Int_t nlostbanks;
-      Int_t ncorruptedbanks;
 
       // List of branches
       TBranch *b_ebeam;            //!
@@ -166,16 +149,10 @@ namespace kfcmd {
       TBranch *b_tfc;              //!
       TBranch *b_tenlxe;           //!
       TBranch *b_tlengthlxe;       //!
-      TBranch *b_tenslxe_layers;   //!
       TBranch *b_tencsi;           //!
       TBranch *b_tenbgo;           //!
-      TBranch *b_tclth;            //!
-      TBranch *b_tclphi;           //!
       TBranch *b_terr;             //!
       TBranch *b_terr0;            //!
-      TBranch *b_tindlxe;          //!
-      TBranch *b_tzcc;             //!
-      TBranch *b_txyzatcl;         //!
       TBranch *b_txyzatlxe;        //!
       TBranch *b_tenconv;          //!
       TBranch *b_nph_total;        //!
@@ -187,13 +164,10 @@ namespace kfcmd {
       TBranch *b_phen0;            //!
       TBranch *b_phth0;            //!
       TBranch *b_phphi0;           //!
-      TBranch *b_phlxe;            //!
-      TBranch *b_phslxe_layers;    //!
       TBranch *b_pherr;            //!
       TBranch *b_phcsi;            //!
       TBranch *b_phbgo;            //!
       TBranch *b_phflag;           //!
-      TBranch *b_phconv;           //!
       TBranch *b_phfc;             //!
       TBranch *b_nsim;             //!
       TBranch *b_simtype;          //!
@@ -204,14 +178,6 @@ namespace kfcmd {
       TBranch *b_simvtx;           //!
       TBranch *b_simvty;           //!
       TBranch *b_simvtz;           //!
-      TBranch *b_ncorr;            //!
-      TBranch *b_idcorr;           //!
-      TBranch *b_bitcorr;          //!
-      TBranch *b_nbadbank;         //!
-      TBranch *b_nbadbankg;        //!
-      TBranch *b_nbadbanks;        //!
-      TBranch *b_nlostbanks;       //!
-      TBranch *b_ncorruptedbanks;  //!
 
       TrPh(TTree *tree = 0);
       virtual ~TrPh();

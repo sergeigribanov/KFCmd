@@ -95,16 +95,10 @@ void kfcmd::core::TrPh::Init(TTree *tree) {
   fChain->SetBranchAddress("tfc", tfc, &b_tfc);
   fChain->SetBranchAddress("tenlxe", tenlxe, &b_tenlxe);
   fChain->SetBranchAddress("tlengthlxe", tlengthlxe, &b_tlengthlxe);
-  fChain->SetBranchAddress("tenslxe_layers", tenslxe_layers, &b_tenslxe_layers);
   fChain->SetBranchAddress("tencsi", tencsi, &b_tencsi);
   fChain->SetBranchAddress("tenbgo", tenbgo, &b_tenbgo);
-  fChain->SetBranchAddress("tclth", tclth, &b_tclth);
-  fChain->SetBranchAddress("tclphi", tclphi, &b_tclphi);
   fChain->SetBranchAddress("terr", terr, &b_terr);
   fChain->SetBranchAddress("terr0", terr0, &b_terr0);
-  fChain->SetBranchAddress("tindlxe", tindlxe, &b_tindlxe);
-  fChain->SetBranchAddress("tzcc", tzcc, &b_tzcc);
-  fChain->SetBranchAddress("txyzatcl", txyzatcl, &b_txyzatcl);
   fChain->SetBranchAddress("txyzatlxe", txyzatlxe, &b_txyzatlxe);
   fChain->SetBranchAddress("tenconv", tenconv, &b_tenconv);
   fChain->SetBranchAddress("nph_total", &nph_total, &b_nph_total);
@@ -116,13 +110,10 @@ void kfcmd::core::TrPh::Init(TTree *tree) {
   fChain->SetBranchAddress("phen0", phen0, &b_phen0);
   fChain->SetBranchAddress("phth0", phth0, &b_phth0);
   fChain->SetBranchAddress("phphi0", phphi0, &b_phphi0);
-  fChain->SetBranchAddress("phlxe", phlxe, &b_phlxe);
-  fChain->SetBranchAddress("phslxe_layers", phslxe_layers, &b_phslxe_layers);
   fChain->SetBranchAddress("pherr", pherr, &b_pherr);
   fChain->SetBranchAddress("phcsi", phcsi, &b_phcsi);
   fChain->SetBranchAddress("phbgo", phbgo, &b_phbgo);
   fChain->SetBranchAddress("phflag", phflag, &b_phflag);
-  fChain->SetBranchAddress("phconv", phconv, &b_phconv);
   fChain->SetBranchAddress("phfc", phfc, &b_phfc);
   fChain->SetBranchAddress("nsim", &nsim, &b_nsim);
   fChain->SetBranchAddress("simtype", simtype, &b_simtype);
@@ -133,15 +124,6 @@ void kfcmd::core::TrPh::Init(TTree *tree) {
   fChain->SetBranchAddress("simvtx", simvtx, &b_simvtx);
   fChain->SetBranchAddress("simvty", simvty, &b_simvty);
   fChain->SetBranchAddress("simvtz", simvtz, &b_simvtz);
-  fChain->SetBranchAddress("ncorr", &ncorr, &b_ncorr);
-  fChain->SetBranchAddress("idcorr", &idcorr, &b_idcorr);
-  fChain->SetBranchAddress("bitcorr", &bitcorr, &b_bitcorr);
-  fChain->SetBranchAddress("nbadbank", &nbadbank, &b_nbadbank);
-  fChain->SetBranchAddress("nbadbankg", &nbadbankg, &b_nbadbankg);
-  fChain->SetBranchAddress("nbadbanks", &nbadbanks, &b_nbadbanks);
-  fChain->SetBranchAddress("nlostbanks", &nlostbanks, &b_nlostbanks);
-  fChain->SetBranchAddress("ncorruptedbanks", &ncorruptedbanks,
-                           &b_ncorruptedbanks);
   Notify();
 }
 
