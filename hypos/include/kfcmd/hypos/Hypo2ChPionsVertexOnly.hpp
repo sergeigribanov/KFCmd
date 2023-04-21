@@ -51,7 +51,7 @@ namespace kfcmd {
        *
        * @param tolerance (optimization tolerance)
        */
-      Hypo2ChPionsVertexOnly(double, double, long = 20, double = 1.e-4);
+      Hypo2ChPionsVertexOnly(double, double, long = 20, double = 1.e-6);
       //! A destructor
       virtual ~Hypo2ChPionsVertexOnly();
     };
