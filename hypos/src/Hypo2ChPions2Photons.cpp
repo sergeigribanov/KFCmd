@@ -50,6 +50,12 @@ Hypo2ChPions2Photons::Hypo2ChPions2Photons(double energy,
                                {pip, pim, getParticle("g0"), getParticle("g1")});
   addOutputVertexConstraintsXYZ("pi+", "vtx0");
   addOutputVertexConstraintsXYZ("pi-", "vtx0");
+  const double pi0_mass = TDatabasePDG::Instance()->GetParticle(111)->Mass();
+  addMassConstraint("pi0-mass-g0-g1", pi0_mass, {"g0", "g1"});
+  const double eta_mass = TDatabasePDG::Instance()->GetParticle(221)->Mass();
+  addMassConstraint("eta-mass-g0-g1", eta_mass, {"g0", "g1"});
+  disableConstraint("pi0-mass-g0-g1");
+  disableConstraint("eta-mass-g0-g1");
 }
 
 Hypo2ChPions2Photons::~Hypo2ChPions2Photons() {}
