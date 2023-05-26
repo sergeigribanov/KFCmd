@@ -31,12 +31,12 @@
 
 #ifndef __KFCMDALTPHOTON_HPP__
 #define __KFCMDALTPHOTON_HPP__
-#include <kfbase/core/ParticleMassLessThetaPhiE.hpp>
+#include "kfcmd/core/ParticleMassLessThetaPhiE.hpp"
 
 namespace kfcmd {
   namespace core {
 
-    using AltPhoton = kfbase::core::ParticleMassLessThetaPhiE;
+    using AltPhoton = kfcmd::core::ParticleMassLessThetaPhiE;
 
   }
 }
