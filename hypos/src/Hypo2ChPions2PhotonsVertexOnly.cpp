@@ -18,9 +18,9 @@
  */
 
 /**
- * @file Hypo2ChPions2AltPhotons.cpp
+ * @file Hypo2ChPions2PhotonsVertexOnly.cpp
  *
- * @brief Implementation of Hypo2ChPions2AltPhotons methods
+ * @brief Implementation of Hypo2ChPions2PhotonsVertexOnly methods
  *
  * @ingroup KFCmd
  *
@@ -29,33 +29,22 @@
  *
  */
 
-#include "kfcmd/hypos/Hypo2ChPions2AltPhotons.hpp"
+#include "kfcmd/hypos/Hypo2ChPions2PhotonsVertexOnly.hpp"
 
 using namespace kfcmd::hypos;
 
-Hypo2ChPions2AltPhotons::Hypo2ChPions2AltPhotons(double energy,
-                       double magneticField,
-                       long nIter,
-                       double tolerance)
+Hypo2ChPions2PhotonsVertexOnly::Hypo2ChPions2PhotonsVertexOnly(double energy,
+                                           double magneticField,
+                                           long nIter,
+                                           double tolerance)
     : kfcmd::core::Hypothesis(energy, magneticField, nIter, tolerance) {
   addVertexXYZ("vtx0");
   auto pip = new kfcmd::core::PiPlusMeson("pi+");
   addChargedParticle(pip);
   auto pim = new kfcmd::core::PiMinusMeson("pi-");
   addChargedParticle(pim);
-  addAltPhoton("g0");
-  addAltPhoton("g1");
-  addConstantMomentumParticle("origin", energy, Eigen::Vector3d::Zero());
-  addEnergyMomentumConstraints("em-vtx0", {getParticle("origin")},
-                               {pip, pim, getParticle("g0"), getParticle("g1")});
+  addPhoton("g0", "vtx0");
+  addPhoton("g1", "vtx0");
   addOutputVertexConstraintsXYZ("pi+", "vtx0");
   addOutputVertexConstraintsXYZ("pi-", "vtx0");
-  const double pi0_mass = TDatabasePDG::Instance()->GetParticle(111)->Mass();
-  addMassConstraint("pi0-mass-g0-g1", pi0_mass, {"g0", "g1"});
-  const double eta_mass = TDatabasePDG::Instance()->GetParticle(221)->Mass();
-  addMassConstraint("eta-mass-g0-g1", eta_mass, {"g0", "g1"});
-  disableConstraint("pi0-mass-g0-g1");
-  disableConstraint("eta-mass-g0-g1");
 }
-
-Hypo2ChPions2AltPhotons::~Hypo2ChPions2AltPhotons() {}

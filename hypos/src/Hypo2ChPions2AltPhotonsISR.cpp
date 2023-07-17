@@ -18,9 +18,9 @@
  */
 
 /**
- * @file Hypo2ChPions2AltPhotons.cpp
+ * @file Hypo2ChPions2AltPhotonsISR.cpp
  *
- * @brief Implementation of Hypo2ChPions2AltPhotons methods
+ * @brief Implementation of Hypo2ChPions2AltPhotonsISR methods
  *
  * @ingroup KFCmd
  *
@@ -29,11 +29,11 @@
  *
  */
 
-#include "kfcmd/hypos/Hypo2ChPions2AltPhotons.hpp"
+#include "kfcmd/hypos/Hypo2ChPions2AltPhotonsISR.hpp"
 
 using namespace kfcmd::hypos;
 
-Hypo2ChPions2AltPhotons::Hypo2ChPions2AltPhotons(double energy,
+Hypo2ChPions2AltPhotonsISR::Hypo2ChPions2AltPhotonsISR(double energy,
                        double magneticField,
                        long nIter,
                        double tolerance)
@@ -45,9 +45,13 @@ Hypo2ChPions2AltPhotons::Hypo2ChPions2AltPhotons(double energy,
   addChargedParticle(pim);
   addAltPhoton("g0");
   addAltPhoton("g1");
+  addAltPhoton("isr");
   addConstantMomentumParticle("origin", energy, Eigen::Vector3d::Zero());
   addEnergyMomentumConstraints("em-vtx0", {getParticle("origin")},
-                               {pip, pim, getParticle("g0"), getParticle("g1")});
+                               {pip, pim,
+                                getParticle("g0"),
+                                getParticle("g1"),
+                                getParticle("isr")});
   addOutputVertexConstraintsXYZ("pi+", "vtx0");
   addOutputVertexConstraintsXYZ("pi-", "vtx0");
   const double pi0_mass = TDatabasePDG::Instance()->GetParticle(111)->Mass();
@@ -58,4 +62,4 @@ Hypo2ChPions2AltPhotons::Hypo2ChPions2AltPhotons(double energy,
   disableConstraint("eta-mass-g0-g1");
 }
 
-Hypo2ChPions2AltPhotons::~Hypo2ChPions2AltPhotons() {}
+Hypo2ChPions2AltPhotonsISR::~Hypo2ChPions2AltPhotonsISR() {}
