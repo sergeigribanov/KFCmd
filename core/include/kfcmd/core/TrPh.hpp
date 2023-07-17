@@ -162,6 +162,7 @@ namespace kfcmd {
       TBranch *b_phth;             //!
       TBranch *b_phphi;            //!
       TBranch *b_phrho;            //!
+      TBranch *b_phrad;            //!
       TBranch *b_phen0;            //!
       TBranch *b_phth0;            //!
       TBranch *b_phphi0;           //!
