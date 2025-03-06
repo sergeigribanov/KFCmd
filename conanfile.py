@@ -26,8 +26,7 @@ class KFCmdRecipe(ConanFile):
         self.requires("kfbase/1.0")
         
     def deploy(self):
-        copy(self, "include", src=self.package_folder, dst=self.deploy_folder)
-        copy(self, "lib", src=self.package_folder, dst=self.deploy_folder)
+        copy(self, "*", src=self.package_folder, dst=self.deploy_folder)
     
     def layout(self):
         cmake_layout(self)
