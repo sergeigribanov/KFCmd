@@ -519,6 +519,25 @@ bool kfcmd::core::Hypothesis::fillAltPhoton(const std::string& name,
   return true;
 }
 
+bool kfcmd::core::Hypothesis::fillAltBSPhoton(const std::string& name,
+                                            std::size_t index,
+                                            const kfcmd::core::TrPh& data) {
+  Eigen::VectorXd par(3);
+  Eigen::MatrixXd cov = Eigen::MatrixXd::Zero(3, 3);
+  par(0) = (data.bs_phen)[index] * 1.e-3;
+  par(1) = (data.bs_phth)[index];
+  par(2) = (data.bs_phphi)[index];
+  cov(0, 0) = std::pow((data.bs_pherr)[index][0] * 1.e-3, 2);
+  cov(1, 1) = std::pow((data.bs_pherr)[index][1], 2);
+  cov(2, 2) = std::pow((data.bs_pherr)[index][2], 2);
+  if (0 == cov.determinant()) return false;
+  this->setInitialParticleParams(name, par);
+  Eigen::MatrixXd inv = cov.inverse();
+  this->setParticleInverseCovarianceMatrix(name, inv);
+  return true;
+}
+
+
 void kfcmd::core::Hypothesis::setBeamXY(double xbeam, double ybeam) {
   addConstant("#beam-x", xbeam);
   addConstant("#beam-y", ybeam);

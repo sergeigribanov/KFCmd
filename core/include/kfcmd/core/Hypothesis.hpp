@@ -111,6 +111,8 @@ namespace kfcmd {
       bool fillPhoton(const std::string&, std::size_t, const TrPh&);
       //! A method that used to fill alternative parametrized photon from TrPh
       bool fillAltPhoton(const std::string&, std::size_t, const TrPh&);
+      //! A method that used to fill alternative parametrized photon from TrPh (taking into account LXe strips)
+      bool fillAltBSPhoton(const std::string&, std::size_t, const TrPh&);
       //! A method that used to disable X, Y and Z vertex constraint for a certain
       //! charged particle
       /*!
