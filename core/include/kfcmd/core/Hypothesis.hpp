@@ -109,6 +109,8 @@ namespace kfcmd {
       bool fillTrack(const std::string&, std::size_t, const TrPh&);
       //! A method that used to fill photon from TrPh
       bool fillPhoton(const std::string&, std::size_t, const TrPh&);
+      //! NEW: fill Photon from strip branches (bs_*), with vertex reconstruction and beam-spot correction rollback
+      bool fillBSPhoton(const std::string&, std::size_t, const TrPh&);
       //! A method that used to fill alternative parametrized photon from TrPh
       bool fillAltPhoton(const std::string&, std::size_t, const TrPh&);
       //! A method that used to fill alternative parametrized photon from TrPh (taking into account LXe strips)

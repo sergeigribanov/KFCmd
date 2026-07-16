@@ -55,8 +55,8 @@ kfcmd::core::Hypothesis::Hypothesis(double energy, double magneticField, long nI
 kfcmd::core::Hypothesis::~Hypothesis() {}
 
 void kfcmd::core::Hypothesis::addEnergyConstraint(const std::string& name,
-                                                     const std::set<kfbase::core::Particle*>& inputs,
-                                                     const std::set<kfbase::core::Particle*>& outputs) {
+						  const std::set<kfbase::core::Particle*>& inputs,
+						  const std::set<kfbase::core::Particle*>& outputs) {
   const std::string scpe = "#momentum-constraint-" + name + "-pe";
   auto cpe = new kfbase::core::MomentumConstraint(scpe, kfbase::core::MOMENT_E);
   addConstraint(cpe);
@@ -243,7 +243,7 @@ void kfcmd::core::Hypothesis::addOutputVertexConstraintsXYZ(const std::string& v
 }
 
 void kfcmd::core::Hypothesis::addInputVertexConstraintsXYZ(const std::string& vertexParticleName,
-                                                            const std::string& vertexName) {
+							   const std::string& vertexName) {
   auto vtx = vertices_.at(vertexName); // !!! TODO: exception
   const auto& particle = dynamic_cast<kfcmd::core::ChargedParticle*>(_particles.at(vertexParticleName));
   if (particle) {
@@ -256,12 +256,12 @@ void kfcmd::core::Hypothesis::addInputVertexConstraintsXYZ(const std::string& ve
   vtxX->setVertex(vtx);
 
   auto vtxY = new kfbase::core::InputVertexConstraint("#" + vertexParticleName +
-                                                       "-input-constraint-y", kfbase::core::VERTEX_Y);
+						      "-input-constraint-y", kfbase::core::VERTEX_Y);
   addConstraint(vtxY);
   vtxY->setVertex(vtx);
 
   auto vtxZ = new kfbase::core::InputVertexConstraint("#" + vertexParticleName +
-                                                       "-input-constraint-z", kfbase::core::VERTEX_Z);
+						      "-input-constraint-z", kfbase::core::VERTEX_Z);
   addConstraint(vtxZ);
   vtxZ->setVertex(vtx);
 
@@ -519,9 +519,118 @@ bool kfcmd::core::Hypothesis::fillAltPhoton(const std::string& name,
   return true;
 }
 
+// =============================================================================
+// fillBSPhoton – strip version of Photon with beam-spot correction rollback
+// =============================================================================
+//
+// Author: Dzmitry Shoukavy (shoukavy@ifanbel.bas-net.by)
+// Algorithm description:
+//   1. Input strip branches (bs_*): energy, angles "bs_phth0/bs_phphi0" are
+//      corrected for the beam-spot position (xbeam, ybeam, z=0) as described
+//      in Kuznetsov memo §3.10.  For kinematic fit, we must "return the angle
+//      back to the detector centre" by reconstructing the true conversion point.
+//   2. The ray from the anchor point (xbeam, ybeam, 0) along the direction
+//      (theta, phi) is intersected with the cylinder of radius R = bs_phrho.
+//      This yields the true conversion point (xc, yc, zc) via solving the
+//      quadratic equation: a*t^2 + b*t + c = 0,
+//        a = sin^2(theta)
+//        b = 2*(xbeam*sin(theta)*cos(phi) + ybeam*sin(theta)*sin(phi))
+//        c = xbeam^2 + ybeam^2 - R^2
+//      The positive root t gives the point on the ray.
+//   3. The covariance matrix is constructed following the same logic as in
+//      the standard fillPhoton (tower), using bs_pherr.  For BGO (flag==3)
+//      the z-coordinate of the cluster is well measured, so sigma_rho is
+//      derived from sigma_z and sigma_theta; for LXe/CsI (barrel) the
+//      opposite is true.
+//   4. The parameters of the Photon particle are set to:
+//        (E, R, phi_c, z_c)  where R = bs_phrho (cylindrical radius),
+//        phi_c and z_c are the reconstructed conversion point coordinates.
+//   5. The inverse covariance matrix is set for the fit.
+//
+bool kfcmd::core::Hypothesis::fillBSPhoton(const std::string& name,
+                                           std::size_t index,
+                                           const kfcmd::core::TrPh& data) {
+  // Check index validity
+  if (index >= (std::size_t)data.bs_nph) return false;
+
+  // Extract strip parameters
+  const double E_mev = (double)data.bs_phen[index];      // MeV
+  const double theta = (double)data.bs_phth0[index];     // rad, beam-corrected polar angle
+  const double phi   = (double)data.bs_phphi0[index];    // rad, beam-corrected azimuthal angle
+  const double rho   = (double)data.bs_phrho[index];     // cm, cylindrical radius of conversion point
+  const double st    = std::sin(theta);
+  const double ct    = std::cos(theta);
+
+  // Basic sanity checks
+  if (!(E_mev > 0.) || !(rho > 1.) || !(st > 1.e-6)) return false;
+
+  // ----- Rollback of beam-spot correction (Kuznetsov memo §3.10) -----
+  const double xb = (double)data.xbeam;
+  const double yb = (double)data.ybeam;
+
+  const double nx = st * std::cos(phi);
+  const double ny = st * std::sin(phi);
+  const double nz = ct;
+
+  const double a = nx*nx + ny*ny;   // = sin^2(theta)
+  const double b = 2.0 * (xb*nx + yb*ny);
+  const double c = xb*xb + yb*yb - rho*rho;
+
+  const double disc = b*b - 4.0*a*c;
+  if (disc <= 0.) return false;
+  const double t = (-b + std::sqrt(disc)) / (2.0 * a);
+  if (!(t > 0.)) return false;
+
+  const double xc = xb + t * nx;
+  const double yc = yb + t * ny;
+  const double zc = t * nz;   // anchor z = 0
+
+  // phi of conversion point in [0, 2pi)
+  double phic = std::atan2(yc, xc);
+  if (phic < 0.) phic += 2.0 * M_PI;
+
+  // ----- Covariance matrix construction (following fillPhoton) -----
+  const double sE  = (double)data.bs_pherr[index][0];   // MeV
+  const double sTh = (double)data.bs_pherr[index][1];   // rad
+  const double sPh = (double)data.bs_pherr[index][2];   // rad
+
+  if (!(sE > 0.) || !(sTh > 0.) || !(sPh > 0.)) return false;
+
+  double s2_rho = 1.e-3;   // cm^2 (seed)
+  double s2_z   = 1.e-3;   // cm^2 (seed)
+
+  if (data.bs_phflag[index] == 3) {
+    // BGO (endcap): z is well measured, rho is derived
+    s2_rho = s2_z * std::tan(theta) * std::tan(theta) +
+      sTh * sTh * zc * zc / std::pow(std::cos(theta), 4);
+  } else {
+    // LXe/CsI (barrel): rho is well measured, z is derived
+    s2_z = s2_rho / (std::tan(theta) * std::tan(theta)) +
+      std::pow(rho * sTh, 2) / std::pow(st, 4);
+  }
+
+  Eigen::VectorXd par(4);
+  par << E_mev * 1.e-3,   // energy in GeV
+    rho,            // R_c (cylindrical radius)
+    phic,           // phi_c
+    zc;             // z_c
+
+  Eigen::MatrixXd cov = Eigen::MatrixXd::Zero(4, 4);
+  cov(0, 0) = std::pow(sE * 1.e-3, 2);
+  cov(1, 1) = s2_rho;
+  cov(2, 2) = sPh * sPh;
+  cov(3, 3) = s2_z;
+
+  if (cov.determinant() == 0.) return false;
+
+  this->setInitialParticleParams(name, par);
+  this->setParticleInverseCovarianceMatrix(name, cov.inverse());
+  return true;
+}
+
 bool kfcmd::core::Hypothesis::fillAltBSPhoton(const std::string& name,
-                                            std::size_t index,
-                                            const kfcmd::core::TrPh& data) {
+					      std::size_t index,
+					      const kfcmd::core::TrPh& data) {
   Eigen::VectorXd par(3);
   Eigen::MatrixXd cov = Eigen::MatrixXd::Zero(3, 3);
   par(0) = (data.bs_phen)[index] * 1.e-3;
