@@ -18,7 +18,7 @@ namespace kfcmd {
       void setSeason(const std::string& s) { season_ = s; }
       void setOutputVertex(kfbase::core::Vertex* vertex) { vertex_ = vertex; }
 
-      // Override target function and its derivatives
+      // Override target function and derivatives with analytical expressions
       virtual double f(const Eigen::VectorXd& x, bool recalc = false) const override;
       virtual Eigen::VectorXd df(const Eigen::VectorXd& x, bool recalc = false) const override;
       virtual Eigen::MatrixXd d2f(const Eigen::VectorXd& x, bool recalc = false) const override;
@@ -47,12 +47,19 @@ namespace kfcmd {
       Eigen::MatrixXd calcD2Direction(const Eigen::VectorXd&, kfbase::core::VERTEX_COMPONENT) const;
 
       // Calibration parameterisation
-      double normFactor(double E_var_GeV) const;
-      double relResolution(double E_var_GeV) const;
-      double asymmetry(double E_var_GeV) const;
+      double relResolution(double E) const;
+      double asymmetry(double E) const;
+      double normFactor(double E) const; // always 1.0 now
 
-      // Compute the log-normal part (without Gaussian angles)
-      double logNormalPart(double E_meas, double E_var) const;
+      // Log-normal function and its derivatives
+      double logNormalTerm(double E) const;          // L(E) value
+      double dLogNormalTerm(double E) const;         // dL/dE
+      double d2LogNormalTerm(double E) const;        // d2L/dE2
+
+      // Helper for f0 and derivatives
+      double f0(double a) const;
+      double df0da(double a) const;
+      double d2f0da2(double a) const;
 
       kfbase::core::Vertex* vertex_;
       double E_meas_;      // measured energy [GeV]
