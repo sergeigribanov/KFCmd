@@ -263,26 +263,14 @@ namespace kfcmd {
     }
 
     // ----------------------------------------------------------------------
-    // Calibration parameterisation (now with correct normFactor)
+    // Calibration parameterisation
     // ----------------------------------------------------------------------
-    double BGOLogNormalPhoton::normFactor(double E_var_GeV) const {
-      // E_var_GeV in GeV; convert to MeV for calibration constants
-      double E_mev = E_var_GeV * 1000.0;
-      if (season_ == "11-13") {
-	if (E_mev < 100.0)
-	  return 1.0278 * (1.0 - std::exp(-904.72 / 341.1));
-	else
-	  return 1.0278 * (1.0 - std::exp(-(E_mev + 804.72) / 341.1));
-      } else if (season_ == "17-24") {
-	return 1.03817 - 0.020413 * std::pow(std::abs((E_mev - 1149.41) / 641.335), 3);
-      } else {
-	// "24-30" or default
-	return 1.0;
-      }
+    double BGOLogNormalPhoton::normFactor(double /*E_var_GeV*/) const {
+      // Energies are already calibrated in tr_ph, so no additional correction
+      return 1.0;
     }
 
     double BGOLogNormalPhoton::relResolution(double E_var_GeV) const {
-      // Returns sigma/E (dimensionless)
       double a0, a1, a2;
       if (endcap_ == 0) {
 	a0 = 0.58899;
@@ -299,25 +287,58 @@ namespace kfcmd {
       return res_percent / 100.0;
     }
 
-    double BGOLogNormalPhoton::asymmetry(double /*E_var_GeV*/) const {
-      // Constant asymmetry (average from Dubrovin's fits)
-      return -0.18;
+    double BGOLogNormalPhoton::asymmetry(double E_var_GeV) const {
+      double E_mev = E_var_GeV * 1000.0;
+      double p0, p1_lin;
+      if (endcap_ == 0) {
+	p0 = -0.184602;
+	p1_lin = -7.4081e-05;
+      } else {
+	p0 = -0.175625;
+	p1_lin = -8.59385e-05;
+      }
+      return p0 + p1_lin * E_mev;
     }
 
     // ----------------------------------------------------------------------
-    // Target function – overridden with correct log-likelihood
+    // Log‑normal part (without Gaussian angles)
+    // ----------------------------------------------------------------------
+    double BGOLogNormalPhoton::logNormalPart(double E_meas, double E_var) const {
+      double mu = normFactor(E_var) * E_var;
+      double sigma = relResolution(E_var) * E_var;
+      double a = asymmetry(E_var);
+
+      if (sigma < 1e-12) sigma = 1e-12;
+      const double xi = std::sqrt(std::log(4.0));
+
+      if (std::abs(a) < 1e-10) {
+	double diff = E_meas - mu;
+	return diff * diff / (sigma * sigma) + 2.0 * std::log(sigma);
+      }
+
+      double f_ = std::sinh(a * xi) / (a * xi);
+      double x_ = f_ * (E_meas - mu) / sigma;
+      double arg = 1.0 + x_ * a;
+
+      if (arg > 0.0) {
+	double logVal = std::log(arg) / a;
+	return logVal * logVal + a * a + 2.0 * std::log(sigma) + 2.0 * std::log(f_);
+      } else {
+	double delta = x_ * a + 1.0;
+	return 10.0 * delta * delta + 2.0 * std::log(sigma) + 2.0 * std::log(f_);
+      }
+    }
+
+    // ----------------------------------------------------------------------
+    // Target function – overridden
     // ----------------------------------------------------------------------
     double BGOLogNormalPhoton::f(const Eigen::VectorXd& x, bool recalc) const {
       const long bi = getBeginIndex();
-      if (bi < 0 || bi + 3 >= x.size()) {
-	return 1e10;
-      }
+      if (bi < 0 || bi + 3 >= x.size()) return 1e10;
 
       const Eigen::VectorXd& init = getInitialParameters();
       const Eigen::MatrixXd& invCov = getInverseCovarianceMatrix();
-      if (init.size() != 4 || invCov.rows() != 4 || invCov.cols() != 4) {
-	return 1e10;
-      }
+      if (init.size() != 4 || invCov.rows() != 4 || invCov.cols() != 4) return 1e10;
 
       // Gaussian part for R, phi, z (indices 1..3)
       Eigen::VectorXd dx(4);
@@ -328,40 +349,79 @@ namespace kfcmd {
 	for (int j = 1; j < 4; ++j)
 	  gauss += dx(i) * invCov(i,j) * dx(j);
 
-      // Log‑normal term for energy (index 0)
       double E_var = x(bi);
-      double mu = normFactor(E_var) * E_var;        // most probable energy [GeV]
-      double sigma = relResolution(E_var) * E_var;  // absolute sigma [GeV]
-      double a = asymmetry(E_var);                  // asymmetry parameter
+      double lnpart = logNormalPart(E_meas_, E_var);
 
-      if (sigma < 1e-12) sigma = 1e-12;
-      const double xi = std::sqrt(std::log(4.0));
+      return gauss + lnpart;
+    }
 
-      // Gaussian limit when asymmetry is negligible
-      if (std::abs(a) < 1e-10) {
-	double diff = E_meas_ - mu;
-	// Correct log-likelihood: χ² + 2*log(sigma)
-	double energyTerm = diff * diff / (sigma * sigma) + 2.0 * std::log(sigma);
-	return gauss + energyTerm;
+    // ----------------------------------------------------------------------
+    // Numerical derivatives (central differences)
+    // ----------------------------------------------------------------------
+    Eigen::VectorXd BGOLogNormalPhoton::df(const Eigen::VectorXd& x, bool recalc) const {
+      const long n = x.size();
+      Eigen::VectorXd grad = Eigen::VectorXd::Zero(n);
+      const double eps = 1e-6;
+
+      // We only need derivatives w.r.t. parameters of this particle (4 params)
+      const long bi = getBeginIndex();
+      if (bi < 0 || bi + 3 >= n) return grad;
+
+      // Compute gradient for the 4 parameters
+      Eigen::VectorXd x_plus = x;
+      Eigen::VectorXd x_minus = x;
+      for (int i = 0; i < 4; ++i) {
+	long idx = bi + i;
+	double h = eps * std::max(1.0, std::abs(x(idx)));
+	if (h == 0) h = eps;
+	x_plus(idx) = x(idx) + h;
+	x_minus(idx) = x(idx) - h;
+	double f_plus = f(x_plus, true);
+	double f_minus = f(x_minus, true);
+	grad(idx) = (f_plus - f_minus) / (2.0 * h);
+	x_plus(idx) = x(idx);
+	x_minus(idx) = x(idx);
       }
+      return grad;
+    }
 
-      double f_ = std::sinh(a * xi) / (a * xi);
-      double x_ = f_ * (E_meas_ - mu) / sigma;
+    Eigen::MatrixXd BGOLogNormalPhoton::d2f(const Eigen::VectorXd& x, bool recalc) const {
+      const long n = x.size();
+      Eigen::MatrixXd hess = Eigen::MatrixXd::Zero(n, n);
+      const double eps = 1e-6;
 
-      double energyTerm = 0.0;
-      double arg = 1.0 + x_ * a;
+      const long bi = getBeginIndex();
+      if (bi < 0 || bi + 3 >= n) return hess;
 
-      if (arg > 0.0) {
-	double logVal = std::log(arg) / a;
-	// Full log-likelihood: (logVal^2 + a^2) + 2*log(sigma) + const
-	energyTerm = logVal * logVal + a * a + 2.0 * std::log(sigma);
-      } else {
-	// Smooth penalty outside domain – still include sigma log term
-	double delta = x_ * a + 1.0;
-	energyTerm = 10.0 * delta * delta + 2.0 * std::log(sigma);
+      // Compute Hessian for the 4 parameters
+      Eigen::VectorXd x_plus = x;
+      Eigen::VectorXd x_minus = x;
+      Eigen::VectorXd x_pp, x_mm, x_pm, x_mp;
+
+      for (int i = 0; i < 4; ++i) {
+	long idx_i = bi + i;
+	double hi = eps * std::max(1.0, std::abs(x(idx_i)));
+	if (hi == 0) hi = eps;
+
+	for (int j = 0; j < 4; ++j) {
+	  long idx_j = bi + j;
+	  double hj = eps * std::max(1.0, std::abs(x(idx_j)));
+	  if (hj == 0) hj = eps;
+
+	  x_pp = x; x_pp(idx_i) += hi; x_pp(idx_j) += hj;
+	  x_mm = x; x_mm(idx_i) -= hi; x_mm(idx_j) -= hj;
+	  x_pm = x; x_pm(idx_i) += hi; x_pm(idx_j) -= hj;
+	  x_mp = x; x_mp(idx_i) -= hi; x_mp(idx_j) += hj;
+
+	  double f_pp = f(x_pp, true);
+	  double f_mm = f(x_mm, true);
+	  double f_pm = f(x_pm, true);
+	  double f_mp = f(x_mp, true);
+
+	  hess(idx_i, idx_j) = (f_pp - f_pm - f_mp + f_mm) / (4.0 * hi * hj);
+	}
       }
-
-      return gauss + energyTerm;
+      return hess;
     }
 
   } // namespace core

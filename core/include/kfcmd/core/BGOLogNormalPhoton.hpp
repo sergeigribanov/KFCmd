@@ -8,26 +8,20 @@
 namespace kfcmd {
   namespace core {
 
-    /**
-     * Photon with log‑normal energy PDF for BGO endcap.
-     * Parameters: (E, R_c, phi_c, z_c) – same as Photon.
-     * The target function f replaces the Gaussian energy penalty with
-     * -2*log( f_lognormal(E_meas; μ(E_var), σ(E_var), a(E_var)) )
-     * where μ, σ, a are parameterised from BGO calibration.
-     */
     class BGOLogNormalPhoton : public kfbase::core::Particle {
     public:
       explicit BGOLogNormalPhoton(const std::string& name);
       virtual ~BGOLogNormalPhoton();
 
-      // Setters for measured parameters and calibration context
       void setMeasuredEnergy(double e) { E_meas_ = e; }
       void setEndcap(int ec) { endcap_ = ec; }
       void setSeason(const std::string& s) { season_ = s; }
       void setOutputVertex(kfbase::core::Vertex* vertex) { vertex_ = vertex; }
 
-      // Override target function
+      // Override target function and its derivatives
       virtual double f(const Eigen::VectorXd& x, bool recalc = false) const override;
+      virtual Eigen::VectorXd df(const Eigen::VectorXd& x, bool recalc = false) const override;
+      virtual Eigen::MatrixXd d2f(const Eigen::VectorXd& x, bool recalc = false) const override;
 
       // Mandatory Particle interface (identical to Photon)
       virtual double calcOutputMomentumComponent(const Eigen::VectorXd&,
@@ -56,6 +50,9 @@ namespace kfcmd {
       double normFactor(double E_var_GeV) const;
       double relResolution(double E_var_GeV) const;
       double asymmetry(double E_var_GeV) const;
+
+      // Compute the log-normal part (without Gaussian angles)
+      double logNormalPart(double E_meas, double E_var) const;
 
       kfbase::core::Vertex* vertex_;
       double E_meas_;      // measured energy [GeV]
