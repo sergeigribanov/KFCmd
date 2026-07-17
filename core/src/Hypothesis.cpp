@@ -34,6 +34,7 @@
 #include "kfcmd/core/ParticlePxPyPz.hpp"
 #include "kfcmd/core/ParticleMassLessThetaPhiE.hpp"
 #include "kfcmd/core/AltPhoton.hpp"
+#include "kfcmd/core/BGOLogNormalPhoton.hpp"
 #include <kfbase/core/MassConstraint.hpp>
 #include <kfbase/core/MomentumConstraint.hpp>
 #include <kfbase/core/DoubleParticleAngularConstraint.hpp>
@@ -179,6 +180,14 @@ void kfcmd::core::Hypothesis::addChargedParticle(kfcmd::core::ChargedParticle* p
 void kfcmd::core::Hypothesis::addPhoton(const std::string& name,
                                         const std::string& vertexName) {
   auto particle = new kfcmd::core::Photon(name);
+  addParticle(particle);
+  auto vtx = vertices_.at(vertexName);
+  particle->setOutputVertex(vtx);
+}
+
+void kfcmd::core::Hypothesis::addBGOPhoton(const std::string& name,
+                                           const std::string& vertexName) {
+  auto particle = new kfcmd::core::BGOLogNormalPhoton(name);
   addParticle(particle);
   auto vtx = vertices_.at(vertexName);
   particle->setOutputVertex(vtx);
@@ -628,6 +637,90 @@ bool kfcmd::core::Hypothesis::fillBSPhoton(const std::string& name,
   return true;
 }
 
+// ----------------------------------------------------------------------
+// fillBGOPhoton – strip version of Photon with log‑normal energy PDF
+// ----------------------------------------------------------------------
+bool kfcmd::core::Hypothesis::fillBGOPhoton(const std::string& name,
+                                            std::size_t index,
+                                            const kfcmd::core::TrPh& data) {
+  // Basic checks and index validity
+  if (index >= (std::size_t)data.bs_nph) return false;
+
+  const double E_mev = (double)data.bs_phen[index];
+  const double theta = (double)data.bs_phth0[index];
+  const double phi   = (double)data.bs_phphi0[index];
+  const double rho   = (double)data.bs_phrho[index];
+  const double st    = std::sin(theta);
+  if (!(E_mev > 0.) || !(rho > 1.) || !(st > 1.e-6)) return false;
+
+  // ----- Rollback of beam-spot correction (Kuznetsov memo §3.10) -----
+  const double xb = (double)data.xbeam;
+  const double yb = (double)data.ybeam;
+  const double nx = st * std::cos(phi);
+  const double ny = st * std::sin(phi);
+  const double nz = std::cos(theta);
+  const double a  = nx*nx + ny*ny;
+  const double b  = 2.0 * (xb*nx + yb*ny);
+  const double c  = xb*xb + yb*yb - rho*rho;
+  const double disc = b*b - 4.0*a*c;
+  if (disc <= 0.) return false;
+  const double t = (-b + std::sqrt(disc)) / (2.0 * a);
+  if (!(t > 0.)) return false;
+  const double xc = xb + t * nx;
+  const double yc = yb + t * ny;
+  const double zc = t * nz;
+  double phic = std::atan2(yc, xc);
+  if (phic < 0.) phic += 2.0 * M_PI;
+
+  // ----- Covariance matrix construction (same as fillPhoton) -----
+  const double sE  = (double)data.bs_pherr[index][0];
+  const double sTh = (double)data.bs_pherr[index][1];
+  const double sPh = (double)data.bs_pherr[index][2];
+  if (!(sE > 0.) || !(sTh > 0.) || !(sPh > 0.)) return false;
+
+  double s2_rho = 1.e-3;
+  double s2_z   = 1.e-3;
+  if (data.bs_phflag[index] == 3) {
+    // BGO (endcap): z is well measured, rho is derived
+    s2_rho = s2_z * std::tan(theta) * std::tan(theta) +
+      sTh * sTh * zc * zc / std::pow(std::cos(theta), 4);
+  } else {
+    // LXe/CsI (barrel): rho is well measured, z is derived
+    s2_z = s2_rho / (std::tan(theta) * std::tan(theta)) +
+      std::pow(rho * sTh, 2) / std::pow(st, 4);
+  }
+
+  Eigen::VectorXd par(4);
+  par << E_mev * 1.e-3, rho, phic, zc;
+
+  Eigen::MatrixXd cov = Eigen::MatrixXd::Zero(4, 4);
+  cov(0, 0) = std::pow(sE * 1.e-3, 2);
+  cov(1, 1) = s2_rho;
+  cov(2, 2) = sPh * sPh;
+  cov(3, 3) = s2_z;
+  if (cov.determinant() == 0.) return false;
+
+  // Get the particle and set its parameters directly
+  auto* particle = getParticle(name);
+  if (!particle) return false;
+
+  auto* bgo = dynamic_cast<kfcmd::core::BGOLogNormalPhoton*>(particle);
+  if (!bgo) return false;
+
+  bgo->setInitialParameters(par);
+
+  Eigen::MatrixXd inv = cov.inverse();
+  inv(0, 0) = 0.0; // remove Gaussian penalty on energy
+  bgo->setInverseCovarianceMatrix(inv);
+
+  // Set measured energy, endcap, season and beam energy
+  bgo->setMeasuredEnergy(E_mev * 1.e-3);
+  bgo->setEndcap( (theta < M_PI/2) ? 0 : 1 );
+  bgo->setSeason(season_);
+
+  return true;
+}
+
 bool kfcmd::core::Hypothesis::fillAltBSPhoton(const std::string& name,
 					      std::size_t index,
 					      const kfcmd::core::TrPh& data) {
@@ -650,4 +743,8 @@ bool kfcmd::core::Hypothesis::fillAltBSPhoton(const std::string& name,
 void kfcmd::core::Hypothesis::setBeamXY(double xbeam, double ybeam) {
   addConstant("#beam-x", xbeam);
   addConstant("#beam-y", ybeam);
+}
+
+void kfcmd::core::Hypothesis::setSeason(const std::string& s) {
+  season_ = s;
 }

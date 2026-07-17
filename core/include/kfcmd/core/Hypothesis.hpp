@@ -109,8 +109,10 @@ namespace kfcmd {
       bool fillTrack(const std::string&, std::size_t, const TrPh&);
       //! A method that used to fill photon from TrPh
       bool fillPhoton(const std::string&, std::size_t, const TrPh&);
-      //! NEW: fill Photon from strip branches (bs_*), with vertex reconstruction and beam-spot correction rollback
+      //! Fill BS Photon from strip branches (bs_*), with vertex reconstruction and beam-spot correction rollback
       bool fillBSPhoton(const std::string&, std::size_t, const TrPh&);
+      //! Fill a BGO photon from strip branches (bs_*) with log‑normal energy PDF
+      bool fillBGOPhoton(const std::string&, std::size_t, const TrPh&);
       //! A method that used to fill alternative parametrized photon from TrPh
       bool fillAltPhoton(const std::string&, std::size_t, const TrPh&);
       //! A method that used to fill alternative parametrized photon from TrPh (taking into account LXe strips)
@@ -184,7 +186,7 @@ namespace kfcmd {
       void enableInputVertexConstraintZ(const std::string&);
 
       void setBeamXY(double, double);
-
+      void setSeason(const std::string& s);     
       void setParticleAngularConstraintAxis(const std::string&, const TVector3&);
       void setAngularConstraintSigma(const std::string&,  double);
 
@@ -200,6 +202,7 @@ namespace kfcmd {
        */
       void addChargedParticle(kfcmd::core::ChargedParticle*);
       void addPhoton(const std::string& , const std::string&);
+      void addBGOPhoton(const std::string&, const std::string&);
       void addAltPhoton(const std::string&);
       void addConstantMomentumParticle(const std::string&, double,
                                        const Eigen::Vector3d&);
@@ -236,6 +239,7 @@ namespace kfcmd {
     private:
       //! A center-of-mass energy
       double _energy;
+      std::string season_; // calibration season for BGO log‑normal photons
     };
   } // namespace core
 }  // namespace kfcmd
